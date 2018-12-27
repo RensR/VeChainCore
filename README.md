@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.com/RensR/VeChainCore.svg?branch=master) ![Dotnet](https://img.shields.io/badge/.NET%20Core-2.2-blue.svg)
+[![Build Status](https://travis-ci.com/RensR/VeChainCore.svg?branch=master)](https://travis-ci.com/RensR/VeChainCore) [![Dotnet](https://img.shields.io/badge/.NET%20Core-2.2-blue.svg)](https://dotnet.microsoft.com/download)
 
 # VeChainCore
 VeChainCore is a VeChain API implementation in .NET Core. It simply wraps the already friendly RESTful web API in some C# magic. The project is designed to be used in other applications and speed up the development process by letting you focus on the flashy stuff, not just the invisible back-end processes.
