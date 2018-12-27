@@ -1,2 +1,10 @@
 language: csharp
-solution: VeChainCore.sln
+mono: none
+dotnet: 2.2
+
+install:
+- dotnet restore
+
+script:
+- dotnet build
+- dotnet test VeChainCoreTest/VeChainCoreTest.csproj
