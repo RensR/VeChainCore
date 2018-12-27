@@ -39,9 +39,13 @@ namespace VeChainCore
         /// the given address.
         /// </summary>
         /// <param name="address">The address id in 0x notation</param>
+        /// <param name="revision">The block number or ID to be able to look at past balances</param>
         /// <returns></returns>
-        public async Task<Account> GetAccount(string address)
+        public async Task<Account> GetAccount(string address, string revision = "best")
         {
+            if (revision != "best")
+                address += $"?revision={revision}";
+
             var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/accounts/{address}");
             Console.WriteLine(streamTask.ToString());
 

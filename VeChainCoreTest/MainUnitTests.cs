@@ -1,4 +1,4 @@
-using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using VeChainCore;
 using VeChainCore.Logic;
@@ -76,12 +76,16 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GetAccountBalance()
         {
-            // Assert that the address that I own has no contract 
-            var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b");
+            // Assert that this address has no contract at the current block
+            var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "1591234");
 
             Assert.True(!account.hasCode);
-            var intValue = HexConverter.HexToBigInt(account.balance);
-            Assert.True(intValue > 0);
+            Assert.Equal(BigInteger.Parse("21087000000000000000000"), HexConverter.HexToBigInt(account.balance));
+
+            // Assert that the address had no engery nor contract at genesis
+            var genesisAccount = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "0");
+            Assert.False(genesisAccount.hasCode);
+            Assert.Equal(0, HexConverter.HexToBigInt(genesisAccount.energy));
         }
 
         [Fact]
