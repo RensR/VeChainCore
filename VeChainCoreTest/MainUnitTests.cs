@@ -1,5 +1,7 @@
+using System;
 using System.Threading.Tasks;
 using VeChainCore;
+using VeChainCore.Logic;
 using VeChainCore.Models;
 using Xunit;
 
@@ -77,7 +79,9 @@ namespace VeChainCoreTest
             // Assert that the address that I own has no contract 
             var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b");
 
-            Assert.False(account.hasCode);
+            Assert.True(!account.hasCode);
+            var intValue = HexConverter.HexToBigInt(account.balance);
+            Assert.True(intValue > 0);
         }
 
         [Fact]
