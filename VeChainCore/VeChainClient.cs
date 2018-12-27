@@ -6,22 +6,58 @@ using VeChainCore.Models;
 
 namespace VeChainCore
 {
-    public static class VeChainClient
+    public class VeChainClient
     {
-        private static readonly HttpClient Client = new HttpClient();
+        private string _blockchainAddress = "http://localhost:8669";
 
-        public static async Task<Account> GetAccount(string address)
+        private readonly HttpClient _client = new HttpClient();
+
+        // Config methods
+        /// <summary>
+        /// Sets the address of the blockchain that the client is interacting with.
+        /// </summary>
+        /// <param name="address">The address of the blockchain, by default "http://localhost:8669"</param>
+        public void SetBlockchainAddress(string address)
         {
-            var streamTask = Client.GetStreamAsync($"http://localhost:8669/accounts/{address}");
+            _blockchainAddress = address.TrimEnd('/');
+        }
+
+        /// <summary>
+        /// Gets the address of the blockchain that the client is interacting with.
+        /// </summary>
+        /// <returns></returns>
+        public string GetBlockchainAddress()
+        {
+            return _blockchainAddress;
+        }
+
+
+
+        // Logic methods
+        /// <summary>
+        /// Gets an <see cref="Account"/> object that contains all Account information for
+        /// the given address.
+        /// </summary>
+        /// <param name="address">The address id in 0x notation</param>
+        /// <returns></returns>
+        public async Task<Account> GetAccount(string address)
+        {
+            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/accounts/{address}");
             Console.WriteLine(streamTask.ToString());
 
             var serializer = new DataContractJsonSerializer(typeof(Account));
             return serializer.ReadObject(await streamTask) as Account;
         }
 
-        public static async Task<Block> GetBlock(uint blockNumber)
+        /// <summary>
+        /// Gets the <see cref="Block"/> object that contains all Block information for
+        /// the given block number
+        /// </summary>
+        /// <param name="blockNumber">The block number</param>
+        /// <returns></returns>
+        public async Task<Block> GetBlock(uint blockNumber)
         {
-            var streamTask = Client.GetStreamAsync($"http://localhost:8669/blocks/{blockNumber}");
+            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/blocks/{blockNumber}");
             Console.WriteLine(streamTask.ToString());
 
             var serializer = new DataContractJsonSerializer(typeof(Block));

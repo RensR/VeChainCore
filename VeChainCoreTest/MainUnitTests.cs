@@ -13,6 +13,16 @@ namespace VeChainCoreTest
         //
         // END CONFIG
 
+
+        private readonly VeChainClient _vechainClient;
+
+        public BlockTest()
+        {
+            _vechainClient = new VeChainClient();
+            _vechainClient.SetBlockchainAddress("http://localhost:8669");
+        }
+
+
         [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
@@ -56,7 +66,7 @@ namespace VeChainCoreTest
                     transactions = new Transaction[0]
                 };
 
-            var block = await VeChainClient.GetBlock(0);
+            var block = await _vechainClient.GetBlock(0);
 
             Assert.Equal(genesis, block);
         }
@@ -65,7 +75,7 @@ namespace VeChainCoreTest
         public async Task GetAccountBalance()
         {
             // Assert that the address that I own has no contract 
-            var account = await VeChainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b");
+            var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b");
 
             Assert.False(account.hasCode);
         }
