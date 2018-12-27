@@ -7,13 +7,17 @@ namespace VeChainCoreTest
 {
     public class BlockTest
     {
+        // CONFIG
+        // 
         private static readonly bool Testnet = true;
+        //
+        // END CONFIG
 
         [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
             
-            var Genesis = Testnet ? 
+            var genesis = Testnet ? 
                 new Block // Test
                 {
                     number = 0,
@@ -52,9 +56,18 @@ namespace VeChainCoreTest
                     transactions = new Transaction[0]
                 };
 
-            var block = await Client.GetBlock(0);
+            var block = await VeChainClient.GetBlock(0);
 
-            Assert.Equal(Genesis, block);
+            Assert.Equal(genesis, block);
+        }
+
+        [Fact]
+        public async Task GetAccountBalance()
+        {
+            // Assert that the address that I own has no contract 
+            var account = await VeChainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b");
+
+            Assert.False(account.hasCode);
         }
     }
 }
