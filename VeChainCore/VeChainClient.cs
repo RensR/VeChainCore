@@ -63,5 +63,21 @@ namespace VeChainCore
             var serializer = new DataContractJsonSerializer(typeof(Block));
             return serializer.ReadObject(await streamTask) as Block;
         }
+
+
+        /// <summary>
+        /// Gets the <see cref="Transaction"/> object that contains all Transaction information for
+        /// the given transaction id
+        /// </summary>
+        /// <param name="blockNumber">The block number</param>
+        /// <returns></returns>
+        public async Task<Transaction> GetTransaction(string id)
+        {
+            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/transactions/{id}");
+            Console.WriteLine(streamTask.ToString());
+
+            var serializer = new DataContractJsonSerializer(typeof(Transaction));
+            return serializer.ReadObject(await streamTask) as Transaction;
+        }
     }
 }
