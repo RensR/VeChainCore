@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using VeChainCore;
+using VeChainCore.Models;
 using Xunit;
 
 namespace VeChainCoreTest
@@ -13,7 +14,7 @@ namespace VeChainCoreTest
         {
             
             var Genesis = Testnet ? 
-                new Block() // Test
+                new Block // Test
                 {
                     number = 0,
                     id = "0x000000000b2bce3c70bc649a02749e8687721b09ed2e15997f466536b20bb127",
@@ -32,7 +33,7 @@ namespace VeChainCoreTest
                     transactions = new Transaction[0]
                 }
                 :
-                new Block() // Main
+                new Block // Main
                 {
                     number = 0,
                     id = "0x00000000851caf3cfdb6e899cf5958bfb1ac3413d346d43539627e6be7ec1b4a",
@@ -51,7 +52,7 @@ namespace VeChainCoreTest
                     transactions = new Transaction[0]
                 };
 
-            Block block = await Client.GetBlock(0);
+            var block = await Client.GetBlock(0);
 
             Assert.Equal(Genesis, block);
         }

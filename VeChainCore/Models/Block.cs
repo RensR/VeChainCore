@@ -2,37 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VeChainCore
+namespace VeChainCore.Models
 {
     public class Block : IEquatable<Block>
     {
-        public UInt32 number;
-        public string id;
-        public UInt32 size;
-        public string parentID;
-        public UInt64 timestamp;
-        public UInt64 gasLimit;
-        public string beneficiary;
-        public UInt64 gasUsed;
-        public UInt64 totalScore;
-        public string txsRoot;
-        public string stateRoot;
-        public string receiptsRoot;
-        public string signer;
-        public bool isTrunk;
-        public Transaction[] transactions;
+        public uint number { get; set; }
+        public string id { get; set; }
+        public uint size { get; set; }
+        public string parentID { get; set; }
+        public uint timestamp { get; set; }
+        public uint gasLimit { get; set; }
+        public string beneficiary { get; set; }
+        public uint gasUsed { get; set; }
+        public uint totalScore { get; set; }
+        public string txsRoot { get; set; }
+        public string stateRoot { get; set; }
+        public string receiptsRoot { get; set; }
+        public string signer { get; set; }
+        public bool isTrunk { get; set; }
+        public Transaction[] transactions { get; set; }
 
         public override string ToString()
         {
-            string block = $"Block: {number}";
-            return base.ToString();
+            return $"Block: {number}";
         }
 
         public override bool Equals(object other)
         {
-            if (!(other is Block toCompareWith))
+            if (!(other is Block))
                 return false;
-            return Equals(other as Block);
+            return Equals((Block) other);
         }
 
         public bool Equals(Block other)

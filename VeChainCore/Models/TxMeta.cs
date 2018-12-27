@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VeChainCore
+namespace VeChainCore.Models
 {
     public class TxMeta : IEquatable<TxMeta>
     {
         public string blockID { get; set; }
-        public UInt32 blockNumber { get; set; }
-        public UInt64 blockTimestamp { get; set; }
+        public uint blockNumber { get; set; }
+        public uint blockTimestamp { get; set; }
 
         public override bool Equals(object obj)
         {
