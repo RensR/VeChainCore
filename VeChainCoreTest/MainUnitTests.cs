@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using VeChainCore;
@@ -95,6 +96,19 @@ namespace VeChainCoreTest
 
             Assert.Equal(749, transaction.clauses.Length);
             Assert.Equal("0x00183e68e864ee05", transaction.blockRef);
+        }
+
+        [Fact]
+        public async Task GetReceipt()
+        {
+            var receipt = await _vechainClient.GetReciept("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+
+            Assert.Equal(749, receipt.outputs.Length);
+            Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
+            Assert.Equal((uint)11989000, receipt.gasUsed);
+
+            var totalSent = receipt.outputs.Sum(output => output.transfers.Sum(transfer => HexConverter.HexToHumanReadableDecimal(transfer.amount)));
+            Assert.Equal(738, totalSent);
         }
     }
 }

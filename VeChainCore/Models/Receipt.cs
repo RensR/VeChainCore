@@ -2,7 +2,7 @@
 
 namespace VeChainCore.Models
 {
-    class Receipt
+    public class Receipt
     {
         public  uint gasUsed { get; set; }
         public string gasPayer { get; set; }

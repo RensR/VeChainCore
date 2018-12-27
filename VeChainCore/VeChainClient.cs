@@ -47,8 +47,6 @@ namespace VeChainCore
                 address += $"?revision={revision}";
 
             var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/accounts/{address}");
-            Console.WriteLine(streamTask.ToString());
-
             var serializer = new DataContractJsonSerializer(typeof(Account));
             return serializer.ReadObject(await streamTask) as Account;
         }
@@ -62,8 +60,6 @@ namespace VeChainCore
         public async Task<Block> GetBlock(uint blockNumber)
         {
             var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/blocks/{blockNumber}");
-            Console.WriteLine(streamTask.ToString());
-
             var serializer = new DataContractJsonSerializer(typeof(Block));
             return serializer.ReadObject(await streamTask) as Block;
         }
@@ -73,15 +69,27 @@ namespace VeChainCore
         /// Gets the <see cref="Transaction"/> object that contains all Transaction information for
         /// the given transaction id
         /// </summary>
-        /// <param name="blockNumber">The block number</param>
+        /// <param name="id">The transaction id</param>
         /// <returns></returns>
         public async Task<Transaction> GetTransaction(string id)
         {
             var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/transactions/{id}");
-            Console.WriteLine(streamTask.ToString());
-
             var serializer = new DataContractJsonSerializer(typeof(Transaction));
             return serializer.ReadObject(await streamTask) as Transaction;
+        }
+
+
+        /// <summary>
+        /// Gets the <see cref="Receipt"/> object that contains all Receipt information for
+        /// the given transaction id
+        /// </summary>
+        /// <param name="id">The transaction id</param>
+        /// <returns></returns>
+        public async Task<Receipt> GetReciept(string id)
+        {
+            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/transactions/{id}/receipt");
+            var serializer = new DataContractJsonSerializer(typeof(Receipt));
+            return serializer.ReadObject(await streamTask) as Receipt;
         }
     }
 }
