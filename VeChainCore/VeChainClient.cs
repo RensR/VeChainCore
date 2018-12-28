@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Threading.Tasks;
+using VeChainCore.Logic;
 using VeChainCore.Models;
 
 namespace VeChainCore
@@ -90,6 +93,17 @@ namespace VeChainCore
             var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/transactions/{id}/receipt");
             var serializer = new DataContractJsonSerializer(typeof(Receipt));
             return serializer.ReadObject(await streamTask) as Receipt;
+        }
+
+        public async Task<HttpResponseMessage> TestnetFaucet(string address)
+        {
+            if (!CheckIfValid.Address(address))
+                return null;
+
+            var content = new StringContent($"{{\"to\":\"{address}\"}}", Encoding.UTF8, "application/json");
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            return  await _client.PostAsync("https://faucet.outofgas.io/requests", content);
         }
     }
 }

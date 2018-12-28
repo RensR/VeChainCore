@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Net;
 using System.Numerics;
 using System.Threading.Tasks;
 using VeChainCore;
@@ -109,6 +110,12 @@ namespace VeChainCoreTest
 
             var totalSent = receipt.outputs.Sum(output => output.transfers.Sum(transfer => HexConverter.HexToHumanReadableDecimal(transfer.amount)));
             Assert.Equal(738, totalSent);
+        }
+
+        [Fact]
+        public async Task TestnetFaucet()
+        {
+            Assert.Null(await _vechainClient.TestnetFaucet("0x"));
         }
     }
 }
