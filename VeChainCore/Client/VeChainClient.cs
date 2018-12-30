@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VeChainCore.Logic;
 using VeChainCore.Models;
 
-namespace VeChainCore
+namespace VeChainCore.Client
 {
     public class VeChainClient
     {
@@ -46,12 +46,13 @@ namespace VeChainCore
         /// <returns></returns>
         public async Task<Account> GetAccount(string address, string revision = "best")
         {
+            if (address == null || address.Length != 42)
+                throw new ArgumentException("Address is not valid");
+
             if (revision != "best")
                 address += $"?revision={revision}";
 
-            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/accounts/{address}");
-            var serializer = new DataContractJsonSerializer(typeof(Account));
-            return serializer.ReadObject(await streamTask) as Account;
+            return await SendGetRequest<Account>($"{_blockchainAddress}/accounts/{address}");
         }
 
         /// <summary>
@@ -62,9 +63,7 @@ namespace VeChainCore
         /// <returns></returns>
         public async Task<Block> GetBlock(uint blockNumber)
         {
-            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/blocks/{blockNumber}");
-            var serializer = new DataContractJsonSerializer(typeof(Block));
-            return serializer.ReadObject(await streamTask) as Block;
+            return await SendGetRequest<Block>($"{_blockchainAddress}/blocks/{blockNumber}");
         }
 
 
@@ -76,11 +75,8 @@ namespace VeChainCore
         /// <returns></returns>
         public async Task<Transaction> GetTransaction(string id)
         {
-            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/transactions/{id}");
-            var serializer = new DataContractJsonSerializer(typeof(Transaction));
-            return serializer.ReadObject(await streamTask) as Transaction;
+            return await SendGetRequest<Transaction>($"{_blockchainAddress}/transactions/{id}");
         }
-
 
         /// <summary>
         /// Gets the <see cref="Receipt"/> object that contains all Receipt information for
@@ -90,9 +86,7 @@ namespace VeChainCore
         /// <returns></returns>
         public async Task<Receipt> GetReciept(string id)
         {
-            var streamTask = _client.GetStreamAsync($"{_blockchainAddress}/transactions/{id}/receipt");
-            var serializer = new DataContractJsonSerializer(typeof(Receipt));
-            return serializer.ReadObject(await streamTask) as Receipt;
+            return await SendGetRequest<Receipt>($"{_blockchainAddress}/transactions/{id}/receipt");
         }
 
         public async Task<HttpResponseMessage> TestnetFaucet(string address)
@@ -104,6 +98,14 @@ namespace VeChainCore
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             return  await _client.PostAsync("https://faucet.outofgas.io/requests", content);
+        }
+
+        private async Task<T> SendGetRequest<T>(string path)
+        {
+            var streamTask = await _client.GetStreamAsync(path);
+
+            var serializer = new DataContractJsonSerializer(typeof(T));
+            return (T) serializer.ReadObject(streamTask);
         }
     }
 }
