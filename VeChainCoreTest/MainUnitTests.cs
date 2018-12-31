@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using VeChainCore.Client;
 using VeChainCore.Logic;
 using VeChainCore.Models;
+using VeChainCore.Models.Extensions;
 using Xunit;
 
 namespace VeChainCoreTest
@@ -115,6 +116,16 @@ namespace VeChainCoreTest
         public async Task TestnetFaucet()
         {
             Assert.Null(await _vechainClient.TestnetFaucet("0x"));
+        }
+
+        [Fact]
+        public async void CalculateGasCost()
+        {
+            var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+
+            var gas = transaction.CalculateGasCost();
+
+            Assert.Equal(transaction.gas, gas);
         }
     }
 }

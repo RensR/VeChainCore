@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace VeChainCore.Models.Extensions
 {
@@ -11,6 +12,9 @@ namespace VeChainCore.Models.Extensions
         /// <returns></returns>
         public static long CalculateGasCost(this Transaction transaction)
         {
+            if (transaction?.clauses == null)
+                throw new NullReferenceException("Transaction is null");
+
             const uint txGas = 5000;
             const uint clauseGas = 16_000;
             const uint clauseGasContractCreation = 48_000;
@@ -21,7 +25,7 @@ namespace VeChainCore.Models.Extensions
             // Add all the gas cost of the data writen to the chain to either the 
             // gas cost of a clause or a contract creation based on whether the 'to'
             // value has been set
-            return transaction.clauses.Sum(clause => clause.DataGas() +
+            return txGas + transaction.clauses.Sum(clause => clause.DataGas() +
                                          (clause.to != null ? clauseGas : clauseGasContractCreation));
         }
 
