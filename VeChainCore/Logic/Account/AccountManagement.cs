@@ -11,13 +11,13 @@ namespace VeChainCore.Logic.Account
     // logic in this class.
     public class AccountManagement
     {
-        public static PrivateKey CreateNewPrivateKey()
+        public static ECKeyPair CreateNewPrivateKey()
         {
             var ecKey = EthECKey.GenerateKey();
             var privateKey = ecKey.GetPrivateKey();
             var genAddress = ecKey.GetPublicAddress();
 
-            return new PrivateKey
+            return new ECKeyPair
             {
                 privateKey = privateKey,
                 address = genAddress

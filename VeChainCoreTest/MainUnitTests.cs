@@ -1,8 +1,6 @@
 using System.Linq;
-using System.Net;
 using System.Numerics;
 using System.Threading.Tasks;
-using VeChainCore;
 using VeChainCore.Client;
 using VeChainCore.Logic;
 using VeChainCore.Models;

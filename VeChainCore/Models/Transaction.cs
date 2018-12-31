@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VeChainCore.Models.Meta;
 
 namespace VeChainCore.Models
@@ -18,6 +19,10 @@ namespace VeChainCore.Models
         public string dependsOn { get; set; }
         public uint size { get; set; }
         public TxMeta meta { get; set; }
+
+
+
+        
 
         public override string ToString()
         {

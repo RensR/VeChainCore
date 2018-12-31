@@ -34,8 +34,6 @@ namespace VeChainCore.Client
             return _blockchainAddress;
         }
 
-
-
         // Logic methods
         /// <summary>
         /// Gets an <see cref="Account"/> object that contains all Account information for
@@ -52,7 +50,7 @@ namespace VeChainCore.Client
             if (revision != "best")
                 address += $"?revision={revision}";
 
-            return await SendGetRequest<Account>($"{_blockchainAddress}/accounts/{address}");
+            return await SendGetRequest<Account>($"/accounts/{address}");
         }
 
         /// <summary>
@@ -63,9 +61,8 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<Block> GetBlock(uint blockNumber)
         {
-            return await SendGetRequest<Block>($"{_blockchainAddress}/blocks/{blockNumber}");
+            return await SendGetRequest<Block>($"/blocks/{blockNumber}");
         }
-
 
         /// <summary>
         /// Gets the <see cref="Transaction"/> object that contains all Transaction information for
@@ -75,7 +72,7 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<Transaction> GetTransaction(string id)
         {
-            return await SendGetRequest<Transaction>($"{_blockchainAddress}/transactions/{id}");
+            return await SendGetRequest<Transaction>($"/transactions/{id}");
         }
 
         /// <summary>
@@ -86,7 +83,7 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<Receipt> GetReciept(string id)
         {
-            return await SendGetRequest<Receipt>($"{_blockchainAddress}/transactions/{id}/receipt");
+            return await SendGetRequest<Receipt>($"/transactions/{id}/receipt");
         }
 
         public async Task<HttpResponseMessage> TestnetFaucet(string address)
@@ -100,12 +97,37 @@ namespace VeChainCore.Client
             return  await _client.PostAsync("https://faucet.outofgas.io/requests", content);
         }
 
+        /// <summary>
+        /// Send a GET request and retrieves an object of type T
+        /// </summary>
+        /// <typeparam name="T">The given object type e.g. Transaction, Block</typeparam>
+        /// <param name="path">The path to the wanted object</param>
+        /// <returns></returns>
         private async Task<T> SendGetRequest<T>(string path)
         {
-            var streamTask = await _client.GetStreamAsync(path);
-
             var serializer = new DataContractJsonSerializer(typeof(T));
-            return (T) serializer.ReadObject(streamTask);
+            return (T) serializer.ReadObject(await _client.GetStreamAsync(RawUrl(path)));
+        }
+
+        /// <summary>
+        /// Sends a POST request and return the chosen return type
+        /// </summary>
+        /// <param name="path">The path to the wanted object</param>
+        /// <param name="httpContent">Parameters of the request</param>
+        /// <returns></returns>
+        private async Task<HttpResponseMessage> SendPostRequest(string path, HttpContent httpContent)
+        {
+            return await _client.PostAsync(RawUrl(path), httpContent);
+        }
+
+        /// <summary>
+        /// Transforms the path to the full URL including the blockchain address
+        /// </summary>
+        /// <param name="path">The query specific part of the URL</param>
+        /// <returns></returns>
+        private string RawUrl(string path)
+        {
+            return _blockchainAddress + path;
         }
     }
 }
