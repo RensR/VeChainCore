@@ -34,6 +34,19 @@ namespace VeChainCore.Client
             return _blockchainAddress;
         }
 
+        /// <summary>
+        /// Gets the blockchain tag that indicates what network is connected, main or testnet
+        /// </summary>
+        /// <returns></returns>
+        public async Task<uint> GetChainTag()
+        {
+            var genesis = await GetBlock(0);
+            var lastByte = genesis.id.Substring(genesis.id.Length - 2);
+            //var lastByte = genesis.id[genesis.id.Length - 1].ToString();
+
+            return uint.Parse(lastByte, System.Globalization.NumberStyles.HexNumber);
+        }
+
         // Logic methods
         /// <summary>
         /// Gets an <see cref="Account"/> object that contains all Account information for

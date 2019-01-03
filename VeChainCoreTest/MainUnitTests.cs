@@ -127,5 +127,13 @@ namespace VeChainCoreTest
 
             Assert.Equal(transaction.gas, gas);
         }
+
+        [Fact]
+        public async Task GetChainTag()
+        {
+            var tag = await _vechainClient.GetChainTag();
+
+            Assert.True(tag == 39 || tag == 74);
+        }
     }
 }
