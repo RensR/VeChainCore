@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VeChainCore.Models
+namespace VeChainCore.Models.Transaction
 {
     public class Clause : IEquatable<Clause>
     {

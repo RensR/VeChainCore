@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using VeChainCore.Models.Meta;
 
-namespace VeChainCore.Models
+namespace VeChainCore.Models.Transaction
 {
     public class Transaction : IEquatable<Transaction>
     {
@@ -19,9 +19,40 @@ namespace VeChainCore.Models
         public uint size { get; set; }
         public TxMeta meta { get; set; }
 
+        public static Transaction CreateUnsigned(
+            uint chainTag, 
+            string blockRef,
+            Clause[] clauses,
+            uint expiration = 720, 
+            uint gasPriceCoef = 100, 
+            uint gas = 21000,
+            string dependsOn = "")
+        {
 
+            //byte chainTag = BlockchainClient.getChainTag();
+            //byte[] blockRef = BlockchainClient.getBlockRef(Revision.BEST).toByteArray();
+            //Amount amount = Amount.createFromToken(AbstractToken.VET);
+            //amount.setDecimalAmount("1.12");
+            //ToClause clause = TransactionClient.buildVETToClause
+            //(Address.fromHexString("0xD3EF28DF6b553eD2fc47259E8134319cB1121A2A"), amount, ToData.ZERO);
 
-        
+            //RawTransaction rawTransaction = RawTransactionFactory.getInstance().createRawTransaction
+            //(chainTag, blockRef, 720, 21000, (byte)0x0, CryptoUtils.generateTxNonce(), clause);
+
+            if(clauses == null || clauses.Length < 1)
+                throw  new ArgumentException("No clauses found");
+
+            return new Transaction
+            {
+                chainTag = chainTag,
+                blockRef =  blockRef,
+                expiration = expiration,
+                clauses = clauses,
+                gasPriceCoef = gasPriceCoef,
+                gas = gas,
+                dependsOn =  dependsOn
+            };
+        }
 
         public override string ToString()
         {

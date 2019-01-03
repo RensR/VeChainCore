@@ -1,6 +1,6 @@
 ﻿using VeChainCore.Models.Meta;
 
-namespace VeChainCore.Models
+namespace VeChainCore.Models.Transaction
 {
     public class Receipt
     {

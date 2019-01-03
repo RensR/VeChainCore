@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VeChainCore.Logic;
 using VeChainCore.Models;
+using VeChainCore.Models.Transaction;
 
 namespace VeChainCore.Client
 {
@@ -40,9 +41,8 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<uint> GetChainTag()
         {
-            var genesis = await GetBlock(0);
+            var genesis = await GetBlock("0");
             var lastByte = genesis.id.Substring(genesis.id.Length - 2);
-            //var lastByte = genesis.id[genesis.id.Length - 1].ToString();
 
             return uint.Parse(lastByte, System.Globalization.NumberStyles.HexNumber);
         }
@@ -70,9 +70,9 @@ namespace VeChainCore.Client
         /// Gets the <see cref="Block"/> object that contains all Block information for
         /// the given block number
         /// </summary>
-        /// <param name="blockNumber">The block number</param>
+        /// <param name="blockNumber">The block number or "best" for the latest</param>
         /// <returns></returns>
-        public async Task<Block> GetBlock(uint blockNumber)
+        public async Task<Block> GetBlock(string blockNumber)
         {
             return await SendGetRequest<Block>($"/blocks/{blockNumber}");
         }

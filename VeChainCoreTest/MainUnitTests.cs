@@ -5,19 +5,13 @@ using VeChainCore.Client;
 using VeChainCore.Logic;
 using VeChainCore.Models;
 using VeChainCore.Models.Extensions;
+using VeChainCore.Models.Transaction;
 using Xunit;
 
 namespace VeChainCoreTest
 {
     public class BlockTest
     {
-        // CONFIG
-        // 
-        private static readonly bool Testnet = true;
-        //
-        // END CONFIG
-
-
         private readonly VeChainClient _vechainClient;
 
         public BlockTest()
@@ -30,8 +24,8 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
-            
-            var genesis = Testnet ? 
+            var testnet = await _vechainClient.GetChainTag() == 39;
+            var genesis = testnet ? 
                 new Block // Test
                 {
                     number = 0,
@@ -70,7 +64,7 @@ namespace VeChainCoreTest
                     transactions = new Transaction[0]
                 };
 
-            var block = await _vechainClient.GetBlock(0);
+            var block = await _vechainClient.GetBlock("0");
 
             Assert.Equal(genesis, block);
         }
@@ -133,6 +127,8 @@ namespace VeChainCoreTest
         {
             var tag = await _vechainClient.GetChainTag();
 
+            // 39 == Testnet
+            // 74 == Mainnet
             Assert.True(tag == 39 || tag == 74);
         }
     }
