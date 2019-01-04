@@ -76,12 +76,12 @@ namespace VeChainCoreTest
             var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "1591234");
 
             Assert.True(!account.hasCode);
-            Assert.Equal(BigInteger.Parse("21087000000000000000000"), HexConverter.HexToBigInt(account.balance));
+            Assert.Equal(BigInteger.Parse("21087000000000000000000"), Hex.HexToBigInt(account.balance));
 
             // Assert that the address had no engery nor contract at genesis
             var genesisAccount = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "0");
             Assert.False(genesisAccount.hasCode);
-            Assert.Equal(0, HexConverter.HexToBigInt(genesisAccount.energy));
+            Assert.Equal(0, Hex.HexToBigInt(genesisAccount.energy));
         }
 
         [Fact]
@@ -102,7 +102,7 @@ namespace VeChainCoreTest
             Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
             Assert.Equal((uint)11989000, receipt.gasUsed);
 
-            var totalSent = receipt.outputs.Sum(output => output.transfers.Sum(transfer => HexConverter.HexToHumanReadableDecimal(transfer.amount)));
+            var totalSent = receipt.outputs.Sum(output => output.transfers.Sum(transfer => Hex.HexToHumanReadableDecimal(transfer.amount)));
             Assert.Equal(738, totalSent);
         }
 

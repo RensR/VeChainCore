@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Nethereum.RLP;
 using VeChainCore.Models.Transaction;
@@ -25,7 +24,7 @@ namespace VeChainCore.Models.Extensions
             if (transaction.clauses.Length == 0)
                 return txGas + clauseGas;
 
-            // Add all the gas cost of the data writen to the chain to either the 
+            // Add all the gas cost of the data written to the chain to either the 
             // gas cost of a clause or a contract creation based on whether the 'to'
             // value has been set
             return txGas + transaction.clauses.Sum(clause => clause.DataGas() +
@@ -55,27 +54,7 @@ namespace VeChainCore.Models.Extensions
             return DataGas(clause.data);
         }
 
-        public static List<IRLPElement> Encode(this RawTransaction rawTransaction)
-        {
-            if (rawTransaction.reserved != null)
-                throw new ArgumentNullException("reservedList is not supported");
-
-            var RLPList = new List<IRLPElement>
-            {
-                new RLPItem(rawTransaction.chainTag),
-                new RLPItem(rawTransaction.blockRef),
-                new RLPItem(rawTransaction.expiration),
-                GetClauseRLP(rawTransaction.clauses),
-                new RLPItem(rawTransaction.gasPriceCoef),
-                new RLPItem(rawTransaction.gas),
-                new RLPItem(rawTransaction.nonce),
-                new RLPCollection(),
-                new RLPItem(rawTransaction.signature)
-            };     
-
-            return RLPList;
-        }
-
+     
         public static byte[][][] GetRawClauses(this Clause[] clauses)
         {
             var clausesAsBytes = new byte[clauses.Length][][];
@@ -87,34 +66,20 @@ namespace VeChainCore.Models.Extensions
                 var clauseArray = new byte[3][];
 
                 clauseArray[0] = clause.to == null
-                    ? RLP.EMPTY_BYTE_ARRAY
+                    ? RLP.ZERO_BYTE_ARRAY
                     : clauseArray[0] = clause.to.ToBytesForRLPEncoding();
 
                 clauseArray[1] = clause.value == null
-                    ? RLP.EMPTY_BYTE_ARRAY
+                    ? RLP.ZERO_BYTE_ARRAY
                     : clauseArray[0] = clause.value.ToBytesForRLPEncoding();
 
                 clauseArray[2] = clause.data == null
-                    ? RLP.EMPTY_BYTE_ARRAY
+                    ? RLP.ZERO_BYTE_ARRAY
                     : clauseArray[0] = clause.data.ToBytesForRLPEncoding();
 
                 clausesAsBytes[i] = clauseArray;
             }
             return clausesAsBytes;
-        }
-
-        public static RLPCollection GetClauseRLP(byte[][][] clauses)
-        {
-            var rlpClauses = new RLPCollection();
-
-            foreach (var clause in clauses)
-            {
-                var singleClause = new RLPCollection();
-                singleClause.AddRange(clause.Select(clauseItem => new RLPItem(clauseItem)));
-                rlpClauses.Add(singleClause);
-            }
-
-            return rlpClauses;
         }
     }
 }

@@ -7,7 +7,7 @@ using VeChainCore.Models.Keys;
 
 namespace VeChainCore.Logic.Account
 {
-    // As VeChain uses the same key generation as ethereum we use the Nethereum implementation for most
+    // As VeChain uses the same key generation as Ethereum we use the Nethereum implementation for most
     // logic in this class.
     public class AccountManagement
     {

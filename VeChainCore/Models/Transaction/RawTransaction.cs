@@ -1,6 +1,7 @@
 ﻿using System;
 using Nethereum.RLP;
 using VeChainCore.Models.Extensions;
+using VeChainCore.Models.Keys;
 
 namespace VeChainCore.Models.Transaction
 {
@@ -18,16 +19,16 @@ namespace VeChainCore.Models.Transaction
         public byte[] signature { get; set; }
 
 
-        public RawTransaction(Transaction transaction, byte[] signature)
+        public RawTransaction(Transaction transaction)
         {
             if (transaction.chainTag == 0)
-                throw new ArgumentNullException("Chaintag is 0");
+                throw new ArgumentException("ChainTag is 0");
             chainTag = ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(transaction.chainTag);
 
-            blockRef = transaction.blockRef.ToBytesForRLPEncoding() ?? throw new ArgumentNullException("BlockRef is null");
+            blockRef = transaction.blockRef.ToBytesForRLPEncoding() ?? throw new ArgumentException("BlockRef is null");
 
             if (transaction.expiration == 0)
-                throw new ArgumentNullException("Expiration is 0");
+                throw new ArgumentException("Expiration is 0");
             expiration = ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(transaction.expiration);
 
             clauses = transaction.clauses.GetRawClauses();
@@ -37,16 +38,19 @@ namespace VeChainCore.Models.Transaction
                 ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(transaction.gasPriceCoef);
 
             if (transaction.gas == 0)
-                throw new ArgumentNullException("Gas is 0");
+                throw new ArgumentException("Gas is 0");
             gas = ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(transaction.gas);
 
             dependsOn = transaction.dependsOn == null ? RLP.EMPTY_BYTE_ARRAY : transaction.dependsOn.ToBytesForRLPEncoding();
 
-            nonce = transaction.nonce.ToBytesForRLPEncoding() ?? throw new ArgumentNullException("Nonce is null");
+            nonce = transaction.nonce.ToBytesForRLPEncoding() ?? throw new ArgumentException("Nonce is null");
 
             reserved = null;
+        }
 
-            this.signature = signature ?? throw new ArgumentNullException("signature is null");
+        public static RawTransaction SignRawTransaction(RawTransaction rawTransaction, ECKeyPair keyPair)
+        {
+            return rawTransaction.Sign(keyPair);
         }
     }
 }

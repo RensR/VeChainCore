@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace VeChainCore.Logic
 {
-    public static class HexConverter
+    public static class Hex
     {
         public static BigInteger HexToBigInt(string hex)
         {
