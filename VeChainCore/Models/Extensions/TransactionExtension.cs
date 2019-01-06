@@ -53,33 +53,5 @@ namespace VeChainCore.Models.Extensions
         {
             return DataGas(clause.data);
         }
-
-     
-        public static byte[][][] GetRawClauses(this Clause[] clauses)
-        {
-            var clausesAsBytes = new byte[clauses.Length][][];
-
-            for (var i = 0; i < clauses.Length; i++)
-            {
-                var clause = clauses[i];
-
-                var clauseArray = new byte[3][];
-
-                clauseArray[0] = clause.to == null
-                    ? RLP.ZERO_BYTE_ARRAY
-                    : clauseArray[0] = clause.to.ToBytesForRLPEncoding();
-
-                clauseArray[1] = clause.value == null
-                    ? RLP.ZERO_BYTE_ARRAY
-                    : clauseArray[0] = clause.value.ToBytesForRLPEncoding();
-
-                clauseArray[2] = clause.data == null
-                    ? RLP.ZERO_BYTE_ARRAY
-                    : clauseArray[0] = clause.data.ToBytesForRLPEncoding();
-
-                clausesAsBytes[i] = clauseArray;
-            }
-            return clausesAsBytes;
-        }
     }
 }

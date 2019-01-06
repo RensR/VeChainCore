@@ -19,6 +19,8 @@ namespace VeChainCore.Models.Transaction
         public uint size { get; set; }
         public TxMeta meta { get; set; }
 
+        public string signature { get; set; }
+
         public static Transaction CreateUnsigned(
             uint chainTag, 
             string blockRef,

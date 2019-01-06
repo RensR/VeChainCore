@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Nethereum.RLP;
+using VeChainCore.Models;
 using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Logic.Cryptography
@@ -49,11 +47,11 @@ namespace VeChainCore.Logic.Cryptography
         public static int OFFSET_LONG_LIST = 0xf7;
 
 
-        public static byte[] Encode(IRLPElement value)
+        public static byte[] Encode(RlpType value)
         {
-            if (value is RLPItem item)
+            if (value is RlpString item)
                 return EncodeString(item);
-            return EncodeList(value as RLPCollection);
+            return EncodeList(value as RlpList);
         }
 
         private static byte[] Encode(byte[] bytesValue, int offset)
@@ -85,12 +83,12 @@ namespace VeChainCore.Logic.Cryptography
             }
         }
 
-        static byte[] EncodeString(RLPItem value)
+        static byte[] EncodeString(RlpString value)
         {
-            return Encode(value.RLPData, OFFSET_SHORT_STRING);
+            return Encode(value.GetBytes(), OFFSET_SHORT_STRING);
         }
 
-        private static byte[] ToMinimalByteArray(int value)
+        public static byte[] ToMinimalByteArray(int value)
         {
             return toByteArray(value).SkipWhile(element => element == 0).ToArray();
         }
@@ -106,13 +104,9 @@ namespace VeChainCore.Logic.Cryptography
             };
         }
 
-        private static byte[] EncodeList(RLPCollection value)
+        private static byte[] EncodeList(RlpList value)
         {
-            var values = new List<IRLPElement>();
-            foreach (IRLPElement rlpElement in value)
-            {
-                values.Add(rlpElement);
-            }
+            var values = value.GetValues();
 
             if (values.Count < 1)
             {
@@ -120,7 +114,7 @@ namespace VeChainCore.Logic.Cryptography
             }
 
             byte[] result = new byte[0];
-            foreach (IRLPElement entry in values)
+            foreach (RlpType entry in values)
             {
                 result = result.Concat(Encode(entry));
             }

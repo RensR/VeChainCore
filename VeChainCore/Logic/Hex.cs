@@ -1,8 +1,22 @@
 ﻿using System.Globalization;
 using System.Numerics;
+using System.Text;
+using Nethereum.RLP;
 
 namespace VeChainCore.Logic
 {
+    public enum Prefix
+    {
+        Empty,
+        ZeroLowerX
+    }
+
+    public enum StringType
+    {
+        Hex,
+        Plain
+    }
+
     public static class Hex
     {
         public static BigInteger HexToBigInt(string hex)
@@ -30,6 +44,24 @@ namespace VeChainCore.Logic
         public static decimal ToHumanReadable(decimal dec)
         {
             return dec / 1_000_000_000_000_000_000;
+        }
+
+        public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex, Prefix prefix = Prefix.Empty)
+        {
+            if(type == StringType.Plain)
+                return Encoding.UTF8.GetString(ba);
+
+            var hex = new StringBuilder(ba.Length * 2 + 2);
+            if (prefix != Prefix.Empty)
+                hex.Append("0x");
+            foreach (byte b in ba)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
+        }
+
+        public static byte[] StringToByteArray(this string input)
+        {
+            return input.ToBytesForRLPEncoding();
         }
     }
 }
