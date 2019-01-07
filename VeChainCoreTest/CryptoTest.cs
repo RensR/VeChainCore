@@ -1,5 +1,5 @@
-﻿using VeChainCore.Logic;
-using VeChainCore.Logic.Cryptography;
+﻿using VeChainCore.Utils;
+using VeChainCore.Utils.Cryptography;
 using Xunit;
 
 namespace VeChainCoreTest

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using VeChainCore.Models;
 
-namespace VeChainCore.Logic.Cryptography
+namespace VeChainCore.Utils.Rlp
 {
     /**
      * <p>Recursive Length Prefix (RLP) decoder.</p>

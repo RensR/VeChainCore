@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Nethereum.RLP;
-using Org.BouncyCastle.Utilities;
-using VeChainCore.Logic;
+using VeChainCore.Utils;
 
-namespace VeChainCore.Models
+namespace VeChainCore.Utils.Rlp
 {
     public interface RlpType
     {
@@ -54,7 +52,7 @@ namespace VeChainCore.Models
             {
                 return new RlpString(EMPTY);
             }
-            var bytes = value.ToBytesForRLPEncoding();
+            var bytes = value.ToByteArray();
             return new RlpString(bytes.SkipWhile(element => element == 0).ToArray());
         }
 
@@ -65,7 +63,7 @@ namespace VeChainCore.Models
 
         public static RlpString Create(string value)
         {
-            return new RlpString(value.ToBytesForRLPEncoding());
+            return new RlpString(value.StringToByteArray());
         }
 
         public override bool Equals(object o)
@@ -81,7 +79,7 @@ namespace VeChainCore.Models
 
             var rlpString = (RlpString) o;
 
-            return Arrays.AreEqual(value, rlpString.value);
+            return value.SequenceEqual(rlpString.value);
         }
 
         public override int GetHashCode()

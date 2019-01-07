@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using VeChainCore.Logic;
+using VeChainCore.Utils;
 using Xunit;
 
 namespace VeChainCoreTest

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using VeChainCore.Models;
 using VeChainCore.Models.Extensions;
 
-namespace VeChainCore.Logic.Cryptography
+namespace VeChainCore.Utils.Rlp
 {
     public class RlpEncoder
     {

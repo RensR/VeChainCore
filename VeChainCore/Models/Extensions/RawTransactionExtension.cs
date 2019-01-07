@@ -1,13 +1,13 @@
 ﻿using System;
 using Nethereum.Signer.Crypto;
 using VeChainCore.Models.Transaction;
-using VeChainCore.Logic.Cryptography;
 using System.Numerics;
 using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RLP;
 using Nethereum.Signer;
-using VeChainCore.Logic;
 using VeChainCore.Models.Keys;
+using VeChainCore.Utils.Rlp;
+using VeChainCore.Utils.Cryptography;
+using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Extensions
 {
@@ -25,7 +25,7 @@ namespace VeChainCore.Models.Extensions
 
             byte[] concatenatedBytes = new byte[52];
             Buffer.BlockCopy(signingHash, 0, concatenatedBytes, 0, signingHash.Length);
-            Buffer.BlockCopy(signer.ToBytesForRLPEncoding(), 0, concatenatedBytes, signingHash.Length, signer.ToBytesForRLPEncoding().Length);
+            Buffer.BlockCopy(signer.HexStringToByteArray(), 0, concatenatedBytes, signingHash.Length, signer.HexStringToByteArray().Length);
             byte[] txIdBytes = Hash.HashBlake2B(concatenatedBytes);
             return txIdBytes.ToHex(true);
 

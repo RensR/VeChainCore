@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
-using VeChainCore.Logic;
+using VeChainCore.Utils;
 using VeChainCore.Models;
 using VeChainCore.Models.Transaction;
 

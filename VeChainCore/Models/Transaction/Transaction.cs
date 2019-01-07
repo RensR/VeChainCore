@@ -7,27 +7,27 @@ namespace VeChainCore.Models.Transaction
     public class Transaction : IEquatable<Transaction>
     {
         public string id { get; set; }
-        public uint chainTag { get; set; }
-        public string blockRef { get; set; }
+        public byte chainTag { get; set; }
+        public ulong blockRef { get; set; }
         public uint expiration { get; set; }
         public Clause[] clauses { get; set; }
-        public uint gasPriceCoef { get; set; }
-        public uint gas { get; set; }
+        public byte gasPriceCoef { get; set; }
+        public ulong gas { get; set; }
         public string origin { get; set; }
         public string nonce { get; set; }
         public string dependsOn { get; set; }
-        public uint size { get; set; }
+        public ulong size { get; set; }
         public TxMeta meta { get; set; }
 
         public string signature { get; set; }
 
         public static Transaction CreateUnsigned(
-            uint chainTag, 
-            string blockRef,
+            byte chainTag, 
+            ulong blockRef,
             Clause[] clauses,
             uint expiration = 720, 
-            uint gasPriceCoef = 100, 
-            uint gas = 21000,
+            byte gasPriceCoef = 100, 
+            ulong gas = 21000,
             string dependsOn = "")
         {
 

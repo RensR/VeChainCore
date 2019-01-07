@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using VeChainCore.Logic.Account;
+using VeChainCore.Utils.Account;
 
 
 namespace VeChainCoreTest

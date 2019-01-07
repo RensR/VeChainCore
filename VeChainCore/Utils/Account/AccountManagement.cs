@@ -5,7 +5,7 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Signer;
 using VeChainCore.Models.Keys;
 
-namespace VeChainCore.Logic.Account
+namespace VeChainCore.Utils.Account
 {
     // As VeChain uses the same key generation as Ethereum we use the Nethereum implementation for most
     // logic in this class.

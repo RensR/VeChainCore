@@ -12,7 +12,7 @@ namespace VeChainCore.Models.Extensions
         /// </summary>
         /// <param name="transaction">The rawTransaction for which the cost is calculated</param>
         /// <returns></returns>
-        public static long CalculateGasCost(this Transaction.Transaction transaction)
+        public static ulong CalculateGasCost(this Transaction.Transaction transaction)
         {
             if (transaction?.clauses == null)
                 throw new NullReferenceException("Transaction is null");
@@ -27,8 +27,14 @@ namespace VeChainCore.Models.Extensions
             // Add all the gas cost of the data written to the chain to either the 
             // gas cost of a clause or a contract creation based on whether the 'to'
             // value has been set
-            return txGas + transaction.clauses.Sum(clause => clause.DataGas() +
-                                         (clause.to != null ? clauseGas : clauseGasContractCreation));
+            ulong dataGasCost = 0;
+            foreach (Clause transactionClause in transaction.clauses)
+            {
+                dataGasCost += transactionClause.DataGas();
+                dataGasCost += transactionClause.to != null ? clauseGas : clauseGasContractCreation;
+            }
+
+            return txGas +dataGasCost;
         }
 
         /// <summary>
@@ -36,7 +42,7 @@ namespace VeChainCore.Models.Extensions
         /// </summary>
         /// <param name="data">The data for which the cost is calculated</param>
         /// <returns></returns>
-        public static uint DataGas(string data)
+        public static ulong DataGas(string data)
         {
             const uint zgas = 4;
             const uint nzgas = 68;
@@ -49,7 +55,7 @@ namespace VeChainCore.Models.Extensions
             return totalGas;
         }
 
-        public static uint DataGas(this Clause clause)
+        public static ulong DataGas(this Clause clause)
         {
             return DataGas(clause.data);
         }

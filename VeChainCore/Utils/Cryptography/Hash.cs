@@ -1,6 +1,6 @@
 ﻿using Isopoh.Cryptography.Blake2b;
 
-namespace VeChainCore.Logic.Cryptography
+namespace VeChainCore.Utils.Cryptography
 {
     public static class Hash
     {

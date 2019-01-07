@@ -1,9 +1,5 @@
-﻿using System.Threading.Tasks;
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RLP;
+﻿using System.Globalization;
 using VeChainCore.Client;
-using VeChainCore.Logic.Cryptography;
-using VeChainCore.Models.Extensions;
 using VeChainCore.Models.Transaction;
 using Xunit;
 
@@ -25,7 +21,7 @@ namespace VeChainCoreTest
         {
             var realTransaction = new Transaction{
                 chainTag= 1,
-                blockRef = "0x00000000aabbccdd",
+                blockRef = ulong.Parse("0x00000000aabbccdd", NumberStyles.HexNumber),
                 expiration= 32,
                 clauses= new[]{ new Clause{
                     to= "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed",

@@ -1,4 +1,4 @@
-﻿namespace VeChainCore.Logic
+﻿namespace VeChainCore.Utils
 {
     public static class CheckIfValid
     {
