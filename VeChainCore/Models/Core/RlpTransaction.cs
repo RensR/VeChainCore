@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using VeChainCore.Utils;
 using VeChainCore.Utils.Rlp;
 
@@ -25,9 +26,9 @@ namespace VeChainCore.Models.Transaction
                 throw new ArgumentException("ChainTag is 0");
             chainTag = RlpString.Create(transaction.chainTag);
 
-            if (transaction.blockRef is 0)
+            if (transaction.blockRef is null)
                 throw new ArgumentException("BlockRef is 0");
-            blockRef = RlpString.Create(transaction.blockRef);
+            blockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray());
 
             if (transaction.expiration == 0)
                 throw new ArgumentException("Expiration is 0");
@@ -60,8 +61,8 @@ namespace VeChainCore.Models.Transaction
             return new RlpList(new List<RlpType>
             {
                 RlpString.Create(clause.to.HexStringToByteArray()),
-                RlpString.Create(clause.value),
-                RlpString.Create(clause.data)
+                RlpString.Create(BigInteger.Parse(clause.value)),
+                RlpString.Create(clause.data.HexStringToByteArray())
             });
         }
 

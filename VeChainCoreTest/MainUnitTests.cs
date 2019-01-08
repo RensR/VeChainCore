@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using VeChainCore.Client;
 using VeChainCore.Utils;
 using VeChainCore.Models;
+using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
-using VeChainCore.Models.Transaction;
 using Xunit;
 
 namespace VeChainCoreTest

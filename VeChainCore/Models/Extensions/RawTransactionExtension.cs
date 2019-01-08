@@ -1,10 +1,10 @@
 ﻿using System;
 using Nethereum.Signer.Crypto;
-using VeChainCore.Models.Transaction;
 using System.Numerics;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.Signer;
-using VeChainCore.Models.Keys;
+using VeChainCore.Core;
+using VeChainCore.Models.Core;
 using VeChainCore.Utils.Rlp;
 using VeChainCore.Utils.Cryptography;
 using VeChainCore.Utils;
@@ -13,7 +13,7 @@ namespace VeChainCore.Models.Extensions
 {
     public static class RawTransactionExtension
     {
-        public static string CalculateTxId(this Transaction.Transaction transaction, string signer)
+        public static string CalculateTxId(this Blockchain.Transaction transaction, string signer)
         {
             if (transaction.signature == null)
                 throw new ArgumentException("transaction is not singed");
@@ -38,7 +38,7 @@ namespace VeChainCore.Models.Extensions
         }
 
 
-        public static Transaction.Transaction Sign(this Transaction.Transaction transaction, ECKeyPair key)
+        public static Blockchain.Transaction Sign(this Blockchain.Transaction transaction, ECKeyPair key)
         {
             var rlp = RlpEncoder.Encode(new RlpTransaction(transaction).AsRLPValues());
 

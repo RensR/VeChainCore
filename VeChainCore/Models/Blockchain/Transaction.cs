@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using VeChainCore.Models.Meta;
+using VeChainCore.Models.Transaction;
 
-namespace VeChainCore.Models.Transaction
+namespace VeChainCore.Models.Blockchain
 {
     public class Transaction : IEquatable<Transaction>
     {
         public string id { get; set; }
         public byte chainTag { get; set; }
-        public ulong blockRef { get; set; }
+        public string blockRef { get; set; }
         public uint expiration { get; set; }
         public Clause[] clauses { get; set; }
         public byte gasPriceCoef { get; set; }
@@ -23,7 +23,7 @@ namespace VeChainCore.Models.Transaction
 
         public static Transaction CreateUnsigned(
             byte chainTag, 
-            ulong blockRef,
+            string blockRef,
             Clause[] clauses,
             uint expiration = 720, 
             byte gasPriceCoef = 100, 

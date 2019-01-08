@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using VeChainCore.Utils.Cryptography;
 using VeChainCore.Utils;
 using VeChainCore.Models.Transaction;
@@ -18,7 +17,7 @@ namespace VeChainCoreTest
             var realTransaction = new Transaction.Transaction
             {
                 chainTag = 1,
-                blockRef = ulong.Parse("00000000aabbccdd", NumberStyles.HexNumber),
+                blockRef = "00000000aabbccdd",
                 expiration = 32,
                 clauses = new[]{ new Clause{
                         to= "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed",
@@ -29,7 +28,8 @@ namespace VeChainCoreTest
                         to= "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed",
                         value= "20000",
                         data= "0x000000606060"
-                    }},
+                    }
+                },
                 gasPriceCoef = 128,
                 gas = 21000,
                 dependsOn = null,
@@ -37,19 +37,14 @@ namespace VeChainCoreTest
             };
 
             var rlpTransaction = new RlpTransaction(realTransaction).AsRLPValues();
-            var trythis = new List<RlpType>
-            {
-                rlpTransaction
-            };
-            var item = new RlpList(trythis);
 
-            var vetEncoded = RlpEncoder.Encode(item);
+            var vetEncoded = RlpEncoder.Encode(rlpTransaction);
            
-            var out1 = Hex.ByteArrayToString(vetEncoded);
+            var out1 = vetEncoded.ByteArrayToString();
             var vethash = Hash.HashBlake2B(vetEncoded);
 
             // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478
-            var vethashReadable = Hex.ByteArrayToString(vethash);
+            var vethashReadable = vethash.ByteArrayToString();
 
             Assert.Equal("2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478", vethashReadable);
         }

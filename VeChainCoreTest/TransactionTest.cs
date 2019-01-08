@@ -1,6 +1,5 @@
-﻿using System.Globalization;
-using VeChainCore.Client;
-using VeChainCore.Models.Transaction;
+﻿using VeChainCore.Client;
+using VeChainCore.Models.Blockchain;
 using Xunit;
 
 namespace VeChainCoreTest
@@ -21,7 +20,7 @@ namespace VeChainCoreTest
         {
             var realTransaction = new Transaction{
                 chainTag= 1,
-                blockRef = ulong.Parse("0x00000000aabbccdd", NumberStyles.HexNumber),
+                blockRef = "0x00000000aabbccdd",
                 expiration= 32,
                 clauses= new[]{ new Clause{
                     to= "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed",
