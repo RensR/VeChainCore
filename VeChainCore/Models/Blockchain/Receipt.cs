@@ -1,6 +1,4 @@
-﻿using VeChainCore.Models.Meta;
-
-namespace VeChainCore.Models.Blockchain
+﻿namespace VeChainCore.Models.Blockchain
 {
     public class Receipt
     {

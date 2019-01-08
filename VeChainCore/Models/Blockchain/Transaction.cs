@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using VeChainCore.Models.Transaction;
 
 namespace VeChainCore.Models.Blockchain
 {

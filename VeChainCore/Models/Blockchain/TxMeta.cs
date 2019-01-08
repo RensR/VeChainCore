@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VeChainCore.Models.Meta
+namespace VeChainCore.Models.Blockchain
 {
     public class TxMeta : IEquatable<TxMeta>
     {

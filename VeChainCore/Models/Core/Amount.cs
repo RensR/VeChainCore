@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Numerics;
 
-namespace VeChainCore.Models.Transaction
+namespace VeChainCore.Models.Core
 {
     public interface IAmount
     {

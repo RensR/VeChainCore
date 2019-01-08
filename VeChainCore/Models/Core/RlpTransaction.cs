@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using VeChainCore.Models.Blockchain;
 using VeChainCore.Utils;
 using VeChainCore.Utils.Rlp;
 
-namespace VeChainCore.Models.Transaction
+namespace VeChainCore.Models.Core
 {
     public class RlpTransaction
     {
@@ -61,7 +62,7 @@ namespace VeChainCore.Models.Transaction
             return new RlpList(new List<RlpType>
             {
                 RlpString.Create(clause.to.HexStringToByteArray()),
-                RlpString.Create(BigInteger.Parse(clause.value)),
+                RlpString.Create(new VET(BigInteger.Parse(clause.value), false).AsBytes),
                 RlpString.Create(clause.data.HexStringToByteArray())
             });
         }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using VeChainCore.Utils.Cryptography;
 using VeChainCore.Utils;
-using VeChainCore.Models.Transaction;
+using VeChainCore.Models.Blockchain;
+using VeChainCore.Models.Core;
 using Xunit;
-using Transaction = VeChainCore.Models.Transaction;
 using VeChainCore.Utils.Rlp;
 
 namespace VeChainCoreTest
@@ -14,7 +14,7 @@ namespace VeChainCoreTest
         [Fact]
         public void RLPHexParser()
         {
-            var realTransaction = new Transaction.Transaction
+            var realTransaction = new VeChainCore.Models.Blockchain.Transaction
             {
                 chainTag = 1,
                 blockRef = "00000000aabbccdd",

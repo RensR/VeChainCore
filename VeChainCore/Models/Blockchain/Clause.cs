@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VeChainCore.Models.Transaction
+namespace VeChainCore.Models.Blockchain
 {
     public class Clause : IEquatable<Clause>
     {

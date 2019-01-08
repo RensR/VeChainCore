@@ -1,4 +1,4 @@
-﻿namespace VeChainCore.Models
+﻿namespace VeChainCore.Models.Blockchain
 {
     public class Output
     {

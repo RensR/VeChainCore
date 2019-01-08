@@ -1,6 +1,6 @@
 ﻿using Nethereum.Signer.Crypto;
 
-namespace VeChainCore.Models.Keys
+namespace VeChainCore.Core
 {
     public class ECKeyPair
     {

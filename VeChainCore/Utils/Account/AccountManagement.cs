@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.Signer;
-using VeChainCore.Models.Keys;
+﻿using Nethereum.Signer;
+using VeChainCore.Core;
 
 namespace VeChainCore.Utils.Account
 {

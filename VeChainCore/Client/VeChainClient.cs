@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VeChainCore.Utils;
 using VeChainCore.Models;
-using VeChainCore.Models.Transaction;
+using VeChainCore.Models.Blockchain;
 
 namespace VeChainCore.Client
 {
