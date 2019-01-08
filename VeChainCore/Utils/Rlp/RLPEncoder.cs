@@ -46,7 +46,7 @@ namespace VeChainCore.Utils.Rlp
         public static int OFFSET_LONG_LIST = 0xf7;
 
 
-        public static byte[] Encode(RlpType value)
+        public static byte[] Encode(IRlpType value)
         {
             if (value is RlpString item)
                 return EncodeString(item);
@@ -113,7 +113,7 @@ namespace VeChainCore.Utils.Rlp
             }
 
             byte[] result = new byte[0];
-            foreach (RlpType entry in values)
+            foreach (IRlpType entry in values)
             {
                 result = result.Concat(Encode(entry));
             }

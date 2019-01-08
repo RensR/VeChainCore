@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using VeChainCore.Utils;
 
 namespace VeChainCore.Utils.Rlp
 {
-    public interface RlpType
+    public interface IRlpType
     {
     }
 
-    public class RlpString : RlpType
+    public class RlpString : IRlpType
     {
         public static byte[] EMPTY = { };
 
@@ -32,7 +31,7 @@ namespace VeChainCore.Utils.Rlp
 
         public override string ToString()
         {
-            return "0x" + Hex.ByteArrayToString(value);
+            return "0x" + value.ByteArrayToString();
         }
 
         public static RlpString Create(byte[] value)
@@ -52,7 +51,7 @@ namespace VeChainCore.Utils.Rlp
             {
                 return new RlpString(EMPTY);
             }
-            var bytes = value.ToByteArray();
+            var bytes = value.BigIntegerToBytes();
             return new RlpString(bytes.SkipWhile(element => element == 0).ToArray());
         }
 
@@ -91,16 +90,16 @@ namespace VeChainCore.Utils.Rlp
     /**
     * RLP list type.
     */
-    public class RlpList : RlpType
+    public class RlpList : IRlpType
     {
-        private readonly List<RlpType> _values;
+        private readonly List<IRlpType> _values;
 
-        public RlpList(List<RlpType> values)
+        public RlpList(List<IRlpType> values)
         {
             _values = values;
         }
 
-        public List<RlpType> GetValues()
+        public List<IRlpType> GetValues()
         {
             return _values;
         }

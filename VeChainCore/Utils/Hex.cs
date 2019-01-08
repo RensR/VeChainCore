@@ -48,6 +48,11 @@ namespace VeChainCore.Utils
             return dec / 1_000_000_000_000_000_000;
         }
 
+        public static byte[] BigIntegerToBytes(this BigInteger bigInt)
+        {
+            return bigInt.ToByteArray().Reverse().ToArray();
+        }
+
         public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex, Prefix prefix = Prefix.Empty)
         {
             if(type == StringType.Plain)

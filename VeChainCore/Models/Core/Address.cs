@@ -17,7 +17,7 @@ namespace VeChainCore.Models.Core
 
         public static bool IsValid(string address)
         {
-            if (!address.StartsWith(" 0x"))
+            if (!address.StartsWith("0x"))
                 return false;
             if (!Hex.OnlyHexInString(address.Substring(2)))
                 return false;

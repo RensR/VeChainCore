@@ -13,7 +13,7 @@ namespace VeChainCore.Models.Extensions
 {
     public static class RawTransactionExtension
     {
-        public static string CalculateTxId(this Blockchain.Transaction transaction, string signer)
+        public static string CalculateTxId(this RawTransaction transaction, string signer)
         {
             if (transaction.signature == null)
                 throw new ArgumentException("transaction is not singed");
@@ -38,7 +38,7 @@ namespace VeChainCore.Models.Extensions
         }
 
 
-        public static Blockchain.Transaction Sign(this Blockchain.Transaction transaction, ECKeyPair key)
+        public static RawTransaction Sign(this RawTransaction transaction, ECKeyPair key)
         {
             var rlp = RlpEncoder.Encode(new RlpTransaction(transaction).AsRLPValues());
 

@@ -14,21 +14,13 @@ namespace VeChainCoreTest
         [Fact]
         public void RLPHexParser()
         {
-            var realTransaction = new VeChainCore.Models.Blockchain.Transaction
+            var realTransaction = new RawTransaction()
             {
                 chainTag = 1,
                 blockRef = "00000000aabbccdd",
                 expiration = 32,
-                clauses = new[]{ new Clause{
-                        to= "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed",
-                        value= "10000",
-                        data= "0x000000606060"}
-                    , new Clause
-                    {
-                        to= "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed",
-                        value= "20000",
-                        data= "0x000000606060"
-                    }
+                clauses = new[]{ new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed", "10000", "0x000000606060", false)
+                    , new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed","20000", "0x000000606060", false)
                 },
                 gasPriceCoef = 128,
                 gas = 21000,

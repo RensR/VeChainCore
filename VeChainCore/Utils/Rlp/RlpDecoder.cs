@@ -59,7 +59,7 @@ namespace VeChainCore.Utils.Rlp
          */
         public static RlpList decode(byte[] rlpEncoded)
         {
-            var rlpList = new RlpList(new List<RlpType>());
+            var rlpList = new RlpList(new List<IRlpType>());
             Traverse(rlpEncoded, 0, rlpEncoded.Length, rlpList);
             return rlpList;
         }
@@ -146,7 +146,7 @@ namespace VeChainCore.Utils.Rlp
 
                         byte listLen = (byte) (prefix - OFFSET_SHORT_LIST);
 
-                        RlpList newLevelList = new RlpList(new List<RlpType>());
+                        RlpList newLevelList = new RlpList(new List<IRlpType>());
                         Traverse(data, startPos + 1, startPos + listLen + 1, newLevelList);
                         rlpList.GetValues().Add(newLevelList);
 
@@ -166,7 +166,7 @@ namespace VeChainCore.Utils.Rlp
                         byte lenOfListLen = (byte) (prefix - OFFSET_LONG_LIST);
                         int listLen = CalcLength(lenOfListLen, data, startPos);
 
-                        RlpList newLevelList = new RlpList(new List<RlpType>());
+                        RlpList newLevelList = new RlpList(new List<IRlpType>());
                         Traverse(data, startPos + lenOfListLen + 1,
                             startPos + lenOfListLen + listLen + 1, newLevelList);
                         rlpList.GetValues().Add(newLevelList);

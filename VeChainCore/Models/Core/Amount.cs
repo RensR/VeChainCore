@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Core
 {
@@ -16,7 +17,8 @@ namespace VeChainCore.Models.Core
     public class VET : IAmount
     {
         public int Precision => 18;
-        public byte[] AsBytes { get; }
+
+        public byte[] AsBytes => AsBigInt.BigIntegerToBytes();
 
         public BigInteger AsBigInt { get; }
 

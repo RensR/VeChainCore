@@ -10,76 +10,76 @@ namespace VeChainCore.Models.Core
 {
     public class RlpTransaction
     {
-        public RlpString chainTag { get; set; }
-        public RlpString blockRef { get; set; }
-        public RlpString expiration { get; set; }
-        public RlpList clauses { get; set; }
-        public RlpString gasPriceCoef { get; set; }
-        public RlpString gas { get; set; }
-        public RlpString dependsOn { get; set; }
-        public RlpString nonce { get; set; }
-        public RlpList reserved { get; set; }
+        public RlpString ChainTag { get; set; }
+        public RlpString BlockRef { get; set; }
+        public RlpString Expiration { get; set; }
+        public RlpList Clauses { get; set; }
+        public RlpString GasPriceCoef { get; set; }
+        public RlpString Gas { get; set; }
+        public RlpString DependsOn { get; set; }
+        public RlpString Nonce { get; set; }
+        public RlpList Reserved { get; set; }
 
 
-        public RlpTransaction(Transaction transaction)
+        public RlpTransaction(RawTransaction transaction)
         {
             if (transaction.chainTag == 0)
                 throw new ArgumentException("ChainTag is 0");
-            chainTag = RlpString.Create(transaction.chainTag);
+            ChainTag = RlpString.Create(transaction.chainTag);
 
             if (transaction.blockRef is null)
                 throw new ArgumentException("BlockRef is 0");
-            blockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray());
+            BlockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray());
 
             if (transaction.expiration == 0)
                 throw new ArgumentException("Expiration is 0");
-            expiration = RlpString.Create(transaction.expiration);
+            Expiration = RlpString.Create(transaction.expiration);
 
-            clauses = new RlpList(transaction.clauses.Select(ToRlpList).ToList());
+            Clauses = new RlpList(transaction.clauses.Select(ToRlpList).ToList());
 
-            gasPriceCoef = transaction.gasPriceCoef == 0
+            GasPriceCoef = transaction.gasPriceCoef == 0
                 ? RlpString.Create(RlpString.EMPTY)
                 : RlpString.Create(transaction.gasPriceCoef);
 
             if (transaction.gas == 0)
                 throw new ArgumentException("Gas is 0");
-            gas = RlpString.Create(transaction.gas);
+            Gas = RlpString.Create(transaction.gas);
 
-            dependsOn = transaction.dependsOn == null
+            DependsOn = transaction.dependsOn == null
                 ? RlpString.Create(RlpString.EMPTY)
                 : RlpString.Create(transaction.dependsOn);
 
             if (transaction.nonce is null)
                 throw new ArgumentException("Nonce is null");
-            nonce = RlpString.Create(transaction.nonce);
+            Nonce = RlpString.Create(transaction.nonce);
 
-            var emptyList = new List<RlpType>();
-            reserved = new RlpList(emptyList);
+            var emptyList = new List<IRlpType>();
+            Reserved = new RlpList(emptyList);
         }
 
-        public RlpType ToRlpList(Clause clause)
+        public IRlpType ToRlpList(RawClause clause)
         {
-            return new RlpList(new List<RlpType>
+            return new RlpList(new List<IRlpType>
             {
-                RlpString.Create(clause.to.HexStringToByteArray()),
-                RlpString.Create(new VET(BigInteger.Parse(clause.value), false).AsBytes),
-                RlpString.Create(clause.data.HexStringToByteArray())
+                RlpString.Create(clause.To.HexString.HexStringToByteArray()),
+                RlpString.Create(clause.Value.AsBytes),
+                RlpString.Create(clause.Data.HexStringToByteArray())
             });
         }
 
         public RlpList AsRLPValues()
         {
-            return new RlpList(new List<RlpType>
+            return new RlpList(new List<IRlpType>
             {
-                chainTag,
-                blockRef,
-                expiration,
-                clauses,
-                gasPriceCoef,
-                gas,
-                dependsOn,
-                nonce,
-                reserved
+                ChainTag,
+                BlockRef,
+                Expiration,
+                Clauses,
+                GasPriceCoef,
+                Gas,
+                DependsOn,
+                Nonce,
+                Reserved
             });
         }
     }
