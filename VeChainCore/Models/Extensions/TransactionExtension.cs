@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using Nethereum.RLP;
 using VeChainCore.Models.Blockchain;
 
 namespace VeChainCore.Models.Extensions
@@ -12,7 +10,7 @@ namespace VeChainCore.Models.Extensions
         /// </summary>
         /// <param name="transaction">The rawTransaction for which the cost is calculated</param>
         /// <returns></returns>
-        public static ulong CalculateGasCost(this Blockchain.Transaction transaction)
+        public static ulong CalculateGasCost(this Transaction transaction)
         {
             if (transaction?.clauses == null)
                 throw new NullReferenceException("Transaction is null");

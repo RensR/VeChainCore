@@ -32,7 +32,7 @@ namespace VeChainCoreTest
 
             var vetEncoded = RlpEncoder.Encode(rlpTransaction);
            
-            var out1 = vetEncoded.ByteArrayToString();
+            var out1 = vetEncoded.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
             var vethash = Hash.HashBlake2B(vetEncoded);
 
             // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478

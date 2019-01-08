@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using Nethereum.RLP;
+using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils
 {
@@ -50,7 +51,7 @@ namespace VeChainCore.Utils
 
         public static byte[] BigIntegerToBytes(this BigInteger bigInt)
         {
-            return bigInt.ToByteArray().Reverse().ToArray();
+            return bigInt.ToByteArray().Reverse().ToArray().TrimLeadingZeroBytes();
         }
 
         public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex, Prefix prefix = Prefix.Empty)
@@ -84,6 +85,8 @@ namespace VeChainCore.Utils
 
         public static bool OnlyHexInString(string test)
         {
+            if (test.StartsWith("0x"))
+                test = test.Substring(2);
             return System.Text.RegularExpressions.Regex.IsMatch(test, @"\A\b[0-9a-fA-F]+\b\Z");
         }
     }

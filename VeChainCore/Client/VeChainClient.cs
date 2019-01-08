@@ -5,8 +5,8 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using VeChainCore.Utils;
-using VeChainCore.Models;
 using VeChainCore.Models.Blockchain;
+using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Client
 {
@@ -39,12 +39,12 @@ namespace VeChainCore.Client
         /// Gets the blockchain tag that indicates what network is connected, main or testnet
         /// </summary>
         /// <returns></returns>
-        public async Task<uint> GetChainTag()
+        public async Task<byte> GetChainTag()
         {
             var genesis = await GetBlock("0");
             var lastByte = genesis.id.Substring(genesis.id.Length - 2);
 
-            return uint.Parse(lastByte, System.Globalization.NumberStyles.HexNumber);
+            return byte.Parse(lastByte, System.Globalization.NumberStyles.HexNumber);
         }
 
         // Logic methods
@@ -75,6 +75,15 @@ namespace VeChainCore.Client
         public async Task<Block> GetBlock(string blockNumber)
         {
             return await SendGetRequest<Block>($"/blocks/{blockNumber}");
+        }
+
+        public string GetLatestBlockRef()
+        {
+            var bestBlockID = GetBlock("best").Result.id.HexStringToByteArray();
+            var eightByte = new byte[8];
+            Buffer.BlockCopy(bestBlockID, 0, eightByte, 0, 8);
+
+            return eightByte.TrimLeadingZeroBytes().ByteArrayToString();
         }
 
         /// <summary>

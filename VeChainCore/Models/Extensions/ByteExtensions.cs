@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Org.BouncyCastle.Crypto.Paddings;
 
 namespace VeChainCore.Models.Extensions
 {
@@ -23,6 +24,17 @@ namespace VeChainCore.Models.Extensions
                 offset += array.Length;
             }
             return rv;
+        }
+
+
+        public static byte[] TrimLeadingZeroBytes(this byte[] array)
+        {
+            return array.TrimLeadingByte((byte) 0);
+        }
+
+        public static byte[] TrimLeadingByte(this byte[] array, byte b)
+        {
+            return array.SkipWhile(leading => leading == b).ToArray();
         }
     }
 }

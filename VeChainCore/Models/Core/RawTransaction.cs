@@ -24,6 +24,7 @@ namespace VeChainCore.Models.Core
             byte chainTag,
             string blockRef,
             RawClause[] clauses,
+            string nonce,
             uint expiration = 720,
             byte gasPriceCoef = 100,
             ulong gas = 21000,
@@ -39,6 +40,7 @@ namespace VeChainCore.Models.Core
                 blockRef = blockRef,
                 expiration = expiration,
                 clauses = clauses,
+                nonce = nonce,
                 gasPriceCoef = gasPriceCoef,
                 gas = gas,
                 dependsOn = dependsOn
