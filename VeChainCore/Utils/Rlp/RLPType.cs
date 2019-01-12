@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using Org.BouncyCastle.Math;
+
 
 namespace VeChainCore.Utils.Rlp
 {
@@ -47,7 +48,7 @@ namespace VeChainCore.Utils.Rlp
         public static RlpString Create(BigInteger value)
         {
             // RLP encoding only supports positive integer values
-            if (value.Sign < 1)
+            if (value.SignValue < 1)
             {
                 return new RlpString(EMPTY);
             }
@@ -55,9 +56,14 @@ namespace VeChainCore.Utils.Rlp
             return new RlpString(bytes.SkipWhile(element => element == 0).ToArray());
         }
 
-        public static RlpString Create(long value)
+        public static RlpString Create(ulong value)
         {
-            return Create((BigInteger) value);
+            return Create(new BigInteger(value.ToString()));
+        }
+
+        public static RlpString Create(int value)
+        {
+            return Create(new BigInteger(value.ToString()));
         }
 
         public static RlpString Create(string value)

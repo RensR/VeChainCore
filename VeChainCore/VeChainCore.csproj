@@ -5,9 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Isopoh.Cryptography.Blake2b" Version="1.0.8" />
     <PackageReference Include="Nethereum.Hex" Version="3.0.0" />
-    <PackageReference Include="Nethereum.KeyStore" Version="3.0.0" />
     <PackageReference Include="Nethereum.Signer" Version="3.0.0" />
   </ItemGroup>
 

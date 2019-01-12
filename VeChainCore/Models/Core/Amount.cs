@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using Org.BouncyCastle.Math;
 using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Core
@@ -31,10 +30,7 @@ namespace VeChainCore.Models.Core
         /// <param name="precision">Indicate whether the precision is already taken into account</param>
         public VET(BigInteger amount, bool precision = true)
         {
-            if(precision)
-                AsBigInt = amount;
-            else
-                AsBigInt = amount * (BigInteger) Math.Pow(10, Precision);
+            AsBigInt = precision ? amount : amount.Multiply(new BigInteger('1' + new string('\t', Precision)));
         }
     }
 }

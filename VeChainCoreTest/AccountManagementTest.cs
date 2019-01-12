@@ -9,8 +9,7 @@ namespace VeChainCoreTest
         [Fact]
         public void GetNewVeChainAddress()
         {
-            var key = AccountManagement.CreateNewPrivateKey();
-            ;
+
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.Serialization.Json;
@@ -77,11 +78,12 @@ namespace VeChainCore.Client
             return await SendGetRequest<Block>($"/blocks/{blockNumber}");
         }
 
-        public string GetLatestBlockRef()
+        public async Task<string> GetLatestBlockRef()
         {
-            var bestBlockID = GetBlock("best").Result.id.HexStringToByteArray();
+            var bestBlockID = await GetBlock("best");
+            var bestBlockIDHex = bestBlockID.id.HexStringToByteArray();
             var eightByte = new byte[8];
-            Buffer.BlockCopy(bestBlockID, 0, eightByte, 0, 8);
+            Buffer.BlockCopy(bestBlockIDHex, 0, eightByte, 0, 8);
 
             return eightByte.TrimLeadingZeroBytes().ByteArrayToString();
         }
@@ -128,7 +130,8 @@ namespace VeChainCore.Client
         private async Task<T> SendGetRequest<T>(string path)
         {
             var serializer = new DataContractJsonSerializer(typeof(T));
-            return (T) serializer.ReadObject(await _client.GetStreamAsync(RawUrl(path)));
+            var returnObject = serializer.ReadObject(await _client.GetStreamAsync(RawUrl(path)));
+            return (T) returnObject;
         }
 
         /// <summary>

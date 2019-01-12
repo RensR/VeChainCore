@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using Org.BouncyCastle.Math;
 
 namespace VeChainCore.Models.Core
 {
@@ -11,7 +11,7 @@ namespace VeChainCore.Models.Core
         public RawClause(string to, string value, string data, bool precision = true)
         {
             To = new Address(to);
-            Value = new VET(BigInteger.Parse(value), precision);
+            Value = new VET( new BigInteger(value), precision);
             Data = data;
         }
     }

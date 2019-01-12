@@ -1,5 +1,5 @@
 ﻿using Nethereum.Signer;
-using VeChainCore.Core;
+using VeChainCore.Models.Core;
 
 namespace VeChainCore.Utils.Account
 {
@@ -7,18 +7,7 @@ namespace VeChainCore.Utils.Account
     // logic in this class.
     public class AccountManagement
     {
-        public static ECKeyPair CreateNewPrivateKey()
-        {
-            var ecKey = EthECKey.GenerateKey();
-            var privateKey = ecKey.GetPrivateKey();
-            var genAddress = ecKey.GetPublicAddress();
 
-            return new ECKeyPair
-            {
-                privateKey = privateKey,
-                address = genAddress
-            };
-        }
 
 
 

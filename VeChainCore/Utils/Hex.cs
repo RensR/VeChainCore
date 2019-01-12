@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Numerics;
 using System.Text;
+using System.Text.RegularExpressions;
 using Nethereum.RLP;
+using Org.BouncyCastle.Math;
 using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils
@@ -31,17 +32,7 @@ namespace VeChainCore.Utils
             // To counteract the strange sign bit https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.parse?redirectedfrom=MSDN&view=netframework-4.7.2#System_Numerics_BigInteger_Parse_System_String_System_Globalization_NumberStyles_
             hex = "00" + hex;
 
-            return BigInteger.Parse(hex, NumberStyles.AllowHexSpecifier);
-        }
-
-        public static decimal HexToDecimal(string hex)
-        {
-            return (decimal) HexToBigInt(hex);
-        }
-
-        public static decimal HexToHumanReadableDecimal(string hex)
-        {
-            return HexToDecimal(hex) / 1_000_000_000_000_000_000;
+            return new BigInteger(hex);
         }
 
         public static decimal ToHumanReadable(decimal dec)
@@ -87,7 +78,39 @@ namespace VeChainCore.Utils
         {
             if (test.StartsWith("0x"))
                 test = test.Substring(2);
-            return System.Text.RegularExpressions.Regex.IsMatch(test, @"\A\b[0-9a-fA-F]+\b\Z");
+            return Regex.IsMatch(test, @"\A\b[0-9a-fA-F]+\b\Z");
+        }
+
+        public static byte[] ToBytesPadded(BigInteger value, int length)
+        {
+            byte[] result = new byte[length];
+            byte[] bytes = value.BigIntegerToBytes();
+            int bytesLength;
+            byte srcOffset;
+            if (bytes[0] == 0)
+            {
+                bytesLength = bytes.Length - 1;
+                srcOffset = 1;
+            }
+            else
+            {
+                bytesLength = bytes.Length;
+                srcOffset = 0;
+            }
+
+            if (bytesLength > length)
+            {
+                throw new Exception("Input is too large to put in byte array of size " + length);
+            }
+            int destOffset = length - bytesLength;
+            Array.Copy(bytes, srcOffset, result, destOffset, bytesLength);
+            return result;
+        }
+
+
+        public static BigInteger BytesToBigInt(byte[] bytes)
+        {
+            return new BigInteger(1, bytes);
         }
     }
 }

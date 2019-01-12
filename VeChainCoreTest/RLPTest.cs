@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using VeChainCore.Utils.Cryptography;
+﻿using VeChainCore.Utils.Cryptography;
 using VeChainCore.Utils;
-using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Core;
 using Xunit;
 using VeChainCore.Utils.Rlp;

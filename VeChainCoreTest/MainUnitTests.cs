@@ -1,6 +1,6 @@
 using System.Linq;
-using System.Numerics;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Math;
 using VeChainCore.Client;
 using VeChainCore.Utils;
 using VeChainCore.Models;
@@ -42,7 +42,7 @@ namespace VeChainCoreTest
                     receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                     signer = "0x0000000000000000000000000000000000000000",
                     isTrunk = true,
-                    transactions = new Transaction[0]
+                    transactions = new string[0]
                 }
                 :
                 new Block // Main
@@ -61,7 +61,7 @@ namespace VeChainCoreTest
                     receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                     signer = "0x0000000000000000000000000000000000000000",
                     isTrunk = true,
-                    transactions = new Transaction[0]
+                    transactions = new string[0]
                 };
 
             var block = await _vechainClient.GetBlock("0");
@@ -76,12 +76,12 @@ namespace VeChainCoreTest
             var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "1591234");
 
             Assert.True(!account.hasCode);
-            Assert.Equal(BigInteger.Parse("21087000000000000000000"), Hex.HexToBigInt(account.balance));
+            Assert.Equal(new BigInteger("21087000000000000000000"), Hex.HexToBigInt(account.balance));
 
             // Assert that the address had no engery nor contract at genesis
             var genesisAccount = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "0");
             Assert.False(genesisAccount.hasCode);
-            Assert.Equal(0, Hex.HexToBigInt(genesisAccount.energy));
+            Assert.Equal(new BigInteger("0"), Hex.HexToBigInt(genesisAccount.energy));
         }
 
         [Fact]
@@ -102,9 +102,6 @@ namespace VeChainCoreTest
             Assert.Equal(749, receipt.outputs.Length);
             Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
             Assert.Equal((uint)11989000, receipt.gasUsed);
-
-            var totalSent = receipt.outputs.Sum(output => output.transfers.Sum(transfer => Hex.HexToHumanReadableDecimal(transfer.amount)));
-            Assert.Equal(738, totalSent);
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using VeChainCore.Models.Core;
 
 namespace VeChainCore.Models.Blockchain
 {
@@ -20,7 +21,7 @@ namespace VeChainCore.Models.Blockchain
         public string receiptsRoot { get; set; }
         public string signer { get; set; }
         public bool isTrunk { get; set; }
-        public Transaction[] transactions { get; set; }
+        public string[] transactions { get; set; }
 
         public override string ToString()
         {
