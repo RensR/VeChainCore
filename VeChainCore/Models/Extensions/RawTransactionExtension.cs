@@ -1,9 +1,4 @@
 ﻿using System;
-using Nethereum.Signer.Crypto;
-using System.Numerics;
-using System.Security.Cryptography;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Crypto.Signers;
 using VeChainCore.Models.Core;
 using VeChainCore.Utils.Rlp;
 using VeChainCore.Utils.Cryptography;
@@ -35,7 +30,7 @@ namespace VeChainCore.Models.Extensions
         {
             var rlp = RlpEncoder.Encode(new RlpTransaction(transaction).AsRLPValues());
 
-            var sigdata = ECDSASign.signMessage(rlp, key, false);
+            var sigdata = ECDSASign.SignMessage(rlp, key, true);
 
             
             //byte[] o = Format(rlp).HexToByteArray();

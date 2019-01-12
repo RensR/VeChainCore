@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -42,7 +41,7 @@ namespace VeChainCore.Utils
 
         public static byte[] BigIntegerToBytes(this BigInteger bigInt)
         {
-            return bigInt.ToByteArray().Reverse().ToArray().TrimLeadingZeroBytes();
+            return bigInt.ToByteArray().TrimLeadingZeroBytes();
         }
 
         public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex, Prefix prefix = Prefix.Empty)

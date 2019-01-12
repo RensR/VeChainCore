@@ -2,7 +2,6 @@
 
 using Org.BouncyCastle.Math;
 using VeChainCore.Client;
-
 using VeChainCore.Models.Core;
 using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
@@ -51,8 +50,8 @@ namespace VeChainCoreTest
             var rawTransaction = asHexString.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
 
 
-            var privateKey = new BigInteger("0x94b848d4197998738a29e50b047364754b12c98561882d97cddce61f55a18c54");
-            var publicKey = ECDSASign.publicKeyFromPrivate(new BigInteger("0x94b848d4197998738a29e50b047364754b12c98561882d97cddce61f55a18c54"));
+            var privateKey = new BigInteger("0x94b848d4197998738a29e50b047364754b12c98561882d97cddce61f55a18c54".HexStringToByteArray());
+            var publicKey = ECDSASign.PublicKeyFromPrivate(privateKey);
 
 
             var customKey = new ECKeyPair(privateKey, publicKey);

@@ -93,7 +93,7 @@ namespace VeChainCore.Models.Core
 
         public static ECKeyPair create(BigInteger privateKey)
         {
-            return new ECKeyPair(privateKey, ECDSASign.publicKeyFromPrivate(privateKey));
+            return new ECKeyPair(privateKey, ECDSASign.PublicKeyFromPrivate(privateKey));
         }
 
         public static ECKeyPair create(String privateKeyHex)

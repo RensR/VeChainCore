@@ -10,12 +10,12 @@ namespace VeChainCore.Utils.Cryptography
 {
     public class ECDSASign
     {
-        public static SignatureData signMessage(byte[] message, ECKeyPair keys, bool needToHash)
+        public static SignatureData SignMessage(byte[] message, ECKeyPair keys, bool needToHash)
         {
             BigInteger publicKey = keys.getPublicKey();
             var messageHash = needToHash ? Hash.HashBlake2B(message) : message;
             int recId = -1;
-
+            var bytekey = publicKey.ToByteArray();
             ECDSASignature sig = keys.Sign(messageHash);
             for (int i = 0; i < 4; i++)
             {
@@ -49,7 +49,7 @@ namespace VeChainCore.Utils.Cryptography
 
         public static byte[] BigIntToBytesWithPadding(BigInteger bigint, int size)
         {
-            byte[] asBytes = bigint.ToByteArray();
+            byte[] asBytes = bigint.BigIntegerToBytes();
             var newArray = new byte[size];
 
             var startAt = newArray.Length - asBytes.Length;
@@ -111,15 +111,15 @@ namespace VeChainCore.Utils.Cryptography
             return ECKeyPair.Curve.Curve.DecodePoint(compEnc);
         }
 
-        public static BigInteger publicKeyFromPrivate(BigInteger privKey)
+        public static BigInteger PublicKeyFromPrivate(BigInteger privKey)
         {
-            ECPoint point = publicPointFromPrivate(privKey);
+            ECPoint point = PublicPointFromPrivate(privKey);
 
             byte[] encoded = point.GetEncoded(false);
             return new BigInteger(1, Arrays.CopyOfRange(encoded, 1, encoded.Length));  // remove prefix
         }
 
-        public static ECPoint publicPointFromPrivate(BigInteger privKey)
+        public static ECPoint PublicPointFromPrivate(BigInteger privKey)
         {
             /*
              * TODO: FixedPointCombMultiplier currently doesn't support scalars longer than the group
@@ -149,7 +149,7 @@ namespace VeChainCore.Utils.Cryptography
 
 
 
-        public override bool Equals(Object o)
+        public override bool Equals(object o)
         {
             if (!(o is SignatureData that)) return false;
             if (v != that.v)
