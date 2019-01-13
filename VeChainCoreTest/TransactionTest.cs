@@ -26,7 +26,7 @@ namespace VeChainCoreTest
         public async Task CreateTransaction()
         {
             var chainTag = await _vechainClient.GetChainTag();
-            var blockref = await _vechainClient.GetLatestBlockRef();
+            var blockref = "0x001a7d4448f0948b"; // await _vechainClient.GetLatestBlockRef();
 
 
             var trans = RawTransaction.CreateUnsigned(chainTag, blockref, new[]
@@ -35,7 +35,7 @@ namespace VeChainCoreTest
 
             }, "12345678", 720, 0, 21000, "");
 
-            var rlpTransaction = new RlpTransaction(trans).AsRLPValues();
+            var rlpTransaction = new RlpTransaction(trans).AsRlpValues();
 
             var rawWithoutMeta =
                 "2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478";
@@ -49,16 +49,15 @@ namespace VeChainCoreTest
 
             var rawTransaction = asHexString.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
 
-
-            var privateKey = new BigInteger("0x94b848d4197998738a29e50b047364754b12c98561882d97cddce61f55a18c54".HexStringToByteArray());
+            // 0x44C3e1Ce754129Eb74522E3CA5695B7Cfa6d2B19
+            var privateKey = new BigInteger("0x58beea15dd1835da3a866169d0c0d553b8a740a99cc7859dd8456509790b7e36".HexStringToByteArray());
             var publicKey = ECDSASign.PublicKeyFromPrivate(privateKey);
 
 
             var customKey = new ECKeyPair(privateKey, publicKey);
 
-            trans.Sign(customKey);
+            trans.Sign(customKey).CalculateTxId(new Address(customKey.GetHexAddress())).Transfer();
 
-            var txid = trans.CalculateTxId(new Address("0xeCC159751F9aed21399d5e3CE72BC9D4FcCB9cCc"));
 
             var hash = Hash.HashBlake2B(asHexString);
             var hashString = hash.ByteArrayToString();

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using VeChainCore.Models.Blockchain;
 using VeChainCore.Utils;
 using VeChainCore.Utils.Rlp;
 
@@ -19,6 +17,7 @@ namespace VeChainCore.Models.Core
         public RlpString DependsOn { get; set; }
         public RlpString Nonce { get; set; }
         public RlpList Reserved { get; set; }
+        public RlpString Signature { get; set; }
 
 
         public RlpTransaction(RawTransaction transaction)
@@ -29,7 +28,7 @@ namespace VeChainCore.Models.Core
 
             if (transaction.blockRef is null)
                 throw new ArgumentException("BlockRef is 0");
-            BlockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray());
+            BlockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray(8));
 
             if (transaction.expiration == 0)
                 throw new ArgumentException("Expiration is 0");
@@ -55,6 +54,9 @@ namespace VeChainCore.Models.Core
 
             var emptyList = new List<IRlpType>();
             Reserved = new RlpList(emptyList);
+
+            if (transaction.signature != null)
+                Signature = RlpString.Create(transaction.signature);
         }
 
         public IRlpType ToRlpList(RawClause clause)
@@ -67,9 +69,9 @@ namespace VeChainCore.Models.Core
             });
         }
 
-        public RlpList AsRLPValues()
+        public RlpList AsRlpValues()
         {
-            return new RlpList(new List<IRlpType>
+            var list = new List<IRlpType>
             {
                 ChainTag,
                 BlockRef,
@@ -80,7 +82,12 @@ namespace VeChainCore.Models.Core
                 DependsOn,
                 Nonce,
                 Reserved
-            });
+            };
+
+            if(Signature != null)
+                list.Add(Signature);
+
+            return new RlpList(list);
         }
     }
 }

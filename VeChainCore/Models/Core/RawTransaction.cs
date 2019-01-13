@@ -18,7 +18,7 @@ namespace VeChainCore.Models.Core
         public ulong size { get; set; }
         public TxMeta meta { get; set; }
 
-        public string signature { get; set; }
+        public byte[] signature { get; set; }
 
         public static RawTransaction CreateUnsigned(
             byte chainTag,

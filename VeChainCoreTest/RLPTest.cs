@@ -26,7 +26,7 @@ namespace VeChainCoreTest
                 nonce = "12345678"
             };
 
-            var rlpTransaction = new RlpTransaction(realTransaction).AsRLPValues();
+            var rlpTransaction = new RlpTransaction(realTransaction).AsRlpValues();
 
             var vetEncoded = RlpEncoder.Encode(rlpTransaction);
            

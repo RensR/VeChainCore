@@ -73,6 +73,11 @@ namespace VeChainCore.Utils
                 .ToArray();
         }
 
+        public static byte[] HexStringToByteArray(this string hex, int length)
+        {
+            return hex.HexStringToByteArray().AddPadding(length);
+        }
+
         public static bool OnlyHexInString(string test)
         {
             if (test.StartsWith("0x"))
@@ -110,6 +115,17 @@ namespace VeChainCore.Utils
         public static BigInteger BytesToBigInt(byte[] bytes)
         {
             return new BigInteger(1, bytes);
+        }
+
+        public static byte[] AddPadding(this byte[] bytes, int length)
+        {
+            byte[] result = new byte[length];
+
+            if(bytes.Length > length)
+                throw new Exception("Input is too large to put in byte array of size " + length);
+
+            Array.Copy(bytes, 0, result, length - bytes.Length, bytes.Length);
+            return result;
         }
     }
 }
