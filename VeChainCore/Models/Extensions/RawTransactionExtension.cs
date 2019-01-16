@@ -29,8 +29,8 @@ namespace VeChainCore.Models.Extensions
         {
             var rlp = RlpEncoder.Encode(new RlpTransaction(transaction).AsRlpValues());
 
-            var sigdata = ECDSASign.SignMessage(rlp, key, true);
-            transaction.signature = sigdata.ToByteArray();
+            SignatureData signatureData = ECDSASign.SignMessage(rlp, key, true);
+            transaction.signature = signatureData.ToByteArray();
 
             return transaction;
         }
@@ -43,8 +43,6 @@ namespace VeChainCore.Models.Extensions
             var bytes = rawTransaction.Encode();
 
             var transactionString = bytes.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
-
-            
 
             return new TransferResult();
         }

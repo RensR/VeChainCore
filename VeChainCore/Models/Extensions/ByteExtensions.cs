@@ -28,7 +28,7 @@ namespace VeChainCore.Models.Extensions
 
         public static byte[] TrimLeadingZeroBytes(this byte[] array)
         {
-            return array.TrimLeadingByte((byte) 0);
+            return array.TrimLeadingByte(0);
         }
 
         public static byte[] TrimLeadingByte(this byte[] array, byte b)

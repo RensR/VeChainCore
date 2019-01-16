@@ -10,15 +10,15 @@ namespace VeChainCore.Models.Core
 
         public ECDSASignature(byte[] rBytes, byte[] sBytes)
         {
-            this.R = Hex.BytesToBigInt(rBytes);
-            this.S = Hex.BytesToBigInt(sBytes);
+            R = Hex.BytesToBigInt(rBytes);
+            S = Hex.BytesToBigInt(sBytes);
         }
 
 
         public ECDSASignature(BigInteger r, BigInteger s)
         {
-            this.R = r;
-            this.S = s;
+            R = r;
+            S = s;
         }
 
         /**
@@ -34,9 +34,9 @@ namespace VeChainCore.Models.Core
 
         /**
          * Will automatically adjust the S component to be less than or equal to half the curve
-         * order, if necessary. This is required because for every signature (r,s) the signature
-         * (r, -s (mod N)) is a valid signature of the same message. However, we dislike the
-         * ability to modify the bits of a Bitcoin transaction after it's been signed, as that
+         * order, if necessary. This is required because for every signature (R,S) the signature
+         * (R, -S (mod N)) is a valid signature of the same message. However, we dislike the
+         * ability to modify the bits of a Bitcoin transaction after it'S been signed, as that
          * violates various assumed invariants. Thus in future only one of those forms will be
          * considered legal and the other will be banned.
          *
@@ -51,7 +51,7 @@ namespace VeChainCore.Models.Core
                 // If S is in the upper half of the number of valid points, then bring it back to
                 // the lower half. Otherwise, imagine that
                 //    N = 10
-                //    s = 8, so (-8 % 10 == 2) thus both (r, 8) and (r, 2) are valid solutions.
+                //    S = 8, so (-8 % 10 == 2) thus both (R, 8) and (R, 2) are valid solutions.
                 //    10 - 8 == 2, giving us always the latter solution, which is canonical.
                 return new ECDSASignature(R, ECKeyPair.Curve.N.Subtract(S));
             }

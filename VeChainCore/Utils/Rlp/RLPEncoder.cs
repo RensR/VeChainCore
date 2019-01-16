@@ -89,10 +89,10 @@ namespace VeChainCore.Utils.Rlp
 
         public static byte[] ToMinimalByteArray(int value)
         {
-            return toByteArray(value).SkipWhile(element => element == 0).ToArray();
+            return ToByteArray(value).SkipWhile(element => element == 0).ToArray();
         }
 
-        private static byte[] toByteArray(int value)
+        private static byte[] ToByteArray(int value)
         {
             return new[]
             {

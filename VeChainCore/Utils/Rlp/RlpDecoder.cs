@@ -57,7 +57,7 @@ namespace VeChainCore.Utils.Rlp
          * @param rlpEncoded - RLP encoded byte-array
          * @return recursive RLP structure
          */
-        public static RlpList decode(byte[] rlpEncoded)
+        public static RlpList Decode(byte[] rlpEncoded)
         {
             var rlpList = new RlpList(new List<IRlpType>());
             Traverse(rlpEncoded, 0, rlpEncoded.Length, rlpList);
@@ -77,7 +77,7 @@ namespace VeChainCore.Utils.Rlp
                 while (startPos < endPos)
                 {
 
-                    int prefix = data[startPos] & 0xff;
+                    var prefix = data[startPos] & 0xff;
 
                     if (prefix < OFFSET_SHORT_STRING)
                     {
