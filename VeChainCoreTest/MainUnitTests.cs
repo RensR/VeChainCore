@@ -5,6 +5,7 @@ using VeChainCore.Utils;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using Xunit;
+using static VeChainCore.Client.VeChainClient;
 
 namespace VeChainCoreTest
 {
@@ -18,12 +19,11 @@ namespace VeChainCoreTest
             _vechainClient.SetBlockchainAddress("http://192.168.178.155:8669");
         }
 
-
         [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
             var chainTag = await _vechainClient.GetChainTag();
-            var genesis = chainTag == 39 ?
+            var genesis = chainTag == (byte) Network.Test ?
                 new Block // Test
                 {
                     number = 0,
@@ -42,7 +42,7 @@ namespace VeChainCoreTest
                     isTrunk = true,
                     transactions = new string[0]
                 }
-                : chainTag == 74 ?
+                : chainTag == (byte)Network.Main ?
                 new Block // Main
                 {
                     number = 0,
@@ -139,9 +139,8 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GetChainTag()
         {
-            var tag = await _vechainClient.GetChainTag();
-            Assert.True(tag == 39 || tag == 74 || tag == 164);
-            //         Test == 39   Main == 74    Dev == 164
+            var tag =  await _vechainClient.GetChainTag();
+            Assert.True(tag == (byte)Network.Test || tag == (byte)Network.Main || tag == (byte)Network.Dev);
         }
     }
 }

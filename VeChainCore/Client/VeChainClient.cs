@@ -12,6 +12,13 @@ namespace VeChainCore.Client
 {
     public class VeChainClient
     {
+        public enum Network
+        {
+            Main = 74,
+            Test = 39,
+            Dev = 164
+        }
+
         private string _blockchainAddress = "http://localhost:8669";
 
         private readonly HttpClient _client = new HttpClient();
