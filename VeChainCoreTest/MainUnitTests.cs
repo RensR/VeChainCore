@@ -1,9 +1,7 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Org.BouncyCastle.Math;
 using VeChainCore.Client;
 using VeChainCore.Utils;
-using VeChainCore.Models;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using Xunit;
@@ -17,7 +15,7 @@ namespace VeChainCoreTest
         public BlockTest()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.SetBlockchainAddress("http://localhost:8669");
+            _vechainClient.SetBlockchainAddress("http://192.168.178.155:8669");
         }
 
 
@@ -25,7 +23,7 @@ namespace VeChainCoreTest
         public async Task GenesisBlockIdCheckAsync()
         {
             var chainTag = await _vechainClient.GetChainTag();
-            var genesis = chainTag == 39 ? 
+            var genesis = chainTag == 39 ?
                 new Block // Test
                 {
                     number = 0,
@@ -44,7 +42,7 @@ namespace VeChainCoreTest
                     isTrunk = true,
                     transactions = new string[0]
                 }
-                :
+                : chainTag == 74 ?
                 new Block // Main
                 {
                     number = 0,
@@ -58,6 +56,24 @@ namespace VeChainCoreTest
                     totalScore = 0,
                     txsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                     stateRoot = "0x09bfdf9e24dd5cd5b63f3c1b5d58b97ff02ca0490214a021ed7d99b93867839c",
+                    receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
+                    signer = "0x0000000000000000000000000000000000000000",
+                    isTrunk = true,
+                    transactions = new string[0]
+                } :
+                new Block // Dev
+                {
+                    number = 0,
+                    id = "0x00000000973ceb7f343a58b08f0693d6701a5fd354ff73d7058af3fba222aea4",
+                    size = 170,
+                    parentID = "0xffffffff00000000000000000000000000000000000000000000000000000000",
+                    timestamp = 1526400000,
+                    gasLimit = 10000000,
+                    beneficiary = "0x0000000000000000000000000000000000000000",
+                    gasUsed = 0,
+                    totalScore = 0,
+                    txsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
+                    stateRoot = "0x278b34bdbc5294d0cbbb7f1c49100c821e6fff7abc69a0c398c8f27d00563a8e",
                     receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                     signer = "0x0000000000000000000000000000000000000000",
                     isTrunk = true,
@@ -124,10 +140,8 @@ namespace VeChainCoreTest
         public async Task GetChainTag()
         {
             var tag = await _vechainClient.GetChainTag();
-
-            // 39 == Testnet
-            // 74 == Mainnet
-            Assert.True(tag == 39 || tag == 74);
+            Assert.True(tag == 39 || tag == 74 || tag == 164);
+            //         Test == 39   Main == 74    Dev == 164
         }
     }
 }
