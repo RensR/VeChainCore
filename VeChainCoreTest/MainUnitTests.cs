@@ -1,19 +1,17 @@
+using System.Linq;
 using System.Threading.Tasks;
-using VeChainCore;
+using Org.BouncyCastle.Math;
+using VeChainCore.Client;
+using VeChainCore.Utils;
 using VeChainCore.Models;
+using VeChainCore.Models.Blockchain;
+using VeChainCore.Models.Extensions;
 using Xunit;
 
 namespace VeChainCoreTest
 {
     public class BlockTest
     {
-        // CONFIG
-        // 
-        private static readonly bool Testnet = true;
-        //
-        // END CONFIG
-
-
         private readonly VeChainClient _vechainClient;
 
         public BlockTest()
@@ -26,8 +24,8 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
-            
-            var genesis = Testnet ? 
+            var chainTag = await _vechainClient.GetChainTag();
+            var genesis = chainTag == 39 ? 
                 new Block // Test
                 {
                     number = 0,
@@ -44,7 +42,7 @@ namespace VeChainCoreTest
                     receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                     signer = "0x0000000000000000000000000000000000000000",
                     isTrunk = true,
-                    transactions = new Transaction[0]
+                    transactions = new string[0]
                 }
                 :
                 new Block // Main
@@ -63,10 +61,10 @@ namespace VeChainCoreTest
                     receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                     signer = "0x0000000000000000000000000000000000000000",
                     isTrunk = true,
-                    transactions = new Transaction[0]
+                    transactions = new string[0]
                 };
 
-            var block = await _vechainClient.GetBlock(0);
+            var block = await _vechainClient.GetBlock("0");
 
             Assert.Equal(genesis, block);
         }
@@ -74,10 +72,62 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GetAccountBalance()
         {
-            // Assert that the address that I own has no contract 
-            var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b");
+            // Assert that this address has no contract at the current block
+            var account = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "1591234");
 
-            Assert.False(account.hasCode);
+            Assert.True(!account.hasCode);
+            Assert.Equal(new BigInteger("21087000000000000000000"), Hex.HexToBigInt(account.balance));
+
+            // Assert that the address had no engery nor contract at genesis
+            var genesisAccount = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "0");
+            Assert.False(genesisAccount.hasCode);
+            Assert.Equal(new BigInteger("0"), Hex.HexToBigInt(genesisAccount.energy));
+        }
+
+        [Fact]
+        public async Task GetTransaction()
+        {
+            var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+
+            Assert.Equal(749, transaction.clauses.Length);
+            // TODO
+            //Assert.Equal("0x00183e68e864ee05", transaction.blockRef);
+        }
+
+        [Fact]
+        public async Task GetReceipt()
+        {
+            var receipt = await _vechainClient.GetReceipt("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+
+            Assert.Equal(749, receipt.outputs.Length);
+            Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
+            Assert.Equal((uint)11989000, receipt.gasUsed);
+        }
+
+        [Fact]
+        public async Task TestnetFaucet()
+        {
+            Assert.Null(await _vechainClient.TestNetFaucet("0x"));
+        }
+
+        [Fact]
+        public async void CalculateGasCost()
+        {
+            var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+
+            var gas = transaction.CalculateGasCost();
+
+            Assert.Equal(transaction.gas, gas);
+        }
+
+        [Fact]
+        public async Task GetChainTag()
+        {
+            var tag = await _vechainClient.GetChainTag();
+
+            // 39 == Testnet
+            // 74 == Mainnet
+            Assert.True(tag == 39 || tag == 74);
         }
     }
 }

@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VeChainCore.Models
+namespace VeChainCore.Models.Blockchain
 {
     public class Transaction : IEquatable<Transaction>
     {
         public string id { get; set; }
-        public uint chainTag { get; set; }
+        public byte chainTag { get; set; }
         public string blockRef { get; set; }
         public uint expiration { get; set; }
         public Clause[] clauses { get; set; }
-        public uint gasPriceCoef { get; set; }
-        public uint gas { get; set; }
+        public byte gasPriceCoef { get; set; }
+        public ulong gas { get; set; }
         public string origin { get; set; }
         public string nonce { get; set; }
         public string dependsOn { get; set; }
-        public uint size { get; set; }
+        public ulong size { get; set; }
         public TxMeta meta { get; set; }
 
+        public string signature { get; set; }
         public override string ToString()
         {
             return $"Transaction {id}";
