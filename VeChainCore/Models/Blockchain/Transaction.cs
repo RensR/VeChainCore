@@ -19,6 +19,7 @@ namespace VeChainCore.Models.Blockchain
         public TxMeta meta { get; set; }
 
         public string signature { get; set; }
+
         public override string ToString()
         {
             return $"Transaction {id}";

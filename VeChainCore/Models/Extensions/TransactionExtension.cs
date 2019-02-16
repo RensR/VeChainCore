@@ -32,7 +32,7 @@ namespace VeChainCore.Models.Extensions
                 dataGasCost += transactionClause.to != null ? clauseGas : clauseGasContractCreation;
             }
 
-            return txGas +dataGasCost;
+            return txGas + dataGasCost;
         }
 
         /// <summary>

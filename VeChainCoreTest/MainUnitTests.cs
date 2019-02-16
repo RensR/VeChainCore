@@ -127,9 +127,49 @@ namespace VeChainCoreTest
         }
 
         [Fact]
-        public async void CalculateGasCost()
+        public void CalculateGasCostDataTwoClauses()
         {
-            var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+            var transaction = new Transaction
+            {
+                clauses = new Clause[]
+                {
+                    new Clause
+                    {
+                        to = "0x1cB569E82928A346f35Dc7B1f5B60309e209AF94",
+                        value = "0",
+                        data = "0xa9059cbb00000000000000000000000040781d7161aa7b17e39b510eb8b0ecc6a976ee480000000000000000000000000000000000000000000000007ce66c50e2840000"
+                    },
+                    new Clause
+                    {
+                        to = "0x1cB569E82928A346f35Dc7B1f5B60309e209AF94",
+                        value = "0",
+                        data = "0xa9059cbb000000000000000000000000c02e9c3d39755d7908e087a258f45c1b3f3642790000000000000000000000000000000000000000000000006f05b59d3b200000"
+                    }
+                },
+                gas = 68_056
+            };
+
+            var gas = transaction.CalculateGasCost();
+
+            Assert.Equal(transaction.gas, gas);
+        }
+
+        [Fact]
+        public void CalculateGasCostDataSingleClause()
+        {
+            var transaction = new Transaction
+            {
+                clauses = new Clause[]
+                {
+                    new Clause
+                    {
+                        to = "0x1cB569E82928A346f35Dc7B1f5B60309e209AF94",
+                        value = "0",
+                        data = "0xa9059cbb00000000000000000000000031a2f4e3567b29012c3332dfea1f3984487246b30000000000000000000000000000000000000000000000004563918244f40000"
+                    }
+                },
+                gas = 36_528
+            };
 
             var gas = transaction.CalculateGasCost();
 
