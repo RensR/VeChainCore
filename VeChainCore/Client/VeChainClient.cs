@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using VeChainCore.Utils;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace VeChainCore.Client
 {
@@ -124,18 +126,40 @@ namespace VeChainCore.Client
             var content = new StringContent($"{{\"to\":\"{address}\"}}", Encoding.UTF8, "application/json");
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            return  await _client.PostAsync("https://faucet.outofgas.io/requests", content);
+            return await _client.PostAsync("https://faucet.outofgas.io/requests", content);
         }
 
-
+        /// <summary>
+        /// Initiate a transaction to be included in the blockchain
+        /// </summary>
+        /// <param name="transactionBytes">The raw transaction in bytes</param>
+        /// <returns></returns>
         public async Task<TransferResult> SendTransaction(byte[] transactionBytes)
         {
             var transactionJson = new ByteArrayContent(transactionBytes);
 
-            var response = await SendPostRequest(RawUrl($"/transactions"), transactionJson);
-            return new TransferResult{ id =response.ToString()};
+            var response = await SendPostRequest($"/transactions", transactionJson);
+            return new TransferResult{ id = response.ToString()};
         }
 
+        /// <summary>
+        /// Checks the results of a mock contract execution
+        /// </summary>
+        /// <param name="transactionBytes"></param>
+        /// <param name="address">Address of the contract</param>
+        /// <returns></returns>
+        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
+        {
+            var json = $"{{\"clauses\": {JsonConvert.SerializeObject(clauses)}}}";
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await SendPostRequest($"/accounts/*", content);
+            var body = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<IEnumerable<CallResult>>(body);
+        }
 
         /// <summary>
         /// Send a GET request and retrieves an object of type T
