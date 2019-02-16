@@ -24,8 +24,8 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
-            var testnet = await _vechainClient.GetChainTag() == 39;
-            var genesis = testnet ? 
+            var chainTag = await _vechainClient.GetChainTag();
+            var genesis = chainTag == 39 ? 
                 new Block // Test
                 {
                     number = 0,

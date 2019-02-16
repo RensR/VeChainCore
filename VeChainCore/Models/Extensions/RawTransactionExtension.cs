@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Core;
 using VeChainCore.Utils.Rlp;
@@ -20,7 +22,7 @@ namespace VeChainCore.Models.Extensions
             Buffer.BlockCopy(signingHash, 0, concatenatedBytes, 0, signingHash.Length);
             Buffer.BlockCopy(signer.HexString.HexStringToByteArray(), 0, concatenatedBytes, signingHash.Length, signer.HexString.HexStringToByteArray().Length);
             byte[] txIdBytes = Hash.HashBlake2B(concatenatedBytes);
-            rawTransaction.id = txIdBytes.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
+            rawTransaction.id = txIdBytes.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
             return rawTransaction;
         }
 
@@ -35,18 +37,18 @@ namespace VeChainCore.Models.Extensions
             return transaction;
         }
 
-        public static TransferResult Transfer(this RawTransaction rawTransaction)
+        public static async Task<TransferResult> Transfer(this RawTransaction rawTransaction, VeChainClient client)
         {
             if(rawTransaction?.signature == null )
                 throw new ArgumentException("Unsigned transaction can not be sent");
 
             var bytes = rawTransaction.Encode();
 
-            var transactionString = bytes.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
+            var transactionString = bytes.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
 
-            
+            var result = await client.SendTransaction(bytes);
 
-            return new TransferResult();
+            return result;
         }
 
         public static byte[] Encode(this RawTransaction rawTransaction)

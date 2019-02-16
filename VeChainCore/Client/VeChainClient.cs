@@ -121,6 +121,16 @@ namespace VeChainCore.Client
             return  await _client.PostAsync("https://faucet.outofgas.io/requests", content);
         }
 
+
+        public async Task<TransferResult> SendTransaction(byte[] transactionBytes)
+        {
+            var transactionJson = new ByteArrayContent(transactionBytes);
+
+            var response = await SendPostRequest(RawUrl($"/transactions"), transactionJson);
+            return new TransferResult{ id =response.ToString()};
+        }
+
+
         /// <summary>
         /// Send a GET request and retrieves an object of type T
         /// </summary>

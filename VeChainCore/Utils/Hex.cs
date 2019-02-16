@@ -8,16 +8,11 @@ using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils
 {
-    public enum Prefix
-    {
-        Empty,
-        ZeroLowerX
-    }
-
+    [Flags]
     public enum StringType
     {
-        Hex,
-        Plain
+        ZeroLowerX,
+        Hex
     }
 
     public static class Hex
@@ -44,13 +39,13 @@ namespace VeChainCore.Utils
             return bigInt.ToByteArray().TrimLeadingZeroBytes();
         }
 
-        public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex, Prefix prefix = Prefix.Empty)
+        public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex)
         {
-            if(type == StringType.Plain)
+            if(type != StringType.Hex)
                 return Encoding.UTF8.GetString(ba);
 
             var hex = new StringBuilder(ba.Length * 2 + 2);
-            if (prefix != Prefix.Empty)
+            if (type != StringType.ZeroLowerX)
                 hex.Append("0x");
             foreach (byte b in ba)
                 hex.AppendFormat("{0:x2}", b);

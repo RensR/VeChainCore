@@ -30,7 +30,7 @@ namespace VeChainCoreTest
 
             var vetEncoded = RlpEncoder.Encode(rlpTransaction);
            
-            var out1 = vetEncoded.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
+            var out1 = vetEncoded.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
             var vethash = Hash.HashBlake2B(vetEncoded);
 
             // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478
@@ -48,7 +48,7 @@ namespace VeChainCoreTest
             // The list should only have 1 element
             Assert.Single(rlpList.GetValues());
             byte[] encodedinner = RlpEncoder.Encode(rlpList.GetValues()[0]);
-            string hexEncodedinner = encodedinner.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
+            string hexEncodedinner = encodedinner.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
             Assert.Equal(hexRaw, hexEncodedinner);
 
         }

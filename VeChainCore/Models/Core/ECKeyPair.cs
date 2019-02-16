@@ -72,7 +72,7 @@ namespace VeChainCore.Models.Core
         public string GetHexAddress()
         {
             var addressBytes = getRawAddress();
-            return addressBytes.ByteArrayToString(StringType.Hex, Prefix.ZeroLowerX);
+            return addressBytes.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
         }
 
         /**
