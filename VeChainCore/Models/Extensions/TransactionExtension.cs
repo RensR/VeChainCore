@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
 
 namespace VeChainCore.Models.Extensions
@@ -6,11 +8,34 @@ namespace VeChainCore.Models.Extensions
     public static class TransactionExtension
     {
         /// <summary>
-        /// Calculates the gas usage of a rawTransaction. Calculations are taken from the Thor Devkit
+        /// Calculates the gas usage of a rawTransaction by combining the intrinsic gas cost with
+        /// the cost of a test run interacting with a potential contract
+        /// <param name="transaction">The rawTransaction for which the cost is calculated</param>
+        /// <returns></returns>
+        public static async Task<ulong> CalculateTotalGasCost(this Transaction transaction, VeChainClient client)
+        {
+            var executionCost = await transaction.CalculateExecutionGasCost(client);
+            var intrinsicCost = transaction.CalculateIntrinsicGasCost();
+            return executionCost + intrinsicCost;
+        }
+
+        public static async Task<ulong> CalculateExecutionGasCost(this Transaction transaction, VeChainClient client)
+        {
+            ulong totalExecutionGas = 0;
+
+
+            var callResult = await client.ExecuteAddressCode(transaction.clauses);
+
+
+            return totalExecutionGas;
+        }
+
+        /// <summary>
+        /// Calculates the intrinsic gas usage of a rawTransaction. Calculations are taken from the Thor Devkit
         /// </summary>
         /// <param name="transaction">The rawTransaction for which the cost is calculated</param>
         /// <returns></returns>
-        public static ulong CalculateGasCost(this Transaction transaction)
+        public static ulong CalculateIntrinsicGasCost(this Transaction transaction)
         {
             if (transaction?.clauses == null)
                 throw new NullReferenceException("Transaction is null");
@@ -32,7 +57,7 @@ namespace VeChainCore.Models.Extensions
                 dataGasCost += transactionClause.to != null ? clauseGas : clauseGasContractCreation;
             }
 
-            return txGas +dataGasCost;
+            return txGas + dataGasCost;
         }
 
         /// <summary>
