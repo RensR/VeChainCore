@@ -31,8 +31,8 @@ namespace VeChainCore.Models.Extensions
         {
             var rlp = RlpEncoder.Encode(new RlpTransaction(transaction).AsRlpValues());
 
-            var sigdata = ECDSASign.SignMessage(rlp, key, true);
-            transaction.signature = sigdata.ToByteArray();
+            SignatureData signatureData = ECDSASign.SignMessage(rlp, key, true);
+            transaction.signature = signatureData.ToByteArray();
 
             return transaction;
         }

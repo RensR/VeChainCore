@@ -97,7 +97,7 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GetReceipt()
         {
-            var receipt = await _vechainClient.GetReciept("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+            var receipt = await _vechainClient.GetReceipt("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
 
             Assert.Equal(749, receipt.outputs.Length);
             Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
@@ -107,7 +107,7 @@ namespace VeChainCoreTest
         [Fact]
         public async Task TestnetFaucet()
         {
-            Assert.Null(await _vechainClient.TestnetFaucet("0x"));
+            Assert.Null(await _vechainClient.TestNetFaucet("0x"));
         }
 
         [Fact]

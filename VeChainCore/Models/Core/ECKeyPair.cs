@@ -36,35 +36,35 @@ namespace VeChainCore.Models.Core
 
         public ECKeyPair(BigInteger privateKey, BigInteger publicKey)
         {
-            this._privateKey = privateKey;
-            this._publicKey = publicKey;
+            _privateKey = privateKey;
+            _publicKey = publicKey;
         }
 
-        public BigInteger getPrivateKey()
+        public BigInteger GetPrivateKey()
         {
             return _privateKey;
         }
 
-        public byte[] getRawPrivateKey()
+        public byte[] GetRawPrivateKey()
         {
             return Hex.ToBytesPadded(_privateKey, PrivateKeySize);
         }
 
 
-        public BigInteger getPublicKey()
+        public BigInteger GetPublicKey()
         {
             return _publicKey;
         }
 
-        public byte[] getRawPublicKey()
+        public byte[] GetRawPublicKey()
         {
             return Hex.ToBytesPadded(_publicKey, PublicKeySize);
         }
 
-        public byte[] getRawAddress()
+        public byte[] GetRawAddress()
         {
-            byte[] hash = Hash.Keccac256(getRawPublicKey());
-            byte[] address = new byte[20];
+            var hash = Hash.Keccac256(GetRawPublicKey());
+            var address = new byte[20];
             Array.Copy(hash, 12, address, 0, address.Length);
             return address; // right most 160 bits
         }
@@ -82,71 +82,62 @@ namespace VeChainCore.Models.Core
          */
         public ECDSASignature Sign(byte[] message)
         {
-            ECDsaSigner signer = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
+            var signer = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
 
-            ECPrivateKeyParameters privKey = new ECPrivateKeyParameters(_privateKey, Curve);
-            signer.Init(true, privKey);
-            BigInteger[] components = signer.GenerateSignature(message);
+            var privateKey = new ECPrivateKeyParameters(_privateKey, Curve);
+            signer.Init(true, privateKey);
+            var components = signer.GenerateSignature(message);
 
             return new ECDSASignature(components[0], components[1]).ToCanonicalised();
         }
 
-        public static ECKeyPair create(BigInteger privateKey)
+        public static ECKeyPair Create(BigInteger privateKey)
         {
             return new ECKeyPair(privateKey, ECDSASign.PublicKeyFromPrivate(privateKey));
         }
 
-        public static ECKeyPair create(String privateKeyHex)
+        public static ECKeyPair Create(String privateKeyHex)
         {
-            byte[] privKey = privateKeyHex.HexStringToByteArray();
-            return create(privKey);
+            return Create(privateKeyHex.HexStringToByteArray());
         }
 
-        public static ECKeyPair create(byte[] privateKey)
+        public static ECKeyPair Create(byte[] privateKey)
         {
             if (privateKey.Length == PrivateKeySize)
             {
-                return create(Hex.BytesToBigInt(privateKey));
+                return Create(Hex.BytesToBigInt(privateKey));
             }
             throw new Exception("Invalid privatekey size");
         }
 
-        public static ECKeyPair create()
+        public static ECKeyPair Create()
         {
-            ECKeyPairGenerator generator = new ECKeyPairGenerator();
-            ECKeyGenerationParameters keygenParams = new ECKeyGenerationParameters(Domain,
-                SecureRandom);
-            generator.Init(keygenParams);
-            AsymmetricCipherKeyPair keypair = generator.GenerateKeyPair();
-            ECPrivateKeyParameters privParams = (ECPrivateKeyParameters) keypair.Private;
-            ECKeyPair k = ECKeyPair.create(privParams.D);
-            return k;
+            var generator = new ECKeyPairGenerator();
+            generator.Init(new ECKeyGenerationParameters(Domain, SecureRandom));
+            AsymmetricCipherKeyPair keyPair = generator.GenerateKeyPair();
+            var privateParams = (ECPrivateKeyParameters) keyPair.Private;
+            return Create(privateParams.D);
         }
 
         public override bool Equals(object o)
         {
             if (this == o)
-            {
                 return true;
-            }
+            
             if (o == null || !(o is ECKeyPair))
-            {
                 return false;
-            }
 
-            ECKeyPair ecKeyPair = (ECKeyPair) o;
+            var ecKeyPair = (ECKeyPair) o;
 
             if (!_privateKey?.Equals(ecKeyPair._privateKey) ?? ecKeyPair._privateKey != null)
-            {
                 return false;
-            }
-
+            
             return _publicKey?.Equals(ecKeyPair._publicKey) ?? ecKeyPair._publicKey == null;
         }
 
         public override int GetHashCode()
         {
-            int result = _privateKey != null ? _privateKey.GetHashCode() : 0;
+            var result = _privateKey != null ? _privateKey.GetHashCode() : 0;
             result = 31 * result + (_publicKey != null ? _publicKey.GetHashCode() : 0);
             return result;
         }

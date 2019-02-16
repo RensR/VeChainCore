@@ -3,16 +3,6 @@ using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Core
 {
-    public interface IAmount
-    {
-        int Precision { get; }
-        byte[] AsBytes { get; }
-        BigInteger AsBigInt { get; }
-        string ContractAddress { get; }
-    }
-
-
-
     public class VET : IAmount
     {
         public int Precision => 18;

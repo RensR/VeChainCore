@@ -13,26 +13,26 @@ namespace VeChainCore.Utils.Rlp
     {
         public static byte[] EMPTY = { };
 
-        private readonly byte[] value;
+        private readonly byte[] _value;
 
         private RlpString(byte[] value)
         {
-            this.value = value;
+            _value = value;
         }
 
         public byte[] GetBytes()
         {
-            return value;
+            return _value;
         }
 
         public BigInteger AsBigInteger()
         {
-            return value.Length == 0 ? BigInteger.Zero : new BigInteger(value);
+            return _value.Length == 0 ? BigInteger.Zero : new BigInteger(_value);
         }
 
         public override string ToString()
         {
-            return "0x" + value.ByteArrayToString();
+            return "0x" + _value.ByteArrayToString();
         }
 
         public static RlpString Create(byte[] value)
@@ -61,11 +61,6 @@ namespace VeChainCore.Utils.Rlp
             return Create(new BigInteger(value.ToString()));
         }
 
-        public static RlpString Create(int value)
-        {
-            return Create(new BigInteger(value.ToString()));
-        }
-
         public static RlpString Create(string value)
         {
             return new RlpString(value.StringToByteArray());
@@ -84,12 +79,17 @@ namespace VeChainCore.Utils.Rlp
 
             var rlpString = (RlpString) o;
 
-            return value.SequenceEqual(rlpString.value);
+            return _value.SequenceEqual(rlpString._value);
+        }
+
+        protected bool Equals(RlpString other)
+        {
+            return Equals(_value, other._value);
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return (_value != null ? _value.GetHashCode() : 0);
         }
     }
 

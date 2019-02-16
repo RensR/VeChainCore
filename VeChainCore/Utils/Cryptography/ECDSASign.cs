@@ -12,10 +12,10 @@ namespace VeChainCore.Utils.Cryptography
     {
         public static SignatureData SignMessage(byte[] message, ECKeyPair keys, bool needToHash)
         {
-            BigInteger publicKey = keys.getPublicKey();
+            BigInteger publicKey = keys.GetPublicKey();
             var messageHash = needToHash ? Hash.HashBlake2B(message) : message;
-            int recId = -1;
-            var bytekey = publicKey.ToByteArray();
+            var recId = -1;
+
             ECDSASignature sig = keys.Sign(messageHash);
             for (int i = 0; i < 4; i++)
             {
@@ -29,14 +29,8 @@ namespace VeChainCore.Utils.Cryptography
             }
 
             if (recId == -1)
-            {
                 throw new Exception("Sign the data failed.");
-            }
-
-            if (recId == 2 || recId == 3)
-            {
-                throw new Exception("Recovery is not valid for VeChain MainNet.");
-            }
+            if (recId == 2 || recId == 3) throw new Exception("Recovery is not valid for VeChain MainNet.");
 
             byte v = (byte) recId;
             sig.R.ToByteArray();
@@ -136,15 +130,15 @@ namespace VeChainCore.Utils.Cryptography
 
     public class SignatureData
     {
-        public byte v;
-        public byte[] r;
-        public byte[] s;
+        public byte V;
+        public byte[] R;
+        public byte[] S;
 
         public SignatureData(byte v, byte[] r, byte[] s)
         {
-            this.v = v;
-            this.r = r;
-            this.s = s;
+            V = v;
+            R = r;
+            S = s;
         }
 
 
@@ -152,40 +146,36 @@ namespace VeChainCore.Utils.Cryptography
         public override bool Equals(object o)
         {
             if (!(o is SignatureData that)) return false;
-            if (v != that.v)
+            if (V != that.V)
             {
                 return false;
             }
-            return Arrays.Equals(r, that.r) && Arrays.Equals(s, that.s);
+            return Equals(R, that.R) && Equals(S, that.S);
         }
 
         protected bool Equals(SignatureData other)
         {
-            return v == other.v && Equals(r, other.r) && Equals(s, other.s);
+            return V == other.V && Equals(R, other.R) && Equals(S, other.S);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = v.GetHashCode();
-                hashCode = (hashCode * 397) ^ (r != null ? r.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (s != null ? s.GetHashCode() : 0);
+                var hashCode = V.GetHashCode();
+                hashCode = (hashCode * 397) ^ (R != null ? R.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (S != null ? S.GetHashCode() : 0);
                 return hashCode;
             }
         }
 
-/**
- * Convert to bytes array. r bytes array append s bytes array, and then append v byte.
- * @return the bytes array.
- */
         public byte[] ToByteArray()
         {
-            int size = r.Length + s.Length + 1;
+            int size = R.Length + S.Length + 1;
             byte[] flat = new byte[size];
-            Array.Copy(r, 0, flat, 0, r.Length);
-            Array.Copy(s, 0, flat, r.Length, s.Length);
-            flat[size - 1] = v;
+            Array.Copy(R, 0, flat, 0, R.Length);
+            Array.Copy(S, 0, flat, R.Length, S.Length);
+            flat[size - 1] = V;
             return flat;
         }
     }
