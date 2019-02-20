@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
@@ -28,13 +29,8 @@ namespace VeChainCore.Models.Extensions
         /// <returns>The execution gas cost of the transaction</returns>
         public static async Task<ulong> CalculateExecutionGasCost(this Transaction transaction, VeChainClient client)
         {
-            ulong totalExecutionGas = 0;
-
-
-            var callResult = await client.ExecuteAddressCode(transaction.clauses);
-
-
-            return totalExecutionGas;
+            var callResults = await client.ExecuteAddressCode(transaction.clauses);
+            return (ulong)callResults.Sum(result => (decimal)result.gasUsed);
         }
 
         /// <summary>

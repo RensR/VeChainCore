@@ -22,11 +22,7 @@ namespace VeChainCore.Utils
             if (hex.StartsWith("0x"))
                 hex = hex.Substring(2);
 
-            // To counteract the strange sign bit
-            // https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.parse?redirectedfrom=MSDN&view=netframework-4.7.2#System_Numerics_BigInteger_Parse_System_String_System_Globalization_NumberStyles_
-            hex = "00" + hex;
-
-            return new BigInteger(hex);
+            return new BigInteger(hex, 16);
         }
 
         public static decimal ToHumanReadable(decimal dec)
