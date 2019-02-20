@@ -14,6 +14,9 @@ namespace VeChainCore.Client
 {
     public class VeChainClient
     {
+        /// <summary>
+        /// The chaintags of the three known VeChain networks
+        /// </summary>
         public enum Network
         {
             Main = 74,
@@ -21,6 +24,9 @@ namespace VeChainCore.Client
             Dev = 164
         }
 
+        /// <summary>
+        /// The address of a running VeChain instance
+        /// </summary>
         private string _blockchainAddress = "http://localhost:8669";
 
         private readonly HttpClient _client = new HttpClient();
@@ -45,7 +51,7 @@ namespace VeChainCore.Client
         }
 
         /// <summary>
-        /// Gets the blockchain tag that indicates what network is connected, main or testnet
+        /// Gets the blockchain tag that indicates what network is connected; Main, Testnet or a dev instance
         /// </summary>
         /// <returns></returns>
         public async Task<byte> GetChainTag()
