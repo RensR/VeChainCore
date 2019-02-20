@@ -126,7 +126,7 @@ namespace VeChainCore.Client
 
         public async Task<HttpResponseMessage> TestNetFaucet(string address)
         {
-            if (!CheckIfValid.Address(address))
+            if (!Hex.IsValidAddress(address))
                 return null;
 
             var content = new StringContent($"{{\"to\":\"{address}\"}}", Encoding.UTF8, "application/json");
