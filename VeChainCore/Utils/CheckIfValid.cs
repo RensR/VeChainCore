@@ -2,15 +2,15 @@
 {
     public static class CheckIfValid
     {
+        /// <summary>
+        /// A valid VeChain address should be 42 characters long and start with 0x and contain only
+        /// hex characters after the 0x.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public static bool Address(string address)
         {
-            return address.Length == 42 && address.StartsWith("0x") && OnlyHexInString(address);
-        }
-
-
-        public static bool OnlyHexInString(string test)
-        {
-            return System.Text.RegularExpressions.Regex.IsMatch(test, @"\A\b(0[xX])?[0-9a-fA-F]+\b\Z");
+            return address.Length == 42 && address.StartsWith("0x") && address.IsHexString();
         }
     }
 }

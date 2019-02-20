@@ -66,7 +66,6 @@ namespace VeChainCore.Utils.Rlp
 
         private static void Traverse(byte[] data, int startPos, int endPos, RlpList rlpList)
         {
-
             try
             {
                 if (data == null || data.Length == 0)
@@ -81,11 +80,9 @@ namespace VeChainCore.Utils.Rlp
 
                     if (prefix < OFFSET_SHORT_STRING)
                     {
-
                         // 1. the data is a string if the range of the
                         // first byte(i.e. prefix) is [0x00, 0x7f],
                         // and the string is the first byte itself exactly;
-
                         byte[] rlpData = {(byte) prefix};
                         rlpList.GetValues().Add(RlpString.Create(rlpData));
                         startPos += 1;
@@ -93,15 +90,12 @@ namespace VeChainCore.Utils.Rlp
                     }
                     else if (prefix == OFFSET_SHORT_STRING)
                     {
-
                         // null
                         rlpList.GetValues().Add(RlpString.Create(new byte[0]));
                         startPos += 1;
-
                     }
                     else if (prefix > OFFSET_SHORT_STRING && prefix <= OFFSET_LONG_STRING)
                     {
-
                         // 2. the data is a string if the range of the
                         // first byte is [0x80, 0xb7], and the string
                         // which length is equal to the first byte minus 0x80
@@ -114,11 +108,9 @@ namespace VeChainCore.Utils.Rlp
 
                         rlpList.GetValues().Add(RlpString.Create(rlpData));
                         startPos += 1 + strLen;
-
                     }
                     else if (prefix > OFFSET_LONG_STRING && prefix < OFFSET_SHORT_LIST)
                     {
-
                         // 3. the data is a string if the range of the
                         // first byte is [0xb8, 0xbf], and the length of the
                         // string which length in bytes is equal to the
@@ -134,11 +126,9 @@ namespace VeChainCore.Utils.Rlp
 
                         rlpList.GetValues().Add(RlpString.Create(rlpData));
                         startPos += lenOfStrLen + strLen + 1;
-
                     }
                     else if (prefix >= OFFSET_SHORT_LIST && prefix <= OFFSET_LONG_LIST)
                     {
-
                         // 4. the data is a list if the range of the
                         // first byte is [0xc0, 0xf7], and the concatenation of
                         // the RLP encodings of all items of the list which the
@@ -151,11 +141,9 @@ namespace VeChainCore.Utils.Rlp
                         rlpList.GetValues().Add(newLevelList);
 
                         startPos += 1 + listLen;
-
                     }
                     else if (prefix > OFFSET_LONG_LIST)
                     {
-
                         // 5. the data is a list if the range of the
                         // first byte is [0xf8, 0xff], and the total payload of the
                         // list which length is equal to the
@@ -173,7 +161,6 @@ namespace VeChainCore.Utils.Rlp
 
                         startPos += lenOfListLen + listLen + 1;
                     }
-
                 }
             }
             catch (Exception e)
@@ -193,6 +180,5 @@ namespace VeChainCore.Utils.Rlp
             }
             return length;
         }
-
     }
 }

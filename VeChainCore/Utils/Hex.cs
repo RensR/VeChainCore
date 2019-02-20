@@ -22,8 +22,8 @@ namespace VeChainCore.Utils
             if (hex.StartsWith("0x"))
                 hex = hex.Substring(2);
 
-
-            // To counteract the strange sign bit https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.parse?redirectedfrom=MSDN&view=netframework-4.7.2#System_Numerics_BigInteger_Parse_System_String_System_Globalization_NumberStyles_
+            // To counteract the strange sign bit
+            // https://docs.microsoft.com/en-us/dotnet/api/system.numerics.biginteger.parse?redirectedfrom=MSDN&view=netframework-4.7.2#System_Numerics_BigInteger_Parse_System_String_System_Globalization_NumberStyles_
             hex = "00" + hex;
 
             return new BigInteger(hex);
@@ -73,11 +73,15 @@ namespace VeChainCore.Utils
             return hex.HexStringToByteArray().AddPadding(length);
         }
 
-        public static bool OnlyHexInString(string test)
+        /// <summary>
+        /// Checks if the string is a valid hex string, containing only hex characters after a
+        /// possible '0x'.
+        /// </summary>
+        /// <param name="test"></param>
+        /// <returns></returns>
+        public static bool IsHexString(this string test)
         {
-            if (test.StartsWith("0x"))
-                test = test.Substring(2);
-            return Regex.IsMatch(test, @"\A\b[0-9a-fA-F]+\b\Z");
+            return Regex.IsMatch(test, @"\A\b(0[xX])?[0-9a-fA-F]+\b\Z");
         }
 
         public static byte[] ToBytesPadded(BigInteger value, int length)
@@ -98,28 +102,26 @@ namespace VeChainCore.Utils
             }
 
             if (bytesLength > length)
-            {
-                throw new Exception("Input is too large to put in byte array of size " + length);
-            }
+                throw new Exception($"Input is too large to put in byte array of size; {bytesLength}>{length}");
+
             int destOffset = length - bytesLength;
             Array.Copy(bytes, srcOffset, result, destOffset, bytesLength);
             return result;
         }
-
 
         public static BigInteger BytesToBigInt(byte[] bytes)
         {
             return new BigInteger(1, bytes);
         }
 
-        public static byte[] AddPadding(this byte[] bytes, int length)
+        public static T[] AddPadding<T>(this T[] array, int length)
         {
-            byte[] result = new byte[length];
+            T[] result = new T[length];
 
-            if(bytes.Length > length)
-                throw new Exception("Input is too large to put in byte array of size " + length);
+            if(array.Length > length)
+                throw new Exception($"Input is too large to put in byte array of size; {array.Length}>{length}");
 
-            Array.Copy(bytes, 0, result, length - bytes.Length, bytes.Length);
+            Array.Copy(array, 0, result, length - array.Length, array.Length);
             return result;
         }
     }

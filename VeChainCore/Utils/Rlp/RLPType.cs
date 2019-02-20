@@ -5,9 +5,7 @@ using Org.BouncyCastle.Math;
 
 namespace VeChainCore.Utils.Rlp
 {
-    public interface IRlpType
-    {
-    }
+    public interface IRlpType { }
 
     public class RlpString : IRlpType
     {
@@ -69,17 +67,12 @@ namespace VeChainCore.Utils.Rlp
         public override bool Equals(object o)
         {
             if (this == o)
-            {
                 return true;
-            }
+            
             if (!(o is RlpString))
-            {
                 return false;
-            }
-
-            var rlpString = (RlpString) o;
-
-            return _value.SequenceEqual(rlpString._value);
+            
+            return _value.SequenceEqual(((RlpString)o)._value);
         }
 
         protected bool Equals(RlpString other)
@@ -89,13 +82,11 @@ namespace VeChainCore.Utils.Rlp
 
         public override int GetHashCode()
         {
-            return (_value != null ? _value.GetHashCode() : 0);
+            return _value != null ? _value.GetHashCode() : 0;
         }
     }
 
-    /**
-    * RLP list type.
-    */
+
     public class RlpList : IRlpType
     {
         private readonly List<IRlpType> _values;
