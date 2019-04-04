@@ -36,7 +36,7 @@ namespace VeChainCoreTest
             // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478
             var vethashReadable = vethash.ByteArrayToString();
 
-            Assert.Equal("2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478", vethashReadable);
+            Assert.Equal("0x10a73083e1bac83485f98559ac17bcd3d485371403ef3da1f91e6c66617996d2", vethashReadable);
         }
 
         [Fact]

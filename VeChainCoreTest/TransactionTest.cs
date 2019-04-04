@@ -18,7 +18,7 @@ namespace VeChainCoreTest
         public TransactionTest()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.SetBlockchainAddress("http://192.168.178.155:8669");
+            _vechainClient.SetBlockchainAddress("https://sync-testnet.vechain.org");
         }
 
 

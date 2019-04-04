@@ -1,19 +1,39 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Threading.Tasks;
 using VeChainCore.Utils;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using Utf8Json;
+using Utf8Json.ImmutableCollection;
+using Utf8Json.Resolvers;
+using VeChainCore.Models.Core;
 
 namespace VeChainCore.Client
 {
-    public class VeChainClient
+    public class VeChainClient : IDisposable
     {
+        public static readonly IJsonFormatterResolver JsonFormatterResolver
+            = CompositeResolver.Create(
+                new IJsonFormatter[]
+                {
+                    new InterfaceImmutableDictionaryFormatter<string, object>(),
+                    new ImmutableDictionaryFormatter<string, object>(),
+                    new ImmutableSortedDictionaryFormatter<string, object>()
+                },
+                new[]
+                {
+                    EnumResolver.Default,
+                    ImmutableCollectionResolver.Instance,
+                    BuiltinResolver.Instance,
+                    AttributeFormatterResolver.Instance,
+                    DynamicGenericResolver.Instance,
+                    StandardResolver.ExcludeNullCamelCase,
+                    DynamicObjectResolver.ExcludeNullCamelCase
+                });
+        
         public enum Network
         {
             Main = 74,
@@ -123,7 +143,8 @@ namespace VeChainCore.Client
             if (!CheckIfValid.Address(address))
                 return null;
 
-            var content = new StringContent($"{{\"to\":\"{address}\"}}", Encoding.UTF8, "application/json");
+            var content = new ByteArrayContent(JsonSerializer.Serialize(new ToEnvelope { to = address }, JsonFormatterResolver));
+            
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             return await _client.PostAsync("https://faucet.outofgas.io/requests", content);
@@ -138,7 +159,7 @@ namespace VeChainCore.Client
         {
             var transactionJson = new ByteArrayContent(transactionBytes);
 
-            var response = await SendPostRequest($"/transactions", transactionJson);
+            var response = await SendPostRequest("/transactions", transactionJson);
             return new TransferResult{ id = response.ToString()};
         }
 
@@ -150,15 +171,17 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
         {
-            var json = $"{{\"clauses\": {JsonConvert.SerializeObject(clauses)}}}";
+            var json = JsonSerializer.Serialize(new ClausesEnvelope {clauses = clauses}, JsonFormatterResolver);
 
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var content = new ByteArrayContent(json);
+            
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await SendPostRequest($"/accounts/*", content);
-            var body = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<IEnumerable<CallResult>>(body);
+            var body = await response.Content.ReadAsByteArrayAsync();
+
+            return JsonSerializer.Deserialize<IEnumerable<CallResult>>(body, JsonFormatterResolver);
         }
 
         /// <summary>
@@ -169,8 +192,7 @@ namespace VeChainCore.Client
         /// <returns></returns>
         private async Task<T> SendGetRequest<T>(string path)
         {
-            var serializer = new DataContractJsonSerializer(typeof(T));
-            object returnObject = serializer.ReadObject(await _client.GetStreamAsync(RawUrl(path)));
+            object returnObject = JsonSerializer.Deserialize<T>(await _client.GetByteArrayAsync(RawUrl(path)), JsonFormatterResolver);
             return (T) returnObject;
         }
 
@@ -193,6 +215,11 @@ namespace VeChainCore.Client
         private string RawUrl(string path)
         {
             return _blockchainAddress + path;
+        }
+
+        public void Dispose()
+        {
+            _client.Dispose();
         }
     }
 }

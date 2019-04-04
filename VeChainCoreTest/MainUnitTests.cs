@@ -16,7 +16,7 @@ namespace VeChainCoreTest
         public BlockTest()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.SetBlockchainAddress("http://192.168.178.155:8669");
+            _vechainClient.SetBlockchainAddress("https://sync-testnet.vechain.org");
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace VeChainCoreTest
             Assert.True(!account.hasCode);
             Assert.Equal(new BigInteger("21087000000000000000000"), Hex.HexToBigInt(account.balance));
 
-            // Assert that the address had no engery nor contract at genesis
+            // Assert that the address had no energy nor contract at genesis
             var genesisAccount = await _vechainClient.GetAccount("0xa9eb0d2bf88d7a190728879865ea231c3a15d54b", "0");
             Assert.False(genesisAccount.hasCode);
             Assert.Equal(new BigInteger("0"), Hex.HexToBigInt(genesisAccount.energy));
@@ -146,13 +146,14 @@ namespace VeChainCoreTest
                         data = "0xa9059cbb000000000000000000000000c02e9c3d39755d7908e087a258f45c1b3f3642790000000000000000000000000000000000000000000000006f05b59d3b200000"
                     }
                 },
-                gas = 68_056
+                gas = 41_384 //68_056
             };
 
             var gas = await transaction.CalculateTotalGasCost(_vechainClient);
             var intrinsicGas = transaction.CalculateIntrinsicGasCost();
 
-            Assert.Equal((ulong)23_192, intrinsicGas);
+            Assert.Equal((ulong)41_384, intrinsicGas);
+            //Assert.Equal((ulong)23_192, intrinsicGas);
 
             Assert.Equal(transaction.gas, gas);
         }
@@ -171,7 +172,7 @@ namespace VeChainCoreTest
                         data = "0xa9059cbb00000000000000000000000031a2f4e3567b29012c3332dfea1f3984487246b30000000000000000000000000000000000000000000000004563918244f40000"
                     }
                 },
-                gas = 36_528
+                gas = 23_192
             };
 
             var gas = await transaction.CalculateTotalGasCost(_vechainClient);
@@ -179,7 +180,7 @@ namespace VeChainCoreTest
 
             Assert.Equal((ulong) 23_192, intrinsicGas);
             
-           // Assert.Equal(transaction.gas, gas);
+            Assert.Equal(transaction.gas, gas);
         }
 
         [Fact]
