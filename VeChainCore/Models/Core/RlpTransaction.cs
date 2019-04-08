@@ -34,7 +34,7 @@ namespace VeChainCore.Models.Core
                 throw new ArgumentException("Expiration is 0");
             Expiration = RlpString.Create(transaction.expiration);
 
-            Clauses = new RlpList(transaction.clauses.Select(ToRlpList).ToList());
+            Clauses = new RlpList(transaction.clauses.Select(ToRlpList).ToArray());
 
             GasPriceCoef = transaction.gasPriceCoef == 0
                 ? RlpString.Create(RlpString.EMPTY)
@@ -52,8 +52,7 @@ namespace VeChainCore.Models.Core
                 throw new ArgumentException("Nonce is null");
             Nonce = RlpString.Create(transaction.nonce);
 
-            var emptyList = new List<IRlpType>();
-            Reserved = new RlpList(emptyList);
+            Reserved = new RlpList(null);
 
             if (transaction.signature != null)
                 Signature = RlpString.Create(transaction.signature);
@@ -61,7 +60,7 @@ namespace VeChainCore.Models.Core
 
         public IRlpType ToRlpList(RawClause clause)
         {
-            return new RlpList(new List<IRlpType>
+            return new RlpList(new []
             {
                 RlpString.Create(clause.To.HexString.HexStringToByteArray()),
                 RlpString.Create(clause.Value.AsBytes),
@@ -87,7 +86,7 @@ namespace VeChainCore.Models.Core
             if(Signature != null)
                 list.Add(Signature);
 
-            return new RlpList(list);
+            return new RlpList(list.ToArray());
         }
     }
 }

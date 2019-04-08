@@ -87,18 +87,14 @@ namespace VeChainCore.Utils.Rlp
     }
 
 
-    public class RlpList : IRlpType
+    public class RlpList : List<IRlpType>, IRlpType
     {
-        private readonly List<IRlpType> _values;
+        public IRlpType[] RlpData;
 
-        public RlpList(List<IRlpType> values)
-        {
-            _values = values;
-        }
 
-        public List<IRlpType> GetValues()
+        public RlpList(IRlpType[] values)
         {
-            return _values;
+            RlpData = values;
         }
     }
 }

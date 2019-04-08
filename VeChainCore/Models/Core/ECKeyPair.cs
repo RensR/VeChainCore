@@ -96,7 +96,7 @@ namespace VeChainCore.Models.Core
             return new ECKeyPair(privateKey, ECDSASign.PublicKeyFromPrivate(privateKey));
         }
 
-        public static ECKeyPair Create(String privateKeyHex)
+        public static ECKeyPair Create(string privateKeyHex)
         {
             return Create(privateKeyHex.HexStringToByteArray());
         }

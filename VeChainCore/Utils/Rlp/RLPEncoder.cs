@@ -102,10 +102,8 @@ namespace VeChainCore.Utils.Rlp
             };
         }
 
-        private static byte[] EncodeList(RlpList value)
+        private static byte[] EncodeList(RlpList values)
         {
-            var values = value.GetValues();
-
             if (values.Count < 1)
                 return Encode(new byte[] { }, OFFSET_SHORT_LIST);
             

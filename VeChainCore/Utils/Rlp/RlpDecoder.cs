@@ -59,7 +59,7 @@ namespace VeChainCore.Utils.Rlp
          */
         public static RlpList Decode(byte[] rlpEncoded)
         {
-            var rlpList = new RlpList(new List<IRlpType>());
+            var rlpList = new RlpList(new IRlpType[0]);
             Traverse(rlpEncoded, 0, rlpEncoded.Length, rlpList);
             return rlpList;
         }
@@ -84,14 +84,14 @@ namespace VeChainCore.Utils.Rlp
                         // first byte(i.e. prefix) is [0x00, 0x7f],
                         // and the string is the first byte itself exactly;
                         byte[] rlpData = {(byte) prefix};
-                        rlpList.GetValues().Add(RlpString.Create(rlpData));
+                        rlpList.Add(RlpString.Create(rlpData));
                         startPos += 1;
 
                     }
                     else if (prefix == OFFSET_SHORT_STRING)
                     {
                         // null
-                        rlpList.GetValues().Add(RlpString.Create(new byte[0]));
+                        rlpList.Add(RlpString.Create(new byte[0]));
                         startPos += 1;
                     }
                     else if (prefix > OFFSET_SHORT_STRING && prefix <= OFFSET_LONG_STRING)
@@ -106,7 +106,7 @@ namespace VeChainCore.Utils.Rlp
                         byte[] rlpData = new byte[strLen];
                         Array.Copy(data, startPos + 1, rlpData, 0, strLen);
 
-                        rlpList.GetValues().Add(RlpString.Create(rlpData));
+                        rlpList.Add(RlpString.Create(rlpData));
                         startPos += 1 + strLen;
                     }
                     else if (prefix > OFFSET_LONG_STRING && prefix < OFFSET_SHORT_LIST)
@@ -124,7 +124,7 @@ namespace VeChainCore.Utils.Rlp
                         byte[] rlpData = new byte[strLen];
                         Array.Copy(data, startPos + lenOfStrLen + 1, rlpData, 0, strLen);
 
-                        rlpList.GetValues().Add(RlpString.Create(rlpData));
+                        rlpList.Add(RlpString.Create(rlpData));
                         startPos += lenOfStrLen + strLen + 1;
                     }
                     else if (prefix >= OFFSET_SHORT_LIST && prefix <= OFFSET_LONG_LIST)
@@ -136,9 +136,9 @@ namespace VeChainCore.Utils.Rlp
 
                         byte listLen = (byte) (prefix - OFFSET_SHORT_LIST);
 
-                        RlpList newLevelList = new RlpList(new List<IRlpType>());
+                        RlpList newLevelList = new RlpList(new IRlpType[0]);
                         Traverse(data, startPos + 1, startPos + listLen + 1, newLevelList);
-                        rlpList.GetValues().Add(newLevelList);
+                        rlpList.Add(newLevelList);
 
                         startPos += 1 + listLen;
                     }
@@ -154,10 +154,10 @@ namespace VeChainCore.Utils.Rlp
                         byte lenOfListLen = (byte) (prefix - OFFSET_LONG_LIST);
                         int listLen = CalcLength(lenOfListLen, data, startPos);
 
-                        RlpList newLevelList = new RlpList(new List<IRlpType>());
+                        RlpList newLevelList = new RlpList(new IRlpType[0]);
                         Traverse(data, startPos + lenOfListLen + 1,
                             startPos + lenOfListLen + listLen + 1, newLevelList);
-                        rlpList.GetValues().Add(newLevelList);
+                        rlpList.Add(newLevelList);
 
                         startPos += lenOfListLen + listLen + 1;
                     }
