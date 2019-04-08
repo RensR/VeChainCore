@@ -30,7 +30,7 @@ namespace VeChainCore.Utils.Rlp
 
         public override string ToString()
         {
-            return "0x" + _value.ByteArrayToString();
+            return _value.ByteArrayToString();
         }
 
         public static RlpString Create(byte[] value)
@@ -89,12 +89,8 @@ namespace VeChainCore.Utils.Rlp
 
     public class RlpList : List<IRlpType>, IRlpType
     {
-        public IRlpType[] RlpData;
+        public IRlpType[] RlpData { get; set; }
 
-
-        public RlpList(IRlpType[] values)
-        {
-            RlpData = values;
-        }
+        public RlpList() {}
     }
 }

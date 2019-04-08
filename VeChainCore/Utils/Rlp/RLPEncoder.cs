@@ -104,7 +104,7 @@ namespace VeChainCore.Utils.Rlp
 
         private static byte[] EncodeList(RlpList values)
         {
-            if (values.Count < 1)
+            if (values == null || values.Count < 1)
                 return Encode(new byte[] { }, OFFSET_SHORT_LIST);
             
             byte[] result = new byte[0];

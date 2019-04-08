@@ -30,6 +30,7 @@ namespace VeChainCoreTest
             };
 
             var rlpTransaction = new RlpTransaction(realTransaction).AsRlpValues();
+            var nether = RLP.en
 
             var vetEncoded = RlpEncoder.Encode(rlpTransaction);
            
@@ -53,7 +54,6 @@ namespace VeChainCoreTest
             byte[] encodedinner = RlpEncoder.Encode(rlpList[0]);
             string hexEncodedinner = encodedinner.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
             Assert.Equal(hexRaw, hexEncodedinner);
-
         }
 
         [Fact]
