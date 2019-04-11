@@ -6,6 +6,7 @@ using VeChainCore.Utils;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Utf8Json;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
@@ -117,7 +118,8 @@ namespace VeChainCore.Client
             Block bestBlockID = await GetBlock("best");
             var bestBlockIDHex = bestBlockID.id.HexStringToByteArray();
             var eightByte = new byte[8];
-            Buffer.BlockCopy(bestBlockIDHex, 0, eightByte, 0, 8);
+            Unsafe.CopyBlock(ref eightByte[0], ref bestBlockIDHex[0], (uint)8); 
+            // Buffer.BlockCopy(bestBlockIDHex, 0, eightByte, 0, 8);
 
             return eightByte.TrimLeadingZeroBytes().ByteArrayToString();
         }

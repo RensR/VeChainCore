@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace VeChainCore.Utils.Rlp
 {
@@ -104,7 +105,8 @@ namespace VeChainCore.Utils.Rlp
                         byte strLen = (byte) (prefix - OFFSET_SHORT_STRING);
 
                         byte[] rlpData = new byte[strLen];
-                        Array.Copy(data, startPos + 1, rlpData, 0, strLen);
+                        Unsafe.CopyBlock(ref rlpData[0], ref data[startPos + 1], (uint)strLen);
+                        // Array.Copy(data, startPos + 1, rlpData, 0, strLen);
 
                         rlpList.Add(RlpString.Create(rlpData));
                         startPos += 1 + strLen;
@@ -122,7 +124,8 @@ namespace VeChainCore.Utils.Rlp
 
                         // now we can parse an item for data[1]..data[length]
                         byte[] rlpData = new byte[strLen];
-                        Array.Copy(data, startPos + lenOfStrLen + 1, rlpData, 0, strLen);
+                        Unsafe.CopyBlock(ref rlpData[0], ref data[startPos + lenOfStrLen + 1], (uint)strLen);
+                        // Array.Copy(data, startPos + lenOfStrLen + 1, rlpData, 0, strLen);
 
                         rlpList.Add(RlpString.Create(rlpData));
                         startPos += lenOfStrLen + strLen + 1;
@@ -165,7 +168,7 @@ namespace VeChainCore.Utils.Rlp
             }
             catch (Exception e)
             {
-                throw new Exception("RLP wrong encoding", e);
+                throw new FormatException("RLP wrong encoding", e);
             }
         }
 

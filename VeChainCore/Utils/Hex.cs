@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Nethereum.RLP;
@@ -12,8 +13,8 @@ namespace VeChainCore.Utils
     public enum StringType
     {
         Default = 0,
-        ZeroLowerX = 1<<0,
-        Hex = 1<<0
+        ZeroLowerX = 1 << 0,
+        Hex = 1 << 0
     }
 
     public static class Hex
@@ -38,9 +39,7 @@ namespace VeChainCore.Utils
 
         public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex)
         {
-            var wantsHex = type.HasFlag(StringType.Hex);
-            
-            if(!wantsHex)
+            if (!type.HasFlag(StringType.Hex))
                 return Encoding.UTF8.GetString(ba);
 
             var hex = new StringBuilder(ba.Length * 2 + 2);
@@ -115,10 +114,11 @@ namespace VeChainCore.Utils
             }
 
             if (bytesLength > length)
-                throw new Exception($"Input is too large to put in byte array of size; {bytesLength}>{length}");
+                throw new ArgumentOutOfRangeException(nameof(length), $"Input is too large to put in byte array of size; {bytesLength}>{length}");
 
             int destOffset = length - bytesLength;
-            Array.Copy(bytes, srcOffset, result, destOffset, bytesLength);
+            Unsafe.CopyBlock(ref result[destOffset], ref bytes[srcOffset], (uint)bytesLength);
+            //Array.Copy(bytes, srcOffset, result, destOffset, bytesLength);
             return result;
         }
 
@@ -127,14 +127,15 @@ namespace VeChainCore.Utils
             return new BigInteger(1, bytes);
         }
 
-        public static T[] AddPadding<T>(this T[] array, int length)
+        public static byte[] AddPadding(this byte[] array, int length)
         {
-            T[] result = new T[length];
+            byte[] result = new byte[length];
 
-            if(array.Length > length)
-                throw new Exception($"Input is too large to put in byte array of size; {array.Length}>{length}");
+            if (array.Length > length)
+                throw new ArgumentOutOfRangeException(nameof(length), $"Input is too large to put in byte array of size; {array.Length}>{length}");
 
-            Array.Copy(array, 0, result, length - array.Length, array.Length);
+            Unsafe.CopyBlock(ref result[length - array.Length], ref array[0], (uint)array.Length);
+            //Array.Copy(array, 0, result, length - array.Length, array.Length);
             return result;
         }
     }

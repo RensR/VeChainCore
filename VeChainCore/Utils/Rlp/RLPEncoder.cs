@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils.Rlp
@@ -65,7 +66,8 @@ namespace VeChainCore.Utils.Rlp
             {
                 byte[] result = new byte[bytesValue.Length + 1];
                 result[0] = (byte) (offset + bytesValue.Length);
-                Buffer.BlockCopy(bytesValue, 0, result, 1, bytesValue.Length);
+                Unsafe.CopyBlock(ref result[1], ref bytesValue[0], (uint)bytesValue.Length);
+                // Buffer.BlockCopy(bytesValue, 0, result, 1, bytesValue.Length);
                 return result;
             }
             else
@@ -74,7 +76,8 @@ namespace VeChainCore.Utils.Rlp
                 byte[] result = new byte[bytesValue.Length + encodedStringLength.Length + 1];
 
                 result[0] = (byte) ((offset + 0x37) + encodedStringLength.Length);
-                Buffer.BlockCopy(encodedStringLength, 0, result, 1, encodedStringLength.Length);
+                Unsafe.CopyBlock(ref result[1], ref encodedStringLength[0], (uint)encodedStringLength.Length);
+                // Buffer.BlockCopy(encodedStringLength, 0, result, 1, encodedStringLength.Length);
                 Buffer.BlockCopy(
                     bytesValue, 0, result, encodedStringLength.Length + 1, bytesValue.Length);
                 return result;

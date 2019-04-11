@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
@@ -29,8 +30,10 @@ namespace VeChainCore.Models.Extensions
             var signingAddress = signer.HexString.HexStringToByteArray();
 
             byte[] concatenatedBytes = new byte[52];
-            Buffer.BlockCopy(signingHash,    0, concatenatedBytes, 0, signingHash.Length);
-            Buffer.BlockCopy(signingAddress, 0, concatenatedBytes, signingHash.Length, signingAddress.Length);
+            Unsafe.CopyBlock(ref concatenatedBytes[0], ref signingHash[0], (uint)signingHash.Length);
+            //Array.Copy(signingHash,    0, concatenatedBytes, 0, signingHash.Length);
+            Unsafe.CopyBlock(ref concatenatedBytes[signingHash.Length], ref signingAddress[0], (uint)signingAddress.Length);
+            //Array.Copy(signingAddress, 0, concatenatedBytes, signingHash.Length, signingAddress.Length);
 
             // Hash the bytes from the signed transaction and the signer address
             byte[] txIdBytes = Hash.HashBlake2B(concatenatedBytes);

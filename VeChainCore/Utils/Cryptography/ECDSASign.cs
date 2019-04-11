@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
@@ -19,7 +20,7 @@ namespace VeChainCore.Utils.Cryptography
             ECDSASignature sig = keys.Sign(messageHash);
             for (int i = 0; i < 4; i++)
             {
-                BigInteger k = RecoverFromSignature(i, sig, messageHash);            
+                BigInteger k = RecoverFromSignature(i, sig, messageHash);
 
                 if (k != null && k.Equals(publicKey))
                 {
@@ -29,8 +30,9 @@ namespace VeChainCore.Utils.Cryptography
             }
 
             if (recId == -1)
-                throw new Exception("Sign the data failed.");
-            if (recId == 2 || recId == 3) throw new Exception("Recovery is not valid for VeChain MainNet.");
+                throw new FormatException("Sign the data failed.");
+            if (recId == 2 || recId == 3)
+                throw new InvalidOperationException("Recovery is not valid for VeChain MainNet.");
 
             byte v = (byte) recId;
             sig.R.ToByteArray();
@@ -46,7 +48,8 @@ namespace VeChainCore.Utils.Cryptography
             var newArray = new byte[size];
 
             var startAt = newArray.Length - asBytes.Length;
-            Array.Copy(asBytes, 0, newArray, startAt, asBytes.Length);
+            Unsafe.CopyBlock(ref newArray[startAt], ref asBytes[0], (uint)asBytes.Length);
+            // Array.Copy(asBytes, 0, newArray, startAt, asBytes.Length);
 
             return newArray;
         }
@@ -61,13 +64,13 @@ namespace VeChainCore.Utils.Cryptography
         public static BigInteger RecoverFromSignature(int recId, ECDSASignature sig, byte[] message)
         {
             if (!(recId == 0 || recId == 1))
-                throw new Exception("recId must be 0 or 1");
+                throw new ArgumentOutOfRangeException(nameof(recId), "recId must be 0 or 1");
             if (message == null)
-                throw new Exception("message cannot be null");
+                throw new ArgumentNullException(nameof(message), "message cannot be null");
 
 
-            BigInteger n = ECKeyPair.Curve.N;  // Curve order.
-            BigInteger i = BigInteger.ValueOf((long)recId / 2);
+            BigInteger n = ECKeyPair.Curve.N; // Curve order.
+            BigInteger i = BigInteger.ValueOf((long) recId / 2);
             BigInteger x = sig.R.Add(i.Multiply(n));
 
             // TODO SecP256K1Curve
@@ -100,7 +103,7 @@ namespace VeChainCore.Utils.Cryptography
         private static ECPoint DecompressKey(BigInteger xBN, bool yBit)
         {
             byte[] compEnc = X9IntegerConverter.IntegerToBytes(xBN, 1 + X9IntegerConverter.GetByteLength(ECKeyPair.Curve.Curve));
-            compEnc[0] = (byte)(yBit ? 0x03 : 0x02);
+            compEnc[0] = (byte) (yBit ? 0x03 : 0x02);
             return ECKeyPair.Curve.Curve.DecodePoint(compEnc);
         }
 
@@ -109,7 +112,7 @@ namespace VeChainCore.Utils.Cryptography
             ECPoint point = PublicPointFromPrivate(privKey);
 
             byte[] encoded = point.GetEncoded(false);
-            return new BigInteger(1, Arrays.CopyOfRange(encoded, 1, encoded.Length));  // remove prefix
+            return new BigInteger(1, Arrays.CopyOfRange(encoded, 1, encoded.Length)); // remove prefix
         }
 
         public static ECPoint PublicPointFromPrivate(BigInteger privKey)
@@ -122,6 +125,7 @@ namespace VeChainCore.Utils.Cryptography
             {
                 privKey = privKey.Mod(ECKeyPair.Curve.N);
             }
+
             return new FixedPointCombMultiplier().Multiply(ECKeyPair.Curve.G, privKey);
         }
     }
@@ -129,9 +133,9 @@ namespace VeChainCore.Utils.Cryptography
 
     public class SignatureData
     {
-        public byte V;
-        public byte[] R;
-        public byte[] S;
+        public readonly byte V;
+        public readonly byte[] R;
+        public readonly byte[] S;
 
         public SignatureData(byte v, byte[] r, byte[] s)
         {
@@ -147,6 +151,7 @@ namespace VeChainCore.Utils.Cryptography
             {
                 return false;
             }
+
             return Equals(R, that.R) && Equals(S, that.S);
         }
 
@@ -170,8 +175,10 @@ namespace VeChainCore.Utils.Cryptography
         {
             int size = R.Length + S.Length + 1;
             byte[] flat = new byte[size];
-            Array.Copy(R, 0, flat, 0, R.Length);
-            Array.Copy(S, 0, flat, R.Length, S.Length);
+            Unsafe.CopyBlock(ref flat[0], ref R[0], (uint)R.Length);
+            // Array.Copy(R, 0, flat, 0, R.Length);
+            Unsafe.CopyBlock(ref flat[R.Length], ref S[0], (uint)S.Length);
+            // Array.Copy(S, 0, flat, R.Length, S.Length);
             flat[size - 1] = V;
             return flat;
         }

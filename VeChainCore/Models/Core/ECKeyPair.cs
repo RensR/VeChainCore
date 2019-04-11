@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -65,7 +66,8 @@ namespace VeChainCore.Models.Core
         {
             var hash = Hash.Keccac256(GetRawPublicKey());
             var address = new byte[20];
-            Array.Copy(hash, 12, address, 0, address.Length);
+            Unsafe.CopyBlock(ref address[0], ref hash[12], (uint)address.Length);
+            // Array.Copy(hash, 12, address, 0, address.Length);
             return address; // right most 160 bits
         }
 
@@ -103,11 +105,10 @@ namespace VeChainCore.Models.Core
 
         public static ECKeyPair Create(byte[] privateKey)
         {
-            if (privateKey.Length == PrivateKeySize)
-            {
-                return Create(Hex.BytesToBigInt(privateKey));
-            }
-            throw new Exception("Invalid privatekey size");
+            if (privateKey.Length != PrivateKeySize)
+                throw new ArgumentException("Invalid private key size", nameof(privateKey));
+            
+            return Create(Hex.BytesToBigInt(privateKey));
         }
 
         public static ECKeyPair Create()
