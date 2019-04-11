@@ -10,7 +10,6 @@ namespace VeChainCoreTest
 {
     public class RLPTest
     {
-
         [Fact]
         public void RLPHexParser()
         {
@@ -19,9 +18,10 @@ namespace VeChainCoreTest
                 chainTag = 1,
                 blockRef = "00000000aabbccdd",
                 expiration = 32,
-                clauses = new[]{
+                clauses = new[]
+                {
                     new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed", "10000", "0x000000606060", false),
-                    new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed","20000", "0x000000606060", false)
+                    new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed", "20000", "0x000000606060", false)
                 },
                 gasPriceCoef = 128,
                 gas = 21000,
@@ -32,8 +32,12 @@ namespace VeChainCoreTest
             var rlpTransaction = new RlpTransaction(realTransaction).AsRlpValues();
 
             var vetEncoded = RlpEncoder.Encode(rlpTransaction);
-           
+
             var out1 = vetEncoded.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
+
+            // TODO: what should the encoded bytes of the RlpTransaction match? is this right?
+            Assert.Equal("0xf85e018800000000aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e2086000000606060818082520880883132333435363738c1c0", out1);
+
             var vethash = Hash.HashBlake2B(vetEncoded);
 
             // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478
@@ -62,7 +66,7 @@ namespace VeChainCoreTest
                 "f902d6819a8702288058b9af928202d0f90273e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f800008001830616988088ff9198c817655decc0b841bd61e198f126adddb169eebf5cd3da25ae3a3f07102e574bcd1368440d1e307c4c47884364e2abc66ef6940c4953758dd1c57f8255025639702104ce83e9a3b501";
 
             var rlpList = RlpDecoder.Decode(input.HexStringToByteArray());
-            var nethereumRLP= RLP.Decode(input.HexStringToByteArray());
+            var nethereumRLP = RLP.Decode(input.HexStringToByteArray());
 
 
             Assert.True(RlpCompare(rlpList, nethereumRLP));
@@ -70,7 +74,7 @@ namespace VeChainCoreTest
 
         public bool RlpCompare(IRlpType rlpType, IRLPElement iRLPElement)
         {
-            if(rlpType is RlpList vCollection)
+            if (rlpType is RlpList vCollection)
             {
                 if (iRLPElement is RLPCollection nCollection && vCollection.Count == nCollection.Count)
                 {
@@ -84,7 +88,7 @@ namespace VeChainCoreTest
             }
             else
             {
-                var vItem = ((RlpString)rlpType).GetBytes();
+                var vItem = ((RlpString) rlpType).GetBytes();
 
                 // Is it true that null is the same as an empty array?
                 if (iRLPElement.RLPData == null && vItem.Length == 0)
@@ -93,6 +97,7 @@ namespace VeChainCoreTest
                 Assert.NotNull(iRLPElement.RLPData);
                 return vItem.SequenceEqual(iRLPElement.RLPData);
             }
+
             return true;
         }
     }
