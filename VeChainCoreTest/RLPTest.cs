@@ -90,6 +90,7 @@ namespace VeChainCoreTest
                 if (iRLPElement.RLPData == null && vItem.Length == 0)
                     return true;
 
+                Assert.NotNull(iRLPElement.RLPData);
                 return vItem.SequenceEqual(iRLPElement.RLPData);
             }
             return true;
