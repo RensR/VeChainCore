@@ -45,7 +45,6 @@ namespace VeChainCore.Utils.Rlp
          */
         public static int OFFSET_LONG_LIST = 0xf7;
 
-
         public static byte[] Encode(IRlpType value)
         {
             if (value is RlpString item)
@@ -103,21 +102,15 @@ namespace VeChainCore.Utils.Rlp
             };
         }
 
-        private static byte[] EncodeList(RlpList value)
+        private static byte[] EncodeList(RlpList values)
         {
-            var values = value.GetValues();
-
-            if (values.Count < 1)
-            {
+            if (values == null || values.Count < 1)
                 return Encode(new byte[] { }, OFFSET_SHORT_LIST);
-            }
-
+            
             byte[] result = new byte[0];
             foreach (IRlpType entry in values)
-            {
                 result = result.Concat(Encode(entry));
-            }
-  
+            
             return Encode(result, OFFSET_SHORT_LIST);
         }
     }

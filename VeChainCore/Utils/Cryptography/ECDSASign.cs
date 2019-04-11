@@ -38,7 +38,6 @@ namespace VeChainCore.Utils.Cryptography
             byte[] s = BigIntToBytesWithPadding(sig.S, 32);
 
             return new SignatureData(v, r, s);
-
         }
 
         public static byte[] BigIntToBytesWithPadding(BigInteger bigint, int size)
@@ -140,8 +139,6 @@ namespace VeChainCore.Utils.Cryptography
             R = r;
             S = s;
         }
-
-
 
         public override bool Equals(object o)
         {
