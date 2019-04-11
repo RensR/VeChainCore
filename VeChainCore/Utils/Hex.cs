@@ -11,8 +11,9 @@ namespace VeChainCore.Utils
     [Flags]
     public enum StringType
     {
-        ZeroLowerX,
-        Hex
+        Default = 0,
+        ZeroLowerX = 1<<0,
+        Hex = 1<<0
     }
 
     public static class Hex
@@ -37,14 +38,19 @@ namespace VeChainCore.Utils
 
         public static string ByteArrayToString(this byte[] ba, StringType type = StringType.Hex)
         {
-            if(type != StringType.Hex)
+            var wantsHex = type.HasFlag(StringType.Hex);
+            
+            if(!wantsHex)
                 return Encoding.UTF8.GetString(ba);
 
             var hex = new StringBuilder(ba.Length * 2 + 2);
-            if (type != StringType.ZeroLowerX)
+
+            if (type.HasFlag(StringType.ZeroLowerX))
                 hex.Append("0x");
+
             foreach (byte b in ba)
                 hex.AppendFormat("{0:x2}", b);
+
             return hex.ToString();
         }
 
