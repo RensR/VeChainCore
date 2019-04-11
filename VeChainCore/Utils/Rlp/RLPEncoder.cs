@@ -66,7 +66,8 @@ namespace VeChainCore.Utils.Rlp
             {
                 byte[] result = new byte[bytesValue.Length + 1];
                 result[0] = (byte) (offset + bytesValue.Length);
-                Unsafe.CopyBlock(ref result[1], ref bytesValue[0], (uint)bytesValue.Length);
+                if (bytesValue.Length > 0)
+                    Unsafe.CopyBlock(ref result[1], ref bytesValue[0], (uint) bytesValue.Length);
                 // Buffer.BlockCopy(bytesValue, 0, result, 1, bytesValue.Length);
                 return result;
             }
@@ -76,7 +77,7 @@ namespace VeChainCore.Utils.Rlp
                 byte[] result = new byte[bytesValue.Length + encodedStringLength.Length + 1];
 
                 result[0] = (byte) ((offset + 0x37) + encodedStringLength.Length);
-                Unsafe.CopyBlock(ref result[1], ref encodedStringLength[0], (uint)encodedStringLength.Length);
+                Unsafe.CopyBlock(ref result[1], ref encodedStringLength[0], (uint) encodedStringLength.Length);
                 // Buffer.BlockCopy(encodedStringLength, 0, result, 1, encodedStringLength.Length);
                 Buffer.BlockCopy(
                     bytesValue, 0, result, encodedStringLength.Length + 1, bytesValue.Length);
@@ -109,11 +110,11 @@ namespace VeChainCore.Utils.Rlp
         {
             if (values == null || values.Count < 1)
                 return Encode(new byte[] { }, OFFSET_SHORT_LIST);
-            
+
             byte[] result = new byte[0];
             foreach (IRlpType entry in values)
                 result = result.Concat(Encode(entry));
-            
+
             return Encode(result, OFFSET_SHORT_LIST);
         }
     }

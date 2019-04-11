@@ -14,7 +14,7 @@ namespace VeChainCoreTest
         [Fact]
         public void RLPHexParser()
         {
-            var realTransaction = new RawTransaction()
+            var realTransaction = new RawTransaction
             {
                 chainTag = 1,
                 blockRef = "00000000aabbccdd",

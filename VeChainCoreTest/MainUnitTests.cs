@@ -131,7 +131,7 @@ namespace VeChainCoreTest
         {
             var transaction = new Transaction
             {
-                clauses = new Clause[]
+                clauses = new[]
                 {
                     new Clause
                     {
@@ -162,7 +162,7 @@ namespace VeChainCoreTest
         {
             var transaction = new Transaction
             {
-                clauses = new Clause[]
+                clauses = new[]
                 {
                     new Clause
                     {

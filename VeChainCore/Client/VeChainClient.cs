@@ -151,7 +151,7 @@ namespace VeChainCore.Client
             if (!Hex.IsValidAddress(address))
                 return null;
 
-            var content = new ByteArrayContent(JsonSerializer.Serialize(new ToEnvelope { to = address }, JsonFormatterResolver));
+            var content = new ByteArrayContent(JsonSerializer.Serialize(new { to = address }, JsonFormatterResolver));
             
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
@@ -179,7 +179,7 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
         {
-            var json = JsonSerializer.Serialize(new ClausesEnvelope {clauses = clauses}, JsonFormatterResolver);
+            var json = JsonSerializer.Serialize(new {clauses}, JsonFormatterResolver);
 
             var content = new ByteArrayContent(json);
             
