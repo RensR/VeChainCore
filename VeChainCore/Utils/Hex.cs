@@ -14,7 +14,7 @@ namespace VeChainCore.Utils
     {
         Default = 0,
         ZeroLowerX = 1 << 0,
-        Hex = 1 << 0
+        Hex = 1 << 1
     }
 
     public static class Hex
