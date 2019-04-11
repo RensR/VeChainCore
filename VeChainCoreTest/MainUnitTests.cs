@@ -146,14 +146,13 @@ namespace VeChainCoreTest
                         data = "0xa9059cbb000000000000000000000000c02e9c3d39755d7908e087a258f45c1b3f3642790000000000000000000000000000000000000000000000006f05b59d3b200000"
                     }
                 },
-                gas = 41_384 //68_056
+                gas = 68_056
             };
 
             var gas = await transaction.CalculateTotalGasCost(_vechainClient);
             var intrinsicGas = transaction.CalculateIntrinsicGasCost();
 
-            Assert.Equal((ulong)41_384, intrinsicGas);
-            //Assert.Equal((ulong)23_192, intrinsicGas);
+            Assert.Equal((ulong)23_192, intrinsicGas);
 
             Assert.Equal(transaction.gas, gas);
         }
@@ -172,7 +171,7 @@ namespace VeChainCoreTest
                         data = "0xa9059cbb000000000000000000000000ddc9070d0bfc3b7533b3ae334166d1adc31be0a60000000000000000000000000000000000000000000000006f05b59d3b200000"
                     }
                 },
-                gas = 23_192
+                gas = 36_528
             };
 
             var gas = await transaction.CalculateTotalGasCost(_vechainClient);
