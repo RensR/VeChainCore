@@ -160,17 +160,16 @@ namespace VeChainCore.Models.Extensions
         /// <returns>The encoded transaction</returns>
         public static byte[] Encode(this Transaction transaction)
         {
-            return new RlpTransaction
-            {
-                chainTag = transaction.chainTag,
-                blockRef = transaction.blockRef,
-                expiration = transaction.expiration,
-                clauses = transaction.clauses.Select(c => new RlpClause(c.to, c.value, c.data, false)).ToArray(),
-                nonce = (ulong) transaction.nonce.HexToBigInteger(false),
-                gasPriceCoef = transaction.gasPriceCoef,
-                gas = transaction.gas,
-                dependsOn = transaction.dependsOn,
-            }.RLPData;
+            return RlpTransaction.CreateUnsigned(
+                transaction.chainTag,
+                transaction.blockRef,
+                transaction.expiration,
+                transaction.clauses.Select(c => new RlpClause(c.to, c.value, c.data, false)).ToArray(),
+                (ulong) transaction.nonce.HexToBigInteger(false),
+                transaction.gasPriceCoef,
+                transaction.gas,
+                transaction.dependsOn
+            ).RLPData;
         }
     }
 }

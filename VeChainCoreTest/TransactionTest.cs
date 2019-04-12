@@ -28,11 +28,11 @@ namespace VeChainCoreTest
             var blockref = "0x001a7d4448f0948b"; // await _vechainClient.GetLatestBlockRef();
 
 
-            var trans = RlpTransaction.CreateUnsigned(chainTag, blockref, new[]
+            var trans = RlpTransaction.CreateUnsigned(chainTag, blockref, 720, new[]
             {
                 new RlpClause("0xd3ae78222beadb038203be21ed5ce7c9b1bff602", "1", "", false)
 
-            }, 12345678, 720, 0, 21000, "");
+            }, 12345678, 0, 21000, "");
 
             var rlpTransaction = trans.RLPData;
 

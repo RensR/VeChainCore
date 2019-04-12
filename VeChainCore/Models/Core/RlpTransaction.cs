@@ -5,11 +5,17 @@ using Nethereum.RLP;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
+using VeChainCore.Utils.Cryptography;
 
 namespace VeChainCore.Models.Core
 {
     public class RlpTransaction : IRLPElement
     {
+        // use CreateUnsigned
+        private RlpTransaction()
+        {
+        }
+
         private static readonly byte[] Reserved = new byte[1] {0xc0};
 
         public readonly byte[][] RLPDataParts = new byte[10][]
@@ -43,19 +49,6 @@ namespace VeChainCore.Models.Core
         public string origin { get; set; }
         public ulong size { get; set; }
         public TxMeta meta { get; set; }
-
-        public byte[] signature
-        {
-            get =>
-                _signature;
-            set
-            {
-                if (value == null)
-                    value = new byte[32];
-                _signature = value;
-                RLPDataParts[1] = RLP.EncodeElement(value);
-            }
-        }
 
         public byte chainTag
         {
@@ -137,12 +130,30 @@ namespace VeChainCore.Models.Core
             }
         }
 
+        public byte[] signature
+        {
+            get
+            {
+                return _signature;
+            }
+            set
+            {
+                _signature = value;
+                RLPDataParts[9] = RLP.EncodeElement(value);
+            }
+        }
+
+        public byte[] Sign()
+        {
+            return _signature = Hash.HashBlake2B(RLPSignatureData);
+        }
+
         public static RlpTransaction CreateUnsigned(
             byte chainTag,
             string blockRef,
+            uint expiration,
             RlpClause[] clauses,
             ulong nonce,
-            uint expiration = 720,
             byte gasPriceCoef = 100,
             ulong gas = 21000,
             string dependsOn = "")
@@ -156,11 +167,11 @@ namespace VeChainCore.Models.Core
                 blockRef = blockRef,
                 expiration = expiration,
                 clauses = clauses,
-                nonce = nonce,
                 gasPriceCoef = gasPriceCoef,
                 gas = gas,
                 dependsOn = dependsOn,
-                signature = new byte[32]
+                nonce = nonce,
+                signature = null
             };
         }
     }
