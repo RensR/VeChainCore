@@ -52,7 +52,7 @@ namespace VeChainCore.Models.Core
 
             if (transaction.nonce is null)
                 throw new ArgumentException("Nonce is null");
-            Nonce = RlpString.Create(transaction.nonce);
+            Nonce = RlpString.Create(UInt64.Parse(transaction.nonce));
 
             Reserved = new RlpList { null };
 
