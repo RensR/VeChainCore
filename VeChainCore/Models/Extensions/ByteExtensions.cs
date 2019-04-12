@@ -45,6 +45,9 @@ namespace VeChainCore.Models.Extensions
             return rv;
         }
 
+        public static byte[] Flatten(this byte[][] arrays)
+            => Combine(arrays);
+
         /// <summary>
         /// Trims the leading zero's of a byte[]
         /// </summary>

@@ -2,9 +2,9 @@
 using VeChainCore.Utils;
 using VeChainCore.Models.Core;
 using Xunit;
-using VeChainCore.Utils.Rlp;
 using Nethereum.RLP;
 using System.Linq;
+using Nethereum.Hex.HexConvertors.Extensions;
 
 namespace VeChainCoreTest
 {
@@ -15,91 +15,45 @@ namespace VeChainCoreTest
         {
             // based on https://github.com/vechain/thor/blob/d9f618b4974733e04949f7b9424001f5bd572baa/tx/transaction_test.go#L20
             string to = "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed";
-            var realTransaction = new RawTransaction
+            var rlpTxn = new RlpTransaction
             {
                 chainTag = 1,
                 blockRef = "00000000aabbccdd",
                 expiration = 32,
                 clauses = new[]
                 {
-                    new RawClause(to, "10000", "0x000000606060", false),
-                    new RawClause(to, "20000", "0x000000606060", false)
+                    new RlpClause(to, "10000", "0x000000606060", false),
+                    new RlpClause(to, "20000", "0x000000606060", false)
                 },
                 gasPriceCoef = 128,
                 gas = 21000,
                 dependsOn = null,
-                nonce = "12345678"
+                nonce = 12345678
             };
 
-            var rlpTransaction = new RlpTransaction(realTransaction).AsRlpValues();
+            //var rlpTransaction = new RlpTransaction(realTransaction).AsRlpValues();
 
-            var vetEncoded = RlpEncoder.Encode(rlpTransaction);
+            //var vetEncoded = RlpEncoder.Encode(rlpTransaction);
 
-            var out1 = vetEncoded.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
+            var rlpData = rlpTxn.RLPData;
+            var rlpSignatureData = rlpTxn.RLPSignatureData;
 
-            Assert.Equal("0xf8550184aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e208600000060606081808252088083bc614ec080", out1);
+            var expectedRlpHex = "0xf8550184aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e208600000060606081808252088083bc614ec080";
+            var actualRlpHex = rlpData.ToHex(true);
 
-            var vethash = Hash.HashBlake2B(vetEncoded);
+            var expectedSignatureRlpHex = "0xf8540184aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e208600000060606081808252088083bc614ec0";
+            var actualSignatureRlpHex = rlpSignatureData.ToHex(true);
+            
+            Assert.Equal(expectedRlpHex, actualRlpHex);
 
-            // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478
-            var vethashReadable = vethash.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
+            var hash = Hash.HashBlake2B(rlpData);
+            var hashHex = hash.ToHex(true);
+            
+            var signingHash = Hash.HashBlake2B(rlpSignatureData);
+            var signingHashHex = signingHash.ToHex(true);
 
-            Assert.Equal("0x2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478", vethashReadable);
-        }
-
-        [Fact]
-        public void DecoderTest()
-        {
-            string hexRaw = "0xf83d81c7860881eec535498202d0e1e094000000002beadb038203be21ed5ce7c9b1bff60289056bc75e2d63100000808082520880884773cc184328eb3ec0";
-            var rlpList = RlpDecoder.Decode(hexRaw.HexStringToByteArray());
-
-            // The list should only have 1 element
-            Assert.Single(rlpList);
-            byte[] encodedinner = RlpEncoder.Encode(rlpList[0]);
-            string hexEncodedinner = encodedinner.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
-            Assert.Equal(hexRaw, hexEncodedinner);
-        }
-
-        [Fact]
-        public void DecodeStaticString()
-        {
-            var input =
-                "f902d6819a8702288058b9af928202d0f90273e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f8000080e094d3ef28df6b553ed2fc47259e8134319cb1121a2a89364200111c48f800008001830616988088ff9198c817655decc0b841bd61e198f126adddb169eebf5cd3da25ae3a3f07102e574bcd1368440d1e307c4c47884364e2abc66ef6940c4953758dd1c57f8255025639702104ce83e9a3b501";
-
-            var rlpList = RlpDecoder.Decode(input.HexStringToByteArray());
-            var nethereumRLP = RLP.Decode(input.HexStringToByteArray());
-
-
-            Assert.True(RlpCompare(rlpList, nethereumRLP));
-        }
-
-        public bool RlpCompare(IRlpType rlpType, IRLPElement iRLPElement)
-        {
-            if (rlpType is RlpList vCollection)
-            {
-                if (iRLPElement is RLPCollection nCollection && vCollection.Count == nCollection.Count)
-                {
-                    for (var i = 0; i < vCollection.Count; i++)
-                    {
-                        if (!RlpCompare(vCollection[i], nCollection[i]))
-                            return false;
-                    }
-                }
-                else return false;
-            }
-            else
-            {
-                var vItem = ((RlpString) rlpType).GetBytes();
-
-                // Is it true that null is the same as an empty array?
-                if (iRLPElement.RLPData == null && vItem.Length == 0)
-                    return true;
-
-                Assert.NotNull(iRLPElement.RLPData);
-                return vItem.SequenceEqual(iRLPElement.RLPData);
-            }
-
-            return true;
+            Assert.Equal("0x4bff7001fec40284d93b4c45617dc741b9a88ed59d0f01a376394c7bfea6ed24", hashHex);
+            Assert.Equal("0x2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478", signingHashHex);
         }
     }
 }

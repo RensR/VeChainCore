@@ -1,15 +1,17 @@
 ﻿using System;
+using Nethereum.RLP;
+using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Core
 {
-    public class Address
+    public class Address : IRLPElement
     {
         public string HexString { get; set; }
 
         public Address(string address)
         {
-            if(!IsValid(address))
+            if (!IsValid(address))
                 throw new ArgumentException("The string is not a hex string");
 
             HexString = address;
@@ -23,5 +25,7 @@ namespace VeChainCore.Models.Core
                 return false;
             return address.Length == 42;
         }
+
+        public byte[] RLPData => RLP.EncodeElement(HexString.HexStringToByteArray().TrimLeadingZeroBytes());
     }
 }

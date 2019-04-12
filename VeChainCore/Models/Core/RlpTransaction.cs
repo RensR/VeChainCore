@@ -1,98 +1,167 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Nethereum.RLP;
+using VeChainCore.Models.Blockchain;
+using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
-using VeChainCore.Utils.Rlp;
 
 namespace VeChainCore.Models.Core
 {
-    public class RlpTransaction
+    public class RlpTransaction : IRLPElement
     {
-        public RlpString ChainTag { get; set; }
-        public RlpString BlockRef { get; set; }
-        public RlpString Expiration { get; set; }
-        public RlpList Clauses { get; set; }
-        public RlpString GasPriceCoef { get; set; }
-        public RlpString Gas { get; set; }
-        public RlpString DependsOn { get; set; }
-        public RlpString Nonce { get; set; }
-        public RlpList Reserved { get; set; }
-        public RlpString Signature { get; set; }
+        private static readonly byte[] Reserved = new byte[1] {0xc0};
 
-
-        public RlpTransaction(RawTransaction transaction)
+        public readonly byte[][] RLPDataParts = new byte[10][]
         {
-            if (transaction.chainTag == 0)
-                throw new ArgumentException("ChainTag is 0");
-            ChainTag = RlpString.Create(transaction.chainTag);
+            Array.Empty<byte>(), // chainTag
+            Array.Empty<byte>(), // blockRef
+            Array.Empty<byte>(), // expiration
+            Array.Empty<byte>(), // clauses
+            Array.Empty<byte>(), // gasPriceCoef
+            Array.Empty<byte>(), // gas
+            Array.Empty<byte>(), // dependsOn
+            Array.Empty<byte>(), // nonce
+            Reserved,
+            Array.Empty<byte>() // signature
+        };
 
-            if (transaction.blockRef is null)
-                throw new ArgumentException("BlockRef is 0");
-            BlockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray(8));
+        public byte[] RLPData => RLP.EncodeList(RLPDataParts);
+        public byte[] RLPSignatureData => RLP.EncodeList(RLPDataParts.Take(9).ToArray());
 
-            if (transaction.expiration == 0)
-                throw new ArgumentException("Expiration is 0");
-            Expiration = RlpString.Create(transaction.expiration);
+        private byte _chainTag;
+        private string _blockRef;
+        private uint _expiration;
+        private RlpClause[] _clauses;
+        private byte _gasPriceCoef;
+        private ulong _gas;
+        private string _dependsOn;
+        private ulong _nonce;
+        private byte[] _signature;
 
+        public string id { get; set; }
+        public string origin { get; set; }
+        public ulong size { get; set; }
+        public TxMeta meta { get; set; }
 
-            Clauses = new RlpList();
-            Clauses.AddRange(transaction.clauses.Select(ToRlpList));
-
-            GasPriceCoef = transaction.gasPriceCoef == 0
-                ? RlpString.Create(RlpString.EMPTY)
-                : RlpString.Create(transaction.gasPriceCoef);
-
-            if (transaction.gas == 0)
-                throw new ArgumentException("Gas is 0");
-            Gas = RlpString.Create(transaction.gas);
-
-            DependsOn = transaction.dependsOn == null
-                ? RlpString.Create(RlpString.EMPTY)
-                : RlpString.Create(transaction.dependsOn);
-
-            if (transaction.nonce is null)
-                throw new ArgumentException("Nonce is null");
-            Nonce = RlpString.Create(transaction.nonce);
-
-            Reserved = new RlpList { null };
-
-            if (transaction.signature != null)
-                Signature = RlpString.Create(transaction.signature);
+        public byte[] signature
+        {
+            get =>
+                _signature;
+            set
+            {
+                if (value == null)
+                    value = new byte[32];
+                _signature = value;
+                RLPDataParts[1] = RLP.EncodeElement(value);
+            }
         }
 
-        public IRlpType ToRlpList(RawClause clause)
+        public byte chainTag
         {
-            var list = new RlpList();
-            list.AddRange(new RlpList
+            get => _chainTag;
+            set
             {
-                RlpString.Create(clause.To.HexString.HexStringToByteArray()),
-                RlpString.Create(clause.Value.AsBytes),
-                RlpString.Create(clause.Data.HexStringToByteArray())
-             });
-            return list;
+                _chainTag = value;
+                RLPDataParts[0] = RLP.EncodeByte(value);
+            }
         }
 
-        public RlpList AsRlpValues()
+        public string blockRef
         {
-            var rlpList = new RlpList();
-
-            rlpList.AddRange(new List<IRlpType>
+            get => _blockRef;
+            set
             {
-                ChainTag,
-                BlockRef,
-                Expiration,
-                Clauses,
-                GasPriceCoef,
-                Gas,
-                DependsOn,
-                Nonce,
-                Reserved
-            });
+                _blockRef = value;
+                RLPDataParts[1] = RLP.EncodeElement(value.HexStringToByteArray().TrimLeadingZeroBytes());
+            }
+        }
 
-            if(Signature != null)
-                rlpList.Add(Signature);
+        public uint expiration
+        {
+            get => _expiration;
+            set
+            {
+                _expiration = value;
+                RLPDataParts[2] = RLP.EncodeElement(ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(value));
+            }
+        }
 
-            return rlpList;
+        public RlpClause[] clauses
+        {
+            get => _clauses;
+            set
+            {
+                _clauses = value;
+                RLPDataParts[3] = RLP.EncodeList(clauses.Select(c => c.RLPData).ToArray().Flatten());
+            }
+        }
+
+        public byte gasPriceCoef
+        {
+            get => _gasPriceCoef;
+            set
+            {
+                _gasPriceCoef = value;
+                RLPDataParts[4] = RLP.EncodeByte(value);
+            }
+        }
+
+        public ulong gas
+        {
+            get => _gas;
+            set
+            {
+                _gas = value;
+                RLPDataParts[5] = RLP.EncodeElement(ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(value));
+            }
+        }
+
+        public string dependsOn
+        {
+            get => _dependsOn;
+            set
+            {
+                _dependsOn = value;
+                RLPDataParts[6] = RLP.EncodeElement(value?.HexStringToByteArray().TrimLeadingZeroBytes());
+            }
+        }
+
+        public ulong nonce
+        {
+            get => _nonce;
+            set
+            {
+                _nonce = value;
+                RLPDataParts[7] = RLP.EncodeElement(ConvertorForRLPEncodingExtensions.ToBytesForRLPEncoding(value));
+            }
+        }
+
+        public static RlpTransaction CreateUnsigned(
+            byte chainTag,
+            string blockRef,
+            RlpClause[] clauses,
+            ulong nonce,
+            uint expiration = 720,
+            byte gasPriceCoef = 100,
+            ulong gas = 21000,
+            string dependsOn = "")
+        {
+            if (clauses == null || clauses.Length < 1)
+                throw new ArgumentException("No clauses found");
+
+            return new RlpTransaction
+            {
+                chainTag = chainTag,
+                blockRef = blockRef,
+                expiration = expiration,
+                clauses = clauses,
+                nonce = nonce,
+                gasPriceCoef = gasPriceCoef,
+                gas = gas,
+                dependsOn = dependsOn,
+                signature = new byte[32]
+            };
         }
     }
 }
