@@ -104,13 +104,13 @@ namespace VeChainCore.Models.Extensions
                 throw new ArgumentException("transaction is not singed");
 
             // Hash the RLP encoded transaction
-            var signingHash = Hash.HashBlake2B(transaction.RLPData);
-            var signingAddress = signer.HexString.HexStringToByteArray();
+            var signedHash = Hash.HashBlake2B(transaction.RLPData);
+            var signerAddress = signer.HexString.HexStringToByteArray();
 
             byte[] concatenatedBytes = new byte[52];
-            Unsafe.CopyBlock(ref concatenatedBytes[0], ref signingHash[0], (uint) signingHash.Length);
+            Unsafe.CopyBlock(ref concatenatedBytes[0], ref signedHash[0], (uint) signedHash.Length);
             //Array.Copy(signingHash,    0, concatenatedBytes, 0, signingHash.Length);
-            Unsafe.CopyBlock(ref concatenatedBytes[signingHash.Length], ref signingAddress[0], (uint) signingAddress.Length);
+            Unsafe.CopyBlock(ref concatenatedBytes[signedHash.Length], ref signerAddress[0], (uint) signerAddress.Length);
             //Array.Copy(signingAddress, 0, concatenatedBytes, signingHash.Length, signingAddress.Length);
 
             // Hash the bytes from the signed transaction and the signer address

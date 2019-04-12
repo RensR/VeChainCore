@@ -41,7 +41,10 @@ namespace VeChainCoreTest
 
             var customKey = new ECKeyPair(privateKey, publicKey);
 
-            var result = trans.Sign(customKey).CalculateTxId(new Address(customKey.GetHexAddress())).Transfer(_vechainClient);
+            var result = await trans
+                .Sign(customKey)
+                .CalculateTxId(new Address(customKey.GetHexAddress()))
+                .Transfer(_vechainClient);
         }
     }
 }
