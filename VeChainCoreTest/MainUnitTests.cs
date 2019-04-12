@@ -152,7 +152,7 @@ namespace VeChainCoreTest
             var gas = await transaction.CalculateTotalGasCost(_vechainClient);
             var intrinsicGas = transaction.CalculateIntrinsicGasCost();
 
-            Assert.Equal((ulong) 23_192, intrinsicGas);
+            Assert.Equal((ulong) 23_192, intrinsicGas); // fails, getting 41384 
 
             Assert.Equal(transaction.gas, gas);
         }
@@ -179,7 +179,7 @@ namespace VeChainCoreTest
 
             Assert.Equal((ulong) 23_192, intrinsicGas);
 
-            Assert.Equal(transaction.gas, gas);
+            Assert.Equal(transaction.gas, gas); // fails, getting 23968
         }
 
         [Fact]

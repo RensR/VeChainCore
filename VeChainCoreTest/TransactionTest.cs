@@ -39,7 +39,6 @@ namespace VeChainCoreTest
             var privateKey = new BigInteger("0xdce1443bd2ef0c2631adc1c67e5c93f13dc23a41c18b536effbbdcbcdb96fb65".HexStringToByteArray());
             var publicKey = ECDSASign.PublicKeyFromPrivate(privateKey);
 
-
             var customKey = new ECKeyPair(privateKey, publicKey);
 
             var result = trans.Sign(customKey).CalculateTxId(new Address(customKey.GetHexAddress())).Transfer(_vechainClient);
