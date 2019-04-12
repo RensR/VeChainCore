@@ -13,6 +13,8 @@ namespace VeChainCoreTest
         [Fact]
         public void RLPHexParser()
         {
+            // based on https://github.com/vechain/thor/blob/d9f618b4974733e04949f7b9424001f5bd572baa/tx/transaction_test.go#L20
+            string to = "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed";
             var realTransaction = new RawTransaction
             {
                 chainTag = 1,
@@ -20,8 +22,8 @@ namespace VeChainCoreTest
                 expiration = 32,
                 clauses = new[]
                 {
-                    new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed", "10000", "0x000000606060", false),
-                    new RawClause("0x7567d83b7b8d80addcb281a71d54fc7b3364ffed", "20000", "0x000000606060", false)
+                    new RawClause(to, "10000", "0x000000606060", false),
+                    new RawClause(to, "20000", "0x000000606060", false)
                 },
                 gasPriceCoef = 128,
                 gas = 21000,
@@ -35,13 +37,12 @@ namespace VeChainCoreTest
 
             var out1 = vetEncoded.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
 
-            // TODO: what should the encoded bytes of the RlpTransaction match? is this right?
-            Assert.Equal("0xf85e018800000000aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e2086000000606060818082520880883132333435363738c1c0", out1);
+            Assert.Equal("0xf8550184aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e208600000060606081808252088083bc614ec080", out1);
 
             var vethash = Hash.HashBlake2B(vetEncoded);
 
             // Should be 2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478
-            var vethashReadable = vethash.ByteArrayToString();
+            var vethashReadable = vethash.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
 
             Assert.Equal("0x2a1c25ce0d66f45276a5f308b99bf410e2fc7d5b6ea37a49f2ab9f1da9446478", vethashReadable);
         }
