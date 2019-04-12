@@ -31,7 +31,6 @@ namespace VeChainCoreTest
             var trans = RlpTransaction.CreateUnsigned(chainTag, blockref, 720, new[]
             {
                 new RlpClause("0xd3ae78222beadb038203be21ed5ce7c9b1bff602", "1", "", false)
-
             }, 12345678, 0, 21000, "");
 
             var rlpTransaction = trans.RLPData;
@@ -44,9 +43,6 @@ namespace VeChainCoreTest
             var customKey = new ECKeyPair(privateKey, publicKey);
 
             var result = trans.Sign(customKey).CalculateTxId(new Address(customKey.GetHexAddress())).Transfer(_vechainClient);
-
-
-
         }
     }
 }

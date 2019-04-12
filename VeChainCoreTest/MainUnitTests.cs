@@ -117,7 +117,7 @@ namespace VeChainCoreTest
 
             Assert.Equal(749, receipt.outputs.Length);
             Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
-            Assert.Equal((uint)11989000, receipt.gasUsed);
+            Assert.Equal((uint) 11989000, receipt.gasUsed);
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace VeChainCoreTest
             var gas = await transaction.CalculateTotalGasCost(_vechainClient);
             var intrinsicGas = transaction.CalculateIntrinsicGasCost();
 
-            Assert.Equal((ulong)23_192, intrinsicGas);
+            Assert.Equal((ulong) 23_192, intrinsicGas);
 
             Assert.Equal(transaction.gas, gas);
         }
@@ -178,15 +178,15 @@ namespace VeChainCoreTest
             var intrinsicGas = transaction.CalculateIntrinsicGasCost();
 
             Assert.Equal((ulong) 23_192, intrinsicGas);
-            
+
             Assert.Equal(transaction.gas, gas);
         }
 
         [Fact]
         public async Task GetChainTag()
         {
-            var tag =  await _vechainClient.GetChainTag();
-            Assert.True(tag == (byte)Network.Test || tag == (byte)Network.Main || tag == (byte)Network.Dev);
+            var tag = await _vechainClient.GetChainTag();
+            Assert.True(tag == (byte) Network.Test || tag == (byte) Network.Main || tag == (byte) Network.Dev);
         }
     }
 }
