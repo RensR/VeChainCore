@@ -1,40 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+using System.Runtime.Serialization;
+using Nethereum.RLP;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public class Clause : IEquatable<Clause>
+    public abstract class Clause : IRLPElement
     {
-        public string to { get; set; }
-        public string value { get; set; }
-        public string data { get; set; }
+        public abstract string to { get; }
+        public abstract decimal value { get; }
+        public abstract string data { get; }
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as Clause);
-        }
-
-        public bool Equals(Clause other)
-        {
-            return other != null &&
-               to == other.to &&
-               value == other.value &&
-               data == other.data;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(to, value, data);
-        }
-
-        public static bool operator ==(Clause clause1, Clause clause2)
-        {
-            return EqualityComparer<Clause>.Default.Equals(clause1, clause2);
-        }
-
-        public static bool operator !=(Clause clause1, Clause clause2)
-        {
-            return !(clause1 == clause2);
-        }
+        [IgnoreDataMember]
+        public abstract byte[] RLPData { get; }
     }
 }

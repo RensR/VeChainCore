@@ -10,8 +10,8 @@ namespace VeChainCore.Models.Core
 
         public ECDSASignature(byte[] rBytes, byte[] sBytes)
         {
-            R = Hex.BytesToBigInt(rBytes);
-            S = Hex.BytesToBigInt(sBytes);
+            R = new BigInteger(1, rBytes);
+            S = new BigInteger(1, sBytes);
         }
 
 
@@ -43,7 +43,7 @@ namespace VeChainCore.Models.Core
          * @return the signature in a canonicalised form.
          */
 
-        public ECDSASignature ToCanonicalised()
+        public ECDSASignature Canonicalize()
         {
             if (!IsCanonical())
             {
@@ -55,6 +55,7 @@ namespace VeChainCore.Models.Core
                 //    10 - 8 == 2, giving us always the latter solution, which is canonical.
                 return new ECDSASignature(R, ECKeyPair.Curve.N.Subtract(S));
             }
+
             return this;
         }
     }

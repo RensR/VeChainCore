@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Math.EC.Multiplier;
 using Org.BouncyCastle.Utilities;
 using VeChainCore.Models.Core;
+using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils.Cryptography
 {
-    public class ECDSASign
+    public static class ECDSASign
     {
         public static SignatureData SignMessage(byte[] message, ECKeyPair keys, bool needToHash)
         {
-            BigInteger publicKey = keys.GetPublicKey();
-            var messageHash = needToHash ? Hash.HashBlake2B(message) : message;
+            BigInteger publicKey = keys.PublicKey;
+            var messageHash = needToHash ? Hash.Blake2B(message) : message;
             var recId = -1;
 
             ECDSASignature sig = keys.Sign(messageHash);
@@ -35,32 +35,20 @@ namespace VeChainCore.Utils.Cryptography
                 throw new InvalidOperationException("Recovery is not valid for VeChain MainNet.");
 
             byte v = (byte) recId;
-            sig.R.ToByteArray();
-            byte[] r = BigIntToBytesWithPadding(sig.R, 32);
-            byte[] s = BigIntToBytesWithPadding(sig.S, 32);
+            
+            byte[] r = sig.R.ToByteArrayUnsigned().PadLeading(32);
+            byte[] s = sig.S.ToByteArrayUnsigned().PadLeading(32);
 
             return new SignatureData(v, r, s);
         }
 
-        public static byte[] BigIntToBytesWithPadding(BigInteger bigint, int size)
-        {
-            byte[] asBytes = bigint.BigIntegerToBytes();
-            var newArray = new byte[size];
-
-            var startAt = newArray.Length - asBytes.Length;
-            Unsafe.CopyBlock(ref newArray[startAt], ref asBytes[0], (uint)asBytes.Length);
-            // Array.Copy(asBytes, 0, newArray, startAt, asBytes.Length);
-
-            return newArray;
-        }
-
         /**
-    * Recover the public key from signature and message.
-    * @param recId recovery id which 0 or 1.
-    * @param sig {@link ECDSASignature} a signature object
-    * @param message message bytes array.
-    * @return public key represented by {@link BigInteger}
-    */
+        * Recover the public key from signature and message.
+        * @param recId recovery id which 0 or 1.
+        * @param sig {@link ECDSASignature} a signature object
+        * @param message message bytes array.
+        * @return public key represented by {@link BigInteger}
+        */
         public static BigInteger RecoverFromSignature(int recId, ECDSASignature sig, byte[] message)
         {
             if (!(recId == 0 || recId == 1))
@@ -127,60 +115,6 @@ namespace VeChainCore.Utils.Cryptography
             }
 
             return new FixedPointCombMultiplier().Multiply(ECKeyPair.Curve.G, privKey);
-        }
-    }
-
-
-    public class SignatureData
-    {
-        public readonly byte V;
-        public readonly byte[] R;
-        public readonly byte[] S;
-
-        public SignatureData(byte v, byte[] r, byte[] s)
-        {
-            V = v;
-            R = r;
-            S = s;
-        }
-
-        public override bool Equals(object o)
-        {
-            if (!(o is SignatureData that)) return false;
-            if (V != that.V)
-            {
-                return false;
-            }
-
-            return Equals(R, that.R) && Equals(S, that.S);
-        }
-
-        protected bool Equals(SignatureData other)
-        {
-            return V == other.V && Equals(R, other.R) && Equals(S, other.S);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = V.GetHashCode();
-                hashCode = (hashCode * 397) ^ (R != null ? R.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (S != null ? S.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
-
-        public byte[] ToByteArray()
-        {
-            int size = R.Length + S.Length + 1;
-            byte[] flat = new byte[size];
-            Unsafe.CopyBlock(ref flat[0], ref R[0], (uint)R.Length);
-            // Array.Copy(R, 0, flat, 0, R.Length);
-            Unsafe.CopyBlock(ref flat[R.Length], ref S[0], (uint)S.Length);
-            // Array.Copy(S, 0, flat, R.Length, S.Length);
-            flat[size - 1] = V;
-            return flat;
         }
     }
 }

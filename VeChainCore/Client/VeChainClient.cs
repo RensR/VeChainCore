@@ -7,6 +7,7 @@ using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Nethereum.Hex.HexConvertors.Extensions;
 using Utf8Json;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
@@ -34,15 +35,13 @@ namespace VeChainCore.Client
                     StandardResolver.ExcludeNullCamelCase,
                     DynamicObjectResolver.ExcludeNullCamelCase
                 });
-        
+
         /// <summary>
         /// The chaintags of the three known VeChain networks
         /// </summary>
         public enum Network
         {
-            Main = 74,
-            Test = 39,
-            Dev = 164
+            Main = 74, Test = 39, Dev = 164
         }
 
         /// <summary>
@@ -116,12 +115,12 @@ namespace VeChainCore.Client
         public async Task<string> GetLatestBlockRef()
         {
             Block bestBlockID = await GetBlock("best");
-            var bestBlockIDHex = bestBlockID.id.HexStringToByteArray();
+            var bestBlockIDHex = bestBlockID.id.HexToByteArray();
             var eightByte = new byte[8];
-            Unsafe.CopyBlock(ref eightByte[0], ref bestBlockIDHex[0], (uint)8); 
+            Unsafe.CopyBlock(ref eightByte[0], ref bestBlockIDHex[0], (uint) 8);
             // Buffer.BlockCopy(bestBlockIDHex, 0, eightByte, 0, 8);
 
-            return eightByte.TrimLeadingZeroBytes().ByteArrayToString();
+            return eightByte.TrimLeading().ToHex(true);
         }
 
         /// <summary>
@@ -148,11 +147,11 @@ namespace VeChainCore.Client
 
         public async Task<HttpResponseMessage> TestNetFaucet(string address)
         {
-            if (!Hex.IsValidAddress(address))
-                return null;
+            if (!Address.IsValid(address))
+                throw new ArgumentException("Invalid address.", nameof(address));
 
-            var content = new ByteArrayContent(JsonSerializer.Serialize(new { to = address }, JsonFormatterResolver));
-            
+            var content = new ByteArrayContent(JsonSerializer.Serialize(new {to = address}, JsonFormatterResolver));
+
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             return await _client.PostAsync("https://faucet.outofgas.io/requests", content);
@@ -168,7 +167,7 @@ namespace VeChainCore.Client
             var transactionJson = new ByteArrayContent(transactionBytes);
 
             var response = await SendPostRequest("/transactions", transactionJson);
-            return new TransferResult{ id = response.ToString()};
+            return new TransferResult {id = response.ToString()};
         }
 
         /// <summary>
@@ -177,12 +176,12 @@ namespace VeChainCore.Client
         /// <param name="transactionBytes"></param>
         /// <param name="address">Address of the contract</param>
         /// <returns></returns>
-        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
+        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<VetClause> clauses)
         {
             var json = JsonSerializer.Serialize(new {clauses}, JsonFormatterResolver);
 
             var content = new ByteArrayContent(json);
-            
+
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await SendPostRequest($"/accounts/*", content);

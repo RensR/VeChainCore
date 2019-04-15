@@ -6,7 +6,6 @@ using Nethereum.Hex.HexConvertors.Extensions;
 using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Core;
-using VeChainCore.Utils;
 using VeChainCore.Utils.Cryptography;
 using Transaction = VeChainCore.Models.Blockchain.Transaction;
 
@@ -62,7 +61,7 @@ namespace VeChainCore.Models.Extensions
             // gas cost of a clause or a contract creation based on whether the 'to'
             // value has been set
             ulong dataGasCost = 0;
-            foreach (Clause transactionClause in transaction.clauses)
+            foreach (var transactionClause in transaction.clauses)
             {
                 dataGasCost += transactionClause.data.DataGas();
                 dataGasCost += transactionClause.to != null ? clauseGas : clauseGasContractCreation;
@@ -98,14 +97,14 @@ namespace VeChainCore.Models.Extensions
         /// <param name="transaction">The RawTransaction for which the id needs to be calculated.</param>
         /// <param name="signer">The address of the signer.</param>
         /// <returns>The RawTransaction with the calculated id.</returns>
-        public static RlpTransaction CalculateTxId(this RlpTransaction transaction, Address signer)
+        public static Transaction CalculateTxId(this Transaction transaction, Address signer)
         {
             if (transaction.signature == null)
                 throw new ArgumentException("transaction is not singed");
 
             // Hash the RLP encoded transaction
-            var signedHash = Hash.HashBlake2B(transaction.RLPData);
-            var signerAddress = signer.HexString.HexStringToByteArray();
+            var signedHash = Hash.Blake2B(transaction.RLPData);
+            var signerAddress = signer.HexString.HexToByteArray();
 
             byte[] concatenatedBytes = new byte[52];
             Unsafe.CopyBlock(ref concatenatedBytes[0], ref signedHash[0], (uint) signedHash.Length);
@@ -114,8 +113,8 @@ namespace VeChainCore.Models.Extensions
             //Array.Copy(signingAddress, 0, concatenatedBytes, signingHash.Length, signingAddress.Length);
 
             // Hash the bytes from the signed transaction and the signer address
-            byte[] txIdBytes = Hash.HashBlake2B(concatenatedBytes);
-            transaction.id = txIdBytes.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
+            byte[] txIdBytes = Hash.Blake2B(concatenatedBytes);
+            transaction.id = txIdBytes.ToHex(true);
             return transaction;
         }
 
@@ -125,12 +124,12 @@ namespace VeChainCore.Models.Extensions
         /// <param name="transaction">The transaction that will be signed.</param>
         /// <param name="key">The key with which the transaction will be signed.</param>
         /// <returns>The signed transaction</returns>
-        public static RlpTransaction Sign(this RlpTransaction transaction, ECKeyPair key)
+        public static Transaction Sign(this Transaction transaction, ECKeyPair key)
         {
             var rlp = transaction.RLPData;
 
             SignatureData signatureData = ECDSASign.SignMessage(rlp, key, true);
-            transaction.signature = signatureData.ToByteArray();
+            transaction.signature = signatureData.ToByteArray().ToHex();
 
             return transaction;
         }
@@ -141,7 +140,7 @@ namespace VeChainCore.Models.Extensions
         /// <param name="transaction">The transaction to be included in the blockchain</param>
         /// <param name="client">The client that determines the interaction with the blockchain</param>
         /// <returns>The result of the transfer</returns>
-        public static async Task<TransferResult> Transfer(this RlpTransaction transaction, VeChainClient client)
+        public static async Task<TransferResult> Transfer(this Transaction transaction, VeChainClient client)
         {
             if (transaction?.signature == null)
                 throw new ArgumentException("Unsigned transaction can not be sent");
@@ -151,25 +150,6 @@ namespace VeChainCore.Models.Extensions
             //var transactionString = bytes.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
 
             return await client.SendTransaction(bytes);
-        }
-
-        /// <summary>
-        /// RLP encode the transaction and turn it into a byte[]
-        /// </summary>
-        /// <param name="transaction">The transaction that is to be encoded</param>
-        /// <returns>The encoded transaction</returns>
-        public static byte[] Encode(this Transaction transaction)
-        {
-            return RlpTransaction.CreateUnsigned(
-                transaction.chainTag,
-                transaction.blockRef,
-                transaction.expiration,
-                transaction.clauses.Select(c => new RlpClause(c.to, c.value, c.data, false)).ToArray(),
-                (ulong) transaction.nonce.HexToBigInteger(false),
-                transaction.gasPriceCoef,
-                transaction.gas,
-                transaction.dependsOn
-            ).RLPData;
         }
     }
 }
