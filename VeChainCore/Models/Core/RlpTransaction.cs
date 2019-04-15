@@ -28,7 +28,7 @@ namespace VeChainCore.Models.Core
 
             if (transaction.blockRef is null)
                 throw new ArgumentException("BlockRef is 0");
-            BlockRef = RlpString.Create(transaction.blockRef.HexStringToByteArray(8));
+            BlockRef = RlpString.Create(UInt64.Parse(transaction.blockRef, System.Globalization.NumberStyles.HexNumber));
 
             if (transaction.expiration == 0)
                 throw new ArgumentException("Expiration is 0");
@@ -52,9 +52,10 @@ namespace VeChainCore.Models.Core
 
             if (transaction.nonce is null)
                 throw new ArgumentException("Nonce is null");
-            Nonce = RlpString.Create(transaction.nonce);
+            Nonce = RlpString.Create(UInt64.Parse(transaction.nonce));
 
-            Reserved = new RlpList { null };
+            RlpList reservedList = null;
+            Reserved = reservedList;
 
             if (transaction.signature != null)
                 Signature = RlpString.Create(transaction.signature);
