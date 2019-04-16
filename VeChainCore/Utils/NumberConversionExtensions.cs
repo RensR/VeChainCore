@@ -3,8 +3,11 @@ using Org.BouncyCastle.Math;
 
 namespace VeChainCore.Utils
 {
-    public static class MathExtensions
+    public static class NumberConversionExtensions
     {
+        public static BigInteger ToBigInteger(this byte[] bytes)
+            => new BigInteger(1, bytes);
+
         public static BigInteger ToBigInteger(this decimal dec)
         {
             var bits = decimal.GetBits(dec);

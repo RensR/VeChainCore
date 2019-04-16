@@ -1,8 +1,9 @@
+using System;
 using System.Runtime.CompilerServices;
 
 namespace VeChainCore.Utils.Cryptography
 {
-    public class SignatureData
+    public class SignatureData : IEquatable<SignatureData>
     {
         public readonly byte V;
         public readonly byte[] R;
@@ -26,7 +27,7 @@ namespace VeChainCore.Utils.Cryptography
             return Equals(R, that.R) && Equals(S, that.S);
         }
 
-        protected bool Equals(SignatureData other)
+        public bool Equals(SignatureData other)
         {
             return V == other.V && Equals(R, other.R) && Equals(S, other.S);
         }

@@ -91,7 +91,7 @@ namespace VeChainCoreTest
             // based on https://github.com/vechain/thor/blob/d9f618b4974733e04949f7b9424001f5bd572baa/tx/transaction_test.go#L20
             string to = "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed";
             var txn = new Transaction(
-                1,
+                (Network) 1,
                 "00000000aabbccdd",
                 32,
                 new[]
@@ -123,11 +123,12 @@ namespace VeChainCoreTest
 
             var expectedSignatureHex = "0xf76f3c91a834165872aa9464fc55b03a13f46ea8d3b858e528fcceaf371ad6884193c3f313ff8effbb57fe4d1adc13dceb933bedbf9dbb528d2936203d5511df00";
             Assert.Equal(expectedSignatureHex, txn.signature);
-            
+
             // signer: 0xd989829d88b0ed1b06edf5c50174ecfa64f14a64
             // id: 0xda90eaea52980bc4bb8d40cb2ff84d78433b3b4a6e7d50b75736c5e3e77b71ec
-            
-            var expectedSignedRlpHex = "0xf8970184aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e208600000060606081808252088083bc614ec0b841f76f3c91a834165872aa9464fc55b03a13f46ea8d3b858e528fcceaf371ad6884193c3f313ff8effbb57fe4d1adc13dceb933bedbf9dbb528d2936203d5511df00";
+
+            var expectedSignedRlpHex =
+                "0xf8970184aabbccdd20f840df947567d83b7b8d80addcb281a71d54fc7b3364ffed82271086000000606060df947567d83b7b8d80addcb281a71d54fc7b3364ffed824e208600000060606081808252088083bc614ec0b841f76f3c91a834165872aa9464fc55b03a13f46ea8d3b858e528fcceaf371ad6884193c3f313ff8effbb57fe4d1adc13dceb933bedbf9dbb528d2936203d5511df00";
             var actualSignedRlpHex = txn.RLPData.ToHex(true);
 
             Assert.Equal(expectedSignedRlpHex, actualSignedRlpHex);

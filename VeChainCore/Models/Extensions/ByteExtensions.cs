@@ -63,16 +63,22 @@ namespace VeChainCore.Models.Extensions
         /// <param name="buffer">The array of bytes.</param>
         /// <param name="desiredLength">The desired length of the array.</param>
         /// <param name="value">The value of the padding byte.</param>
+        /// <param name="allowLonger">If true, over-length input buffers are returned instead of being in error.</param>
         /// <returns>An array with leading bytes.</returns>
-        public static byte[] PadLeading(this byte[] buffer, int desiredLength, byte value = 0)
+        public static byte[] PadLeading(this byte[] buffer, int desiredLength, byte value = 0, bool allowLonger = true)
         {
-            var bytes = new byte[desiredLength];
-
             if (desiredLength == buffer.Length)
                 return buffer;
 
             if (desiredLength < buffer.Length)
+            {
+                if (allowLonger)
+                    return buffer;
+
                 throw new ArgumentException("Array longer than desired padded length.", nameof(desiredLength));
+            }
+
+            var bytes = new byte[desiredLength];
 
             int paddingLength = desiredLength - buffer.Length;
 
