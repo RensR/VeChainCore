@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using VeChainCore.Utils;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
 using System.Collections.Generic;
@@ -16,13 +15,12 @@ using VeChainCore.Utils.Json;
 
 namespace VeChainCore.Client
 {
-    public class VeChainClient : IDisposable
+    public class VeChainClient : IVeChainClient
     {
         public static readonly IJsonFormatterResolver JsonFormatterResolver
             = CompositeResolver.Create(
                 new IJsonFormatter[]
                 {
-                    new VeChainHexFormatter(),
                     new InterfaceImmutableDictionaryFormatter<string, object>(),
                     new ImmutableDictionaryFormatter<string, object>(),
                     new ImmutableSortedDictionaryFormatter<string, object>()
@@ -30,6 +28,7 @@ namespace VeChainCore.Client
                 new[]
                 {
                     VeChainFormatterResolver.Instance,
+                    ClauseFormatterResolver.Instance,
                     EnumResolver.Default,
                     ImmutableCollectionResolver.Instance,
                     BuiltinResolver.Instance,
@@ -94,7 +93,7 @@ namespace VeChainCore.Client
 
         public async Task<string> GetLatestBlockRef()
         {
-            Block bestBlockId = await GetBlock("best");
+            var bestBlockId = await GetBlock("best");
             var bestBlockIdHex = bestBlockId.id.HexToByteArray();
             var eightByte = new byte[8];
             Unsafe.CopyBlock(ref eightByte[0], ref bestBlockIdHex[0], 8);

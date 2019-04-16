@@ -21,8 +21,8 @@ namespace VeChainCoreTest
         {
             var transaction = new Transaction(
                 Network.Test,
-                "00000000aabbccdd",
-                32,
+                ulong.MaxValue - uint.MaxValue,
+                uint.MaxValue,
                 new[]
                 {
                     new VetClause(
@@ -50,8 +50,8 @@ namespace VeChainCoreTest
         {
             var transaction = new Transaction(
                 Network.Test,
-                "00000000aabbccdd",
-                32,
+                ulong.MaxValue - uint.MaxValue,
+                uint.MaxValue,
                 new[]
                 {
                     new VetClause(

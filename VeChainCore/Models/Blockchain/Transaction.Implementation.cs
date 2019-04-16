@@ -1,25 +1,25 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
+using Utf8Json;
 using VeChainCore.Client;
 using VeChainCore.Models.Core;
 using VeChainCore.Models.Extensions;
+using VeChainCore.Utils;
 using VeChainCore.Utils.Cryptography;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public partial class Transaction : IEquatable<Transaction>, IRLPElement
+    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
+    public partial class Transaction : IEquatable<Transaction>, IRLPElement, IList<Clause>
     {
-        public override string ToString()
-        {
-            return $"Transaction {id}";
-        }
-
         public bool Equals(Transaction other)
         {
             return other != null &&
@@ -27,7 +27,7 @@ namespace VeChainCore.Models.Blockchain
                    chainTag == other.chainTag &&
                    blockRef == other.blockRef &&
                    expiration == other.expiration &&
-                   EqualityComparer<Clause[]>.Default.Equals(clauses, other.clauses) &&
+                   clauses.SequenceEqual(other.clauses) &&
                    gasPriceCoef == other.gasPriceCoef &&
                    gas == other.gas &&
                    origin == other.origin &&
@@ -37,55 +37,19 @@ namespace VeChainCore.Models.Blockchain
                    EqualityComparer<TxMeta>.Default.Equals(meta, other.meta);
         }
 
-        public override int GetHashCode()
-        {
-            var h = new HashCode();
-            h.Add(id);
-            h.Add(chainTag);
-            h.Add(blockRef);
-            h.Add(expiration);
-            h.Add(clauses);
-            h.Add(gasPriceCoef);
-            h.Add(gas);
-            h.Add(origin);
-            h.Add(nonce);
-            h.Add(dependsOn);
-            h.Add(size);
-            h.Add(meta);
-            h.Add(signature);
-            return h.ToHashCode();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as Transaction);
-        }
-
-        public static bool operator ==(Transaction clause1, Transaction clause2)
-        {
-            return EqualityComparer<Transaction>.Default.Equals(clause1, clause2);
-        }
-
-        public static bool operator !=(Transaction clause1, Transaction clause2)
-        {
-            return !(clause1 == clause2);
-        }
 
         public byte[][] GetRlpDataElements()
         {
-            var nbiGas = (System.Numerics.BigInteger) gas;
-            var nbiNonce = (System.Numerics.BigInteger) nonce;
-
             return new[]
             {
                 RLP.EncodeByte((byte) chainTag),
-                RLP.EncodeElement(blockRef.HexToByteArray().TrimLeading()),
+                RLP.EncodeElement(blockRef.ToBigEndianBytes().TrimLeading()),
                 RLP.EncodeElement(((long) expiration).ToBytesForRLPEncoding().TrimLeading()),
                 RLP.EncodeList(clauses.Select(c => c.RLPData).ToArray()),
                 RLP.EncodeByte(gasPriceCoef),
-                RLP.EncodeElement(nbiGas.ToBytesForRLPEncoding().TrimLeading()),
+                RLP.EncodeElement(gas.ToBigEndianBytes().TrimLeading()),
                 RLP.EncodeElement(dependsOn?.HexToByteArray().TrimLeading()),
-                RLP.EncodeElement(nbiNonce.ToBytesForRLPEncoding().TrimLeading()),
+                RLP.EncodeElement(nonce.ToBigEndianBytes().TrimLeading()),
                 Reserved,
                 RLP.EncodeElement(signature?.HexToByteArray())
             };
@@ -93,7 +57,7 @@ namespace VeChainCore.Models.Blockchain
 
         public Transaction(
             Network chainTag,
-            string blockRef,
+            ulong blockRef,
             uint expiration,
             Clause[] clauses,
             ulong nonce,
@@ -113,9 +77,7 @@ namespace VeChainCore.Models.Blockchain
         }
 
         public byte[][] GetRlpDataSignatureElements()
-        {
-            return GetRlpDataElements().Take(9).ToArray();
-        }
+            => GetRlpDataElements().Take(9).ToArray();
 
         [IgnoreDataMember]
         public byte[] RLPData
@@ -196,7 +158,7 @@ namespace VeChainCore.Models.Blockchain
             const uint clauseGas = 16_000;
             const uint clauseGasContractCreation = 48_000;
 
-            if (clauses.Length == 0)
+            if (clauses.Count == 0)
                 return txGas + clauseGas;
 
             // Add all the gas cost of the data written to the chain to either the 
@@ -210,6 +172,74 @@ namespace VeChainCore.Models.Blockchain
             }
 
             return txGas + dataGasCost;
+        }
+
+        public override int GetHashCode()
+        {
+            var h = new HashCode();
+            h.Add(id);
+            h.Add(chainTag);
+            h.Add(blockRef);
+            h.Add(expiration);
+            h.Add(clauses);
+            h.Add(gasPriceCoef);
+            h.Add(gas);
+            h.Add(origin);
+            h.Add(nonce);
+            h.Add(dependsOn);
+            h.Add(size);
+            h.Add(meta);
+            h.Add(signature);
+            return h.ToHashCode();
+        }
+
+        public override bool Equals(object obj)
+            => Equals(obj as Transaction);
+
+        public static bool operator ==(Transaction clause1, Transaction clause2)
+            => EqualityComparer<Transaction>.Default.Equals(clause1, clause2);
+
+        public static bool operator !=(Transaction clause1, Transaction clause2)
+            => !(clause1 == clause2);
+
+        public void Add(Clause item) => clauses.Add(item);
+
+        public void Clear() => clauses.Clear();
+
+        public bool Contains(Clause item) => clauses.Contains(item);
+
+        public void CopyTo(Clause[] array, int arrayIndex) => clauses.CopyTo(array, arrayIndex);
+
+        public bool Remove(Clause item) => clauses.Remove(item);
+
+        public int Count => clauses.Count;
+
+        public bool IsReadOnly => clauses.IsReadOnly;
+
+        public int IndexOf(Clause item) => clauses.IndexOf(item);
+
+        public void Insert(int index, Clause item) => clauses.Insert(index, item);
+
+        public void RemoveAt(int index) => clauses.RemoveAt(index);
+
+        public Clause this[int index]
+        {
+            get => clauses[index];
+            set => clauses[index] = value;
+        }
+
+        public IEnumerator<Clause> GetEnumerator()
+            => clauses.GetEnumerator();
+
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => clauses.GetEnumerator();
+
+        public override string ToString()
+        {
+            return id != null
+                ? $"{{\"id\":{id}}}"
+                : JsonSerializer.ToJsonString(this, VeChainClient.JsonFormatterResolver);
         }
     }
 }

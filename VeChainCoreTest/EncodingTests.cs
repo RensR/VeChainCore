@@ -92,7 +92,7 @@ namespace VeChainCoreTest
             string to = "0x7567d83b7b8d80addcb281a71d54fc7b3364ffed";
             var txn = new Transaction(
                 (Network) 1,
-                "00000000aabbccdd",
+                0x00000000aabbccdd,
                 32,
                 new[]
                 {

@@ -5,6 +5,14 @@ namespace VeChainCore.Utils
 {
     public static class NumberConversionExtensions
     {
+        public static byte[] ToBigEndianBytes(this ulong value)
+        {
+            var bytes = BitConverter.GetBytes(value);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            return bytes;
+        }
+        
         public static BigInteger ToBigInteger(this byte[] bytes)
             => new BigInteger(1, bytes);
 

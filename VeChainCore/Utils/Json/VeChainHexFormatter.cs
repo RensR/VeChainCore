@@ -40,12 +40,12 @@ namespace VeChainCore.Utils.Json
             Serialize(ref writer, bytes, formatterResolver);
         }
 
-        private static void WriteHexChar(in JsonWriter writer, int nib)
+        private static void WriteHexCharUnsafe(in JsonWriter writer, int nib)
         {
             if (nib <= 9)
-                writer.WriteRaw((byte) ('0' + nib));
+                writer.WriteRawUnsafe((byte) ('0' + nib));
             else
-                writer.WriteRaw((byte) ('a' + (nib - 0xa)));
+                writer.WriteRawUnsafe((byte) ('a' + (nib - 0xa)));
         }
 
         public void Serialize(ref JsonWriter writer, byte[] value, IJsonFormatterResolver formatterResolver)
@@ -53,12 +53,12 @@ namespace VeChainCore.Utils.Json
             int length = value.Length;
             bool noBytes = length == 0;
             writer.EnsureCapacity((noBytes ? 1 : length) * 2 + 4);
-            writer.WriteRaw((byte) '"');
-            writer.WriteRaw((byte) '0');
-            writer.WriteRaw((byte) 'x');
+            writer.WriteRawUnsafe((byte) '"');
+            writer.WriteRawUnsafe((byte) '0');
+            writer.WriteRawUnsafe((byte) 'x');
             if (noBytes)
             {
-                writer.WriteRaw((byte) '0');
+                writer.WriteRawUnsafe((byte) '0');
             }
             else
             {
@@ -69,12 +69,12 @@ namespace VeChainCore.Utils.Json
                     int hiNib = aByte >> 4;
                     int loNib = aByte & 0xF;
 
-                    WriteHexChar(writer, hiNib);
-                    WriteHexChar(writer, loNib);
+                    WriteHexCharUnsafe(writer, hiNib);
+                    WriteHexCharUnsafe(writer, loNib);
                 }
             }
 
-            writer.WriteRaw((byte) '"');
+            writer.WriteRawUnsafe((byte) '"');
         }
 
 

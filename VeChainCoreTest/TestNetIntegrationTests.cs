@@ -32,7 +32,7 @@ namespace VeChainCoreTest
         {
             var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
 
-            Assert.Equal(749, transaction.clauses.Length);
+            Assert.Equal(749, transaction.clauses.Count);
             // TODO
             //Assert.Equal("0x00183e68e864ee05", transaction.blockRef);
         }

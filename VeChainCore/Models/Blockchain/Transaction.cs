@@ -17,19 +17,26 @@ using VeChainCore.Utils.Json;
 
 namespace VeChainCore.Models.Blockchain
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso href="https://github.com/vechain/thor/wiki/Transaction-Model"/>
     public partial class Transaction
     {
-
         public Network chainTag { get; set; }
-        public string blockRef { get; set; }
+
+        [JsonFormatter(typeof(VeChainHexFormatter))]
+        public ulong blockRef { get; set; }
+
         public uint expiration { get; set; }
-        public Clause[] clauses { get; set; }
+        public IList<Clause> clauses { get; set; }
         public byte gasPriceCoef { get; set; }
-        
+
         [JsonFormatter(typeof(VeChainHexFormatter))]
         public ulong gas { get; set; }
+
         public string dependsOn { get; set; }
-        
+
         [JsonFormatter(typeof(VeChainHexFormatter))]
         public ulong nonce { get; set; }
 
