@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
+using Utf8Json;
 using VeChainCore.Client;
 using VeChainCore.Models.Core;
 using VeChainCore.Models.Extensions;
@@ -220,7 +221,6 @@ namespace VeChainCore.Models.Blockchain
         public static bool operator !=(Transaction clause1, Transaction clause2)
             => !(clause1 == clause2);
 
-        /*
         public void AddClause(Clause item) => clauses.Add(item);
 
         public void ClearClauses() => clauses.Clear();
@@ -241,6 +241,5 @@ namespace VeChainCore.Models.Blockchain
                 ? $"{{\"id\":{id}}}"
                 : JsonSerializer.ToJsonString(this, VeChainClient.JsonFormatterResolver);
         }
-        */
     }
 }

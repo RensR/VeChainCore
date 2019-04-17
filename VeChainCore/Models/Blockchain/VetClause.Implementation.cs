@@ -9,6 +9,7 @@ namespace VeChainCore.Models.Blockchain
 {
     public partial class VetClause : Clause, IEquatable<VetClause>, IRLPElement
     {
+        [IgnoreDataMember]
         private readonly VET _vet;
 
         public VetClause(string to, decimal value, string data)

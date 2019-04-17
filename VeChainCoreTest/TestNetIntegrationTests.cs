@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Org.BouncyCastle.Math;
@@ -41,7 +42,7 @@ namespace VeChainCoreTest
         {
             var receipt = await _vechainClient.GetReceipt("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
 
-            Assert.Equal(749, receipt.outputs.Length);
+            Assert.Equal(749, receipt.outputs.Count);
             Assert.Equal("0x3d0296f141deca31be8", receipt.paid);
             Assert.Equal((uint) 11989000, receipt.gasUsed);
         }
@@ -82,7 +83,7 @@ namespace VeChainCoreTest
                 receiptsRoot = "0x45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0",
                 signer = "0x0000000000000000000000000000000000000000",
                 isTrunk = true,
-                transactions = new string[0]
+                transactions = new List<string>()
             };
 
             var block = await _vechainClient.GetBlock("0");

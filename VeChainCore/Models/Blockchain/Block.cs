@@ -1,90 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
+using Utf8Json;
+using VeChainCore.Client;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public class Block : IEquatable<Block>
+    [DataContract]
+    public partial class Block : IEquatable<Block>
     {
+        [DataMember]
         public uint number { get; set; }
+
+        [DataMember]
         public string id { get; set; }
+
+        [DataMember]
         public uint size { get; set; }
+
+        [DataMember]
         public string parentID { get; set; }
+
+        [DataMember]
         public uint timestamp { get; set; }
+
+        [DataMember]
         public uint gasLimit { get; set; }
+
+        [DataMember]
         public string beneficiary { get; set; }
+
+        [DataMember]
         public uint gasUsed { get; set; }
+
+        [DataMember]
         public uint totalScore { get; set; }
+
+        [DataMember]
         public string txsRoot { get; set; }
+
+        [DataMember]
         public string stateRoot { get; set; }
+
+        [DataMember]
         public string receiptsRoot { get; set; }
+
+        [DataMember]
         public string signer { get; set; }
+
+        [DataMember]
         public bool isTrunk { get; set; }
-        public string[] transactions { get; set; }
 
-        public override string ToString()
-        {
-            return $"Block: {number}";
-        }
-
-        public override bool Equals(object other)
-        {
-            if (!(other is Block))
-                return false;
-            return Equals((Block) other);
-        }
-
-        public bool Equals(Block other)
-        {
-            var equal = other != null &&
-                   number == other.number &&
-                   id == other.id &&
-                   size == other.size &&
-                   parentID == other.parentID &&
-                   timestamp == other.timestamp &&
-                   gasLimit == other.gasLimit &&
-                   beneficiary == other.beneficiary &&
-                   gasUsed == other.gasUsed &&
-                   totalScore == other.totalScore &&
-                   txsRoot == other.txsRoot &&
-                   stateRoot == other.stateRoot &&
-                   receiptsRoot == other.receiptsRoot &&
-                   signer == other.signer &&
-                   isTrunk == other.isTrunk;
-
-            var transactionEqual = transactions.SequenceEqual(other.transactions);
-            return equal && transactionEqual;
-        }
-
-        public static bool operator ==(Block clause1, Block clause2)
-        {
-            return EqualityComparer<Block>.Default.Equals(clause1, clause2);
-        }
-
-        public static bool operator !=(Block clause1, Block clause2)
-        {
-            return !(clause1 == clause2);
-        }
-
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(number);
-            hash.Add(id);
-            hash.Add(size);
-            hash.Add(parentID);
-            hash.Add(timestamp);
-            hash.Add(gasLimit);
-            hash.Add(beneficiary);
-            hash.Add(gasUsed);
-            hash.Add(totalScore);
-            hash.Add(txsRoot);
-            hash.Add(stateRoot);
-            hash.Add(receiptsRoot);
-            hash.Add(signer);
-            hash.Add(isTrunk);
-            hash.Add(transactions);
-            return hash.ToHashCode();
-        }
+        [DataMember]
+        public List<string> transactions { get; set; }
     }
 }

@@ -6,23 +6,14 @@ using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public sealed class ArbitraryClause : Clause
+    [DataContract]
+    public sealed partial class ArbitraryClause : Clause
     {
+        [DataMember]
         public override string to { get; }
+        [DataMember]
         public override decimal value { get; }
+        [DataMember]
         public override string data { get; }
-
-
-        [IgnoreDataMember]
-        public byte[][] RlpDataParts
-            => new[]
-            {
-                new Address(to).RLPData,
-                RLP.EncodeElement(value.ToBigInteger().ToByteArrayUnsigned()),
-                RLP.EncodeElement(data.HexToByteArray())
-            };
-
-        [IgnoreDataMember]
-        public override byte[] RLPData => RLP.EncodeList(RlpDataParts);
     }
 }
