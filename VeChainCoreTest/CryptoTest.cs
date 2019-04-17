@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using Nethereum.Hex.HexConvertors.Extensions;
-using VeChainCore.Utils;
 using VeChainCore.Utils.Cryptography;
 using Xunit;
 

@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using Utf8Json;
 using VeChainCore.Models.Blockchain;
 

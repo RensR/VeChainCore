@@ -1,12 +1,9 @@
 using System;
-using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Org.BouncyCastle.Math;
 using Utf8Json;
-using Utf8Json.Formatters;
 
 namespace VeChainCore.Utils.Json
 {

@@ -1,6 +1,4 @@
-using System;
 using System.Globalization;
-using System.Linq;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
 using Org.BouncyCastle.Math;

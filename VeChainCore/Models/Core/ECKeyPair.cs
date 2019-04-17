@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RLP;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -13,9 +12,7 @@ using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Math.EC.Multiplier;
 using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Utilities.Encoders;
 using VeChainCore.Models.Extensions;
-using VeChainCore.Utils;
 using VeChainCore.Utils.Cryptography;
 
 namespace VeChainCore.Models.Core

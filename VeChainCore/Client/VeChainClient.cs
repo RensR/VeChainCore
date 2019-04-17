@@ -3,15 +3,16 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using VeChainCore.Models.Blockchain;
-using VeChainCore.Models.Extensions;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Utf8Json;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
 using VeChainCore.Models.Core;
 using VeChainCore.Utils.Json;
+using Account = VeChainCore.Models.Blockchain.Account;
 
 namespace VeChainCore.Client
 {
@@ -19,24 +20,15 @@ namespace VeChainCore.Client
     {
         public static readonly IJsonFormatterResolver JsonFormatterResolver
             = CompositeResolver.Create(
-                new IJsonFormatter[]
-                {
-                    new InterfaceImmutableDictionaryFormatter<string, object>(),
-                    new ImmutableDictionaryFormatter<string, object>(),
-                    new ImmutableSortedDictionaryFormatter<string, object>()
-                },
-                new[]
-                {
-                    VeChainFormatterResolver.Instance,
-                    ClauseFormatterResolver.Instance,
-                    EnumResolver.Default,
-                    ImmutableCollectionResolver.Instance,
-                    BuiltinResolver.Instance,
-                    AttributeFormatterResolver.Instance,
-                    DynamicGenericResolver.Instance,
-                    StandardResolver.ExcludeNullCamelCase,
-                    DynamicObjectResolver.ExcludeNullCamelCase
-                });
+                VeChainFormatterResolver.Instance,
+                ClauseFormatterResolver.Instance,
+                EnumResolver.Default,
+                ImmutableCollectionResolver.Instance,
+                BuiltinResolver.Instance,
+                AttributeFormatterResolver.Instance,
+                DynamicGenericResolver.Instance,
+                StandardResolver.ExcludeNullCamelCase
+            );
 
         /// <summary>
         /// The address of a running VeChain instance
@@ -65,7 +57,7 @@ namespace VeChainCore.Client
 
         // Logic methods
         /// <summary>
-        /// Gets an <see cref="Account"/> object that contains all Account information for
+        /// Gets an <see cref="Models.Blockchain.Account"/> object that contains all Account information for
         /// the given address.
         /// </summary>
         /// <param name="address">The address id in 0x notation</param>
@@ -91,13 +83,15 @@ namespace VeChainCore.Client
         public async Task<Block> GetBlock(string blockNumber)
             => await SendGetRequest<Block>($"/blocks/{blockNumber}");
 
-        public async Task<string> GetLatestBlockRef()
+        public async Task<ulong> GetLatestBlockRef()
         {
             var bestBlockId = await GetBlock("best");
             var bestBlockIdHex = bestBlockId.id.HexToByteArray();
             var eightByte = new byte[8];
             Unsafe.CopyBlock(ref eightByte[0], ref bestBlockIdHex[0], 8);
-            return eightByte.TrimLeading().ToHex(true);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(eightByte);
+            return BitConverter.ToUInt64(eightByte);
         }
 
         /// <summary>
@@ -157,7 +151,7 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
         {
-            //var debugJson = JsonSerializer.PrettyPrint(JsonSerializer.ToJsonString(new {clauses}, JsonFormatterResolver));
+            //var debugJson = JsonSerializer.ToJsonString(new {clauses}, JsonFormatterResolver);
 
             var json = JsonSerializer.Serialize(new {clauses}, JsonFormatterResolver);
 
@@ -165,7 +159,9 @@ namespace VeChainCore.Client
 
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            var response = await SendPostRequest($"/accounts/*", content);
+            var debugJson = Encoding.UTF8.GetString(json);
+            
+            var response = await SendPostRequest("/accounts/*", content);
 
             response.EnsureSuccessStatusCode();
 

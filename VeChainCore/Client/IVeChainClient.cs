@@ -36,7 +36,7 @@ namespace VeChainCore.Client
         /// <returns></returns>
         Task<Block> GetBlock(string blockNumber);
 
-        Task<string> GetLatestBlockRef();
+        Task<ulong> GetLatestBlockRef();
 
         /// <summary>
         /// Gets the <see cref="Transaction"/> object that contains all Transaction information for

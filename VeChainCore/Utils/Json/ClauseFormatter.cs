@@ -10,9 +10,9 @@ namespace VeChainCore.Utils.Json
         {
         }
 
-        private static readonly byte[] PropertyNameTo = Encoding.UTF8.GetBytes("to");
-        private static readonly byte[] PropertyNameValue = Encoding.UTF8.GetBytes("value");
-        private static readonly byte[] PropertyNameData = Encoding.UTF8.GetBytes("data");
+        private static readonly byte[] PropertyNameTo = Encoding.UTF8.GetBytes("\"to\"");
+        private static readonly byte[] PropertyNameValue = Encoding.UTF8.GetBytes("\"value\"");
+        private static readonly byte[] PropertyNameData = Encoding.UTF8.GetBytes("\"data\"");
 
         public void Serialize(ref JsonWriter writer, Clause value, IJsonFormatterResolver formatterResolver)
         {

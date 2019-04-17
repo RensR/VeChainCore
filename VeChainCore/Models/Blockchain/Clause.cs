@@ -1,6 +1,5 @@
 using System.Runtime.Serialization;
 using Nethereum.RLP;
-using Utf8Json;
 
 namespace VeChainCore.Models.Blockchain
 {

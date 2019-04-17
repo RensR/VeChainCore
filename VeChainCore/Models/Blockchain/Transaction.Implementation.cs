@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
-using Utf8Json;
 using VeChainCore.Client;
 using VeChainCore.Models.Core;
 using VeChainCore.Models.Extensions;
@@ -18,7 +16,7 @@ using VeChainCore.Utils.Cryptography;
 namespace VeChainCore.Models.Blockchain
 {
     [DebuggerDisplay("{" + nameof(ToString) + "()}")]
-    public partial class Transaction : IEquatable<Transaction>, IRLPElement, IList<Clause>
+    public partial class Transaction : IEquatable<Transaction>, IRLPElement
     {
         public bool Equals(Transaction other)
         {
@@ -59,7 +57,30 @@ namespace VeChainCore.Models.Blockchain
             Network chainTag,
             ulong blockRef,
             uint expiration,
-            Clause[] clauses,
+            IEnumerable<Clause> clauses,
+            ulong nonce,
+            byte gasPriceCoef,
+            ulong gas,
+            string dependsOn
+        )
+            : this(
+                chainTag,
+                blockRef,
+                expiration,
+                clauses as List<Clause> ?? new List<Clause>(clauses),
+                nonce,
+                gasPriceCoef,
+                gas,
+                dependsOn
+            )
+        {
+        }
+
+        public Transaction(
+            Network chainTag,
+            ulong blockRef,
+            uint expiration,
+            List<Clause> clauses,
             ulong nonce,
             byte gasPriceCoef,
             ulong gas,
@@ -121,7 +142,6 @@ namespace VeChainCore.Models.Blockchain
         /// Calculates the gas usage of a rawTransaction by combining the intrinsic gas cost with
         /// the cost of a test run interacting with a potential contract
         /// </summary>
-        /// <param name="transaction">The rawTransaction for which the cost is calculated</param>
         /// <param name="client"></param>
         /// <returns>The total gas cost of a transaction</returns>
         public async Task<ulong> CalculateTotalGasCost(VeChainClient client)
@@ -135,7 +155,6 @@ namespace VeChainCore.Models.Blockchain
         /// Calculates the execution gas cost of a transaction by submitting it to the contract on the client
         /// instance of the blockchain.
         /// </summary>
-        /// <param name="transaction">The Transaction for which the cost is calculated</param>
         /// <param name="client"></param>
         /// <returns>The execution gas cost of the transaction</returns>
         public async Task<ulong> CalculateExecutionGasCost(VeChainClient client)
@@ -147,7 +166,6 @@ namespace VeChainCore.Models.Blockchain
         /// <summary>
         /// Calculates the intrinsic gas usage of a rawTransaction.
         /// </summary>
-        /// <param name="transaction">The Transaction for which the cost is calculated</param>
         /// <returns>The intrinsic gas cost of the transaction</returns>
         public ulong CalculateIntrinsicGasCost()
         {
@@ -202,38 +220,20 @@ namespace VeChainCore.Models.Blockchain
         public static bool operator !=(Transaction clause1, Transaction clause2)
             => !(clause1 == clause2);
 
-        public void Add(Clause item) => clauses.Add(item);
+        /*
+        public void AddClause(Clause item) => clauses.Add(item);
 
-        public void Clear() => clauses.Clear();
+        public void ClearClauses() => clauses.Clear();
 
-        public bool Contains(Clause item) => clauses.Contains(item);
+        public bool ContainsClause(Clause item) => clauses.Contains(item);
 
-        public void CopyTo(Clause[] array, int arrayIndex) => clauses.CopyTo(array, arrayIndex);
+        public bool RemoveClause(Clause item) => clauses.Remove(item);
 
-        public bool Remove(Clause item) => clauses.Remove(item);
+        public int IndexOfClause(Clause item) => clauses.IndexOf(item);
 
-        public int Count => clauses.Count;
+        public void InsertClause(int index, Clause item) => clauses.Insert(index, item);
 
-        public bool IsReadOnly => clauses.IsReadOnly;
-
-        public int IndexOf(Clause item) => clauses.IndexOf(item);
-
-        public void Insert(int index, Clause item) => clauses.Insert(index, item);
-
-        public void RemoveAt(int index) => clauses.RemoveAt(index);
-
-        public Clause this[int index]
-        {
-            get => clauses[index];
-            set => clauses[index] = value;
-        }
-
-        public IEnumerator<Clause> GetEnumerator()
-            => clauses.GetEnumerator();
-
-
-        IEnumerator IEnumerable.GetEnumerator()
-            => clauses.GetEnumerator();
+        public void RemoveAtClause(int index) => clauses.RemoveAt(index);
 
         public override string ToString()
         {
@@ -241,5 +241,6 @@ namespace VeChainCore.Models.Blockchain
                 ? $"{{\"id\":{id}}}"
                 : JsonSerializer.ToJsonString(this, VeChainClient.JsonFormatterResolver);
         }
+        */
     }
 }

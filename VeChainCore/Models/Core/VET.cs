@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace VeChainCore.Models.Core
+﻿namespace VeChainCore.Models.Core
 {
     public class VET : Amount
     {

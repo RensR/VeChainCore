@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RLP;
-using Nethereum.Signer.Crypto;
-using Org.BouncyCastle.Math;
 using Utf8Json;
-using VeChainCore.Client;
-using VeChainCore.Models.Core;
-using VeChainCore.Models.Extensions;
-using VeChainCore.Utils.Cryptography;
 using VeChainCore.Utils.Json;
 
 namespace VeChainCore.Models.Blockchain
@@ -21,32 +9,52 @@ namespace VeChainCore.Models.Blockchain
     /// 
     /// </summary>
     /// <seealso href="https://github.com/vechain/thor/wiki/Transaction-Model"/>
+    [DataContract]
     public partial class Transaction
     {
+        [DataMember]
         public Network chainTag { get; set; }
 
+        [DataMember]
         [JsonFormatter(typeof(VeChainHexFormatter))]
         public ulong blockRef { get; set; }
 
+        [DataMember]
         public uint expiration { get; set; }
-        public IList<Clause> clauses { get; set; }
+
+        [DataMember]
+        public List<Clause> clauses { get; set; }
+
+        [DataMember]
         public byte gasPriceCoef { get; set; }
 
+        [DataMember]
         [JsonFormatter(typeof(VeChainHexFormatter))]
         public ulong gas { get; set; }
 
+        [DataMember]
         public string dependsOn { get; set; }
 
+        [DataMember]
         [JsonFormatter(typeof(VeChainHexFormatter))]
         public ulong nonce { get; set; }
 
+        [DataMember]
         private static readonly byte[] Reserved = {0xc0};
 
+        [DataMember]
         public string signature { get; set; }
 
+        [DataMember]
         public string id { get; set; }
+
+        [DataMember]
         public string origin { get; set; }
+
+        [DataMember]
         public ulong size { get; set; }
+
+        [DataMember]
         public TxMeta meta { get; set; }
     }
 }

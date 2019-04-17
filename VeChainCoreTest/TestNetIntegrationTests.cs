@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Utilities.Encoders;
 using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Utils;
