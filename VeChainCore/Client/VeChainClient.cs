@@ -22,7 +22,7 @@ namespace VeChainCore.Client
             = CompositeResolver.Create(
                 VeChainFormatterResolver.Instance,
                 ClauseFormatterResolver.Instance,
-                EnumResolver.Default,
+                EnumResolver.UnderlyingValue,
                 ImmutableCollectionResolver.Instance,
                 BuiltinResolver.Instance,
                 AttributeFormatterResolver.Instance,
