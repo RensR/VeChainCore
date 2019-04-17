@@ -14,20 +14,21 @@ namespace VeChainCore.Utils.Json
         private static readonly byte[] PropertyNameValue = Encoding.UTF8.GetBytes("\"value\"");
         private static readonly byte[] PropertyNameData = Encoding.UTF8.GetBytes("\"data\"");
 
-        public void Serialize(ref JsonWriter writer, Clause value, IJsonFormatterResolver formatterResolver)
+        public void Serialize(ref JsonWriter writer, Clause clause, IJsonFormatterResolver formatterResolver)
         {
             writer.WriteBeginObject();
             writer.WriteRaw(PropertyNameTo);
             writer.WriteNameSeparator();
-            writer.WriteString(value.to);
+            writer.WriteString(clause.to);
             writer.WriteValueSeparator();
             writer.WriteRaw(PropertyNameValue);
             writer.WriteNameSeparator();
-            JsonSerializer.Serialize(ref writer, value.value, formatterResolver);
+            ((IJsonFormatter<decimal>) VeChainHexFormatter.Default)
+                .Serialize(ref writer, clause.value, formatterResolver);
             writer.WriteValueSeparator();
             writer.WriteRaw(PropertyNameData);
             writer.WriteNameSeparator();
-            writer.WriteString(value.data);
+            writer.WriteString(clause.data);
             writer.WriteEndObject();
         }
 

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 using Utf8Json;
 using VeChainCore.Utils.Json;
 
@@ -16,7 +18,7 @@ namespace VeChainCore.Models.Blockchain
         public Network chainTag { get; set; }
 
         [DataMember]
-        [JsonFormatter(typeof(VeChainHexFormatter))]
+        [JsonFormatter(typeof(VeChainHexFormatter), false)]
         public ulong blockRef { get; set; }
 
         [DataMember]
@@ -29,14 +31,12 @@ namespace VeChainCore.Models.Blockchain
         public byte gasPriceCoef { get; set; }
 
         [DataMember]
-        [JsonFormatter(typeof(VeChainHexFormatter))]
         public ulong gas { get; set; }
 
-        [DataMember]
+        [DataMember(IsRequired = false, EmitDefaultValue = false), DefaultValue(null)]
         public string dependsOn { get; set; }
 
-        [DataMember]
-        [JsonFormatter(typeof(VeChainHexFormatter))]
+        [DataMember, JsonFormatter(typeof(VeChainHexFormatter), true)]
         public ulong nonce { get; set; }
 
         [DataMember]
@@ -45,16 +45,17 @@ namespace VeChainCore.Models.Blockchain
         [DataMember]
         public string signature { get; set; }
 
-        [DataMember]
+        [IgnoreDataMember]
         public string id { get; set; }
 
-        [DataMember]
+        [IgnoreDataMember]
         public string origin { get; set; }
 
-        [DataMember]
+
+        [IgnoreDataMember]
         public ulong size { get; set; }
 
-        [DataMember]
+        [IgnoreDataMember]
         public TxMeta meta { get; set; }
     }
 }

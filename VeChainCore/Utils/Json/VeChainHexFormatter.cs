@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Org.BouncyCastle.Math;
 using Utf8Json;
+using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils.Json
 {
@@ -15,6 +16,13 @@ namespace VeChainCore.Utils.Json
             IJsonFormatter<byte[]>
     {
         public static readonly IJsonFormatter Default = new VeChainHexFormatter();
+        public static readonly IJsonFormatter TrimLeadingZeros = new VeChainHexFormatter(true);
+        private readonly bool _trimLeadingZeros;
+
+        public VeChainHexFormatter(bool trimLeadingZeros = false)
+        {
+            _trimLeadingZeros = trimLeadingZeros;
+        }
 
         public void Serialize(
             ref JsonWriter writer,
@@ -33,11 +41,12 @@ namespace VeChainCore.Utils.Json
         {
             var bytes = BitConverter.GetBytes(value);
             if (BitConverter.IsLittleEndian)
-                bytes = bytes.Reverse().ToArray();
+                Array.Reverse(bytes);
+            bytes.TrimLeading();
             Serialize(ref writer, bytes, formatterResolver);
         }
 
-        private static void WriteHexCharUnsafe(in JsonWriter writer, int nib)
+        private static void WriteHexCharUnsafe(ref JsonWriter writer, int nib)
         {
             if (nib <= 9)
                 writer.WriteRawUnsafe((byte) ('0' + nib));
@@ -59,6 +68,7 @@ namespace VeChainCore.Utils.Json
             }
             else
             {
+                bool writtenNonZero = false;
                 for (int i = 0; i < length; i++)
                 {
                     byte aByte = value[i];
@@ -66,8 +76,22 @@ namespace VeChainCore.Utils.Json
                     int hiNib = aByte >> 4;
                     int loNib = aByte & 0xF;
 
-                    WriteHexCharUnsafe(writer, hiNib);
-                    WriteHexCharUnsafe(writer, loNib);
+                    if (_trimLeadingZeros && !writtenNonZero)
+                    {
+                        if (hiNib == 0)
+                        {
+                            if (loNib == 0)
+                                continue;
+
+                            WriteHexCharUnsafe(ref writer, loNib);
+                            writtenNonZero = true;
+                            continue;
+                        }
+                        writtenNonZero = true;
+                    }
+
+                    WriteHexCharUnsafe(ref writer, hiNib);
+                    WriteHexCharUnsafe(ref writer, loNib);
                 }
             }
 
@@ -105,6 +129,7 @@ namespace VeChainCore.Utils.Json
             var bytes = DeserializeBytes(ref reader, formatterResolver);
             if (BitConverter.IsLittleEndian)
                 bytes = bytes.Reverse().ToArray();
+            bytes = bytes.PadLeading(8);
             return Unsafe.ReadUnaligned<ulong>(ref bytes[0]);
         }
 

@@ -22,10 +22,10 @@ namespace VeChainCore.Client
             = CompositeResolver.Create(
                 VeChainFormatterResolver.Instance,
                 ClauseFormatterResolver.Instance,
+                AttributeFormatterResolver.Instance,
                 EnumResolver.UnderlyingValue,
                 ImmutableCollectionResolver.Instance,
                 BuiltinResolver.Instance,
-                AttributeFormatterResolver.Instance,
                 DynamicGenericResolver.Instance,
                 StandardResolver.ExcludeNullCamelCase
             );
@@ -160,7 +160,7 @@ namespace VeChainCore.Client
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var debugJson = Encoding.UTF8.GetString(json);
-            
+
             var response = await SendPostRequest("/accounts/*", content);
 
             response.EnsureSuccessStatusCode();

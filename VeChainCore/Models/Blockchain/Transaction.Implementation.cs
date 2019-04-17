@@ -21,19 +21,19 @@ namespace VeChainCore.Models.Blockchain
     {
         public bool Equals(Transaction other)
         {
-            return other != null &&
-                   id == other.id &&
-                   chainTag == other.chainTag &&
-                   blockRef == other.blockRef &&
-                   expiration == other.expiration &&
-                   clauses.SequenceEqual(other.clauses) &&
-                   gasPriceCoef == other.gasPriceCoef &&
-                   gas == other.gas &&
-                   origin == other.origin &&
-                   nonce == other.nonce &&
-                   dependsOn == other.dependsOn &&
-                   size == other.size &&
-                   EqualityComparer<TxMeta>.Default.Equals(meta, other.meta);
+            if (other == null)
+                return false;
+            return id == other.id
+                   || (
+                       chainTag == other.chainTag
+                       && blockRef == other.blockRef
+                       && expiration == other.expiration
+                       && clauses.SequenceEqual(other.clauses)
+                       && gasPriceCoef == other.gasPriceCoef
+                       && gas == other.gas
+                       && nonce == other.nonce
+                       && dependsOn == other.dependsOn
+                   );
         }
 
 
@@ -203,11 +203,8 @@ namespace VeChainCore.Models.Blockchain
             h.Add(clauses);
             h.Add(gasPriceCoef);
             h.Add(gas);
-            h.Add(origin);
             h.Add(nonce);
             h.Add(dependsOn);
-            h.Add(size);
-            h.Add(meta);
             h.Add(signature);
             return h.ToHashCode();
         }
