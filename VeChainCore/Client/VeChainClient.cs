@@ -131,15 +131,18 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<TransferResult> SendTransaction(Transaction txn)
         {
-            var bytes = txn.RLPData;
+            if (string.IsNullOrEmpty(txn.signature))
+                throw new ArgumentException("Transaction must be signed.", nameof(txn.signature));
 
-            var rlp = new ByteArrayContent(bytes);
+            var json = JsonSerializer.Serialize(txn, JsonFormatterResolver);
 
-            //rlp.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var bytes = new ByteArrayContent(json);
 
-            var response = await SendPostRequest("/transactions", rlp);
+            bytes.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await SendPostRequest("/transactions", bytes);
             
-            await DetailedThrowOnUnsuccessfulResponse(response, rlp);
+            await DetailedThrowOnUnsuccessfulResponse(response, bytes);
 
             return new TransferResult {id = response.ToString()};
         }
