@@ -134,8 +134,10 @@ namespace VeChainCore.Client
             if (string.IsNullOrEmpty(txn.signature))
                 throw new ArgumentException("Transaction must be signed.", nameof(txn.signature));
 
-            var json = JsonSerializer.Serialize(txn, JsonFormatterResolver);
+            var rlp = txn.RLPData;
 
+            var json = JsonSerializer.Serialize(new {raw = rlp.ToHex(true)}, JsonFormatterResolver);
+            
             var bytes = new ByteArrayContent(json);
 
             bytes.Headers.ContentType = new MediaTypeHeaderValue("application/json");
