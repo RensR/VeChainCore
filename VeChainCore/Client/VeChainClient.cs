@@ -139,8 +139,7 @@ namespace VeChainCore.Client
 
             var response = await SendPostRequest("/transactions", rlp);
             
-            if (!response.IsSuccessStatusCode)
-                throw new HttpRequestException($"{response.StatusCode} {response.ReasonPhrase}\n{response.Content.Headers}\n{await response.Content.ReadAsStringAsync()}");
+            await DetailedThrowOnUnsuccessfulResponse(response, rlp);
 
             return new TransferResult {id = response.ToString()};
         }
@@ -163,13 +162,19 @@ namespace VeChainCore.Client
             var debugJson = Encoding.UTF8.GetString(json);
 
             var response = await SendPostRequest("/accounts/*", content);
-            
-            if (!response.IsSuccessStatusCode)
-                throw new HttpRequestException($"{response.StatusCode} {response.ReasonPhrase}\n{response.Content.Headers}\n{await response.Content.ReadAsStringAsync()}");
+
+            await DetailedThrowOnUnsuccessfulResponse(response, content);
 
             var body = await response.Content.ReadAsByteArrayAsync();
 
             return JsonSerializer.Deserialize<IEnumerable<CallResult>>(body, JsonFormatterResolver);
+        }
+
+        private static async Task DetailedThrowOnUnsuccessfulResponse(HttpResponseMessage response, ByteArrayContent content)
+        {
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"HTTP {(uint) response.StatusCode} {response.ReasonPhrase}\n{response.Content.Headers}\n\n{await response.Content.ReadAsStringAsync()}\n\n")
+                    {Data = {{typeof(HttpContent), content}}};
         }
 
         /// <summary>
