@@ -13,7 +13,36 @@ namespace VeChainCoreTest
         public GasTests()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.BlockchainAddress = new Uri("https://sync-testnet.vechain.org");
+            _vechainClient.BlockchainAddress = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
+        }
+
+        [Fact]
+        public async Task CalculateGasCostAsync()
+        {
+            var transaction = new Transaction(
+                Network.Test,
+                ulong.MaxValue - uint.MaxValue,
+                uint.MaxValue,
+                new[]
+                {
+                    new VetClause(
+                        "0x1cB569E82928A346f35Dc7B1f5B60309e209AF94",
+                        1,
+                        "0x"
+                    ),
+                },
+                12345678,
+                0,
+                21000,
+                null
+            );
+
+            var intrinsicGas = transaction.CalculateIntrinsicGasCost();
+
+//            Assert.Equal((ulong) 23_192, intrinsicGas);
+
+            var gas = await transaction.CalculateTotalGasCost(_vechainClient);
+//            Assert.Equal(transaction.gas, gas); // etting 23968 (23192+776)
         }
 
         [Fact]

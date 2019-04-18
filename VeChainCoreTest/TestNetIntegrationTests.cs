@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Org.BouncyCastle.Math;
+using Utf8Json;
 using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Utils;
@@ -17,7 +19,7 @@ namespace VeChainCoreTest
         public TestNetIntegrationTests()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.BlockchainAddress = new Uri("https://sync-testnet.vechain.org");
+            _vechainClient.BlockchainAddress = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
         }
 
         [Fact]
@@ -30,9 +32,36 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GetTransaction()
         {
-            var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+            using (var httpClient = new HttpClient() {BaseAddress = _vechainClient.BlockchainAddress})
+            {
+                var raw = await httpClient.GetByteArrayAsync("/transactions/0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
 
-            Assert.Equal(749, transaction.clauses.Count);
+                var o = JsonSerializer.Deserialize<dynamic>(raw);
+
+                Assert.Equal(749, o["clauses"].Count);
+
+                var transaction = await _vechainClient.GetTransaction("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
+
+                Assert.Equal(749, transaction.clauses.Count);
+
+                for (var i = 0; i < 749; ++i)
+                {
+                    var oClause = o["clauses"][i];
+                    var clause = transaction.clauses[i];
+
+                    Assert.Equal(oClause["to"], clause.to);
+
+
+                    Assert.Equal(oClause["data"], clause.data);
+
+
+                    Assert.Equal(
+                        ((string) oClause["value"]).HexToByteArray().ToHexCompact(),
+                        clause.value.ToBigInteger().ToByteArrayUnsigned().ToHexCompact()
+                    );
+                }
+            }
+
             // TODO
             //Assert.Equal("0x00183e68e864ee05", transaction.blockRef);
         }

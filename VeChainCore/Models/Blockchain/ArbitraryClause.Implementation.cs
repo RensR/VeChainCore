@@ -8,6 +8,10 @@ namespace VeChainCore.Models.Blockchain
 {
     public sealed partial class ArbitraryClause
     {
+        public ArbitraryClause(string to, decimal value, string data)
+            => (this.to, this.value, this.data) = (to, value, data);
+
+
         [IgnoreDataMember]
         public byte[][] RlpDataParts
             => new[]
