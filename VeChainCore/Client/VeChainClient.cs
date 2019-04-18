@@ -121,7 +121,7 @@ namespace VeChainCore.Client
 
             json.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            return await _client.PostAsync("https://faucet.outofgas.io/requests", json);
+            return await _client.PostAsync("https://faucet-new.outofgas.io/requests", json);
         }
 
         /// <summary>
@@ -138,8 +138,9 @@ namespace VeChainCore.Client
             //rlp.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await SendPostRequest("/transactions", rlp);
-
-            response.EnsureSuccessStatusCode();
+            
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"{response.StatusCode} {response.ReasonPhrase}\n{response.Content.Headers}\n{await response.Content.ReadAsStringAsync()}");
 
             return new TransferResult {id = response.ToString()};
         }
@@ -162,8 +163,9 @@ namespace VeChainCore.Client
             var debugJson = Encoding.UTF8.GetString(json);
 
             var response = await SendPostRequest("/accounts/*", content);
-
-            response.EnsureSuccessStatusCode();
+            
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"{response.StatusCode} {response.ReasonPhrase}\n{response.Content.Headers}\n{await response.Content.ReadAsStringAsync()}");
 
             var body = await response.Content.ReadAsByteArrayAsync();
 
