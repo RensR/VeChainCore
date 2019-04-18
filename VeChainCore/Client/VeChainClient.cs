@@ -137,16 +137,16 @@ namespace VeChainCore.Client
             var rlp = txn.RLPData;
 
             var json = JsonSerializer.Serialize(new {raw = rlp.ToHex(true)}, JsonFormatterResolver);
-            
+
             var bytes = new ByteArrayContent(json);
 
             bytes.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await SendPostRequest("/transactions", bytes);
-            
+
             await DetailedThrowOnUnsuccessfulResponse(response, bytes);
 
-            return new TransferResult {id = response.ToString()};
+            return JsonSerializer.Deserialize<TransferResult>(await response.Content.ReadAsByteArrayAsync(), JsonFormatterResolver);
         }
 
         /// <summary>
