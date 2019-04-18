@@ -145,7 +145,7 @@ namespace VeChainCore.Models.Blockchain
         /// </summary>
         /// <param name="client"></param>
         /// <returns>The total gas cost of a transaction</returns>
-        public async Task<ulong> CalculateTotalGasCost(VeChainClient client)
+        public async Task<ulong> CalculateTotalGasCost(IVeChainClient client)
         {
             var executionCost = await CalculateExecutionGasCost(client);
             var intrinsicCost = CalculateIntrinsicGasCost();
@@ -158,7 +158,7 @@ namespace VeChainCore.Models.Blockchain
         /// </summary>
         /// <param name="client"></param>
         /// <returns>The execution gas cost of the transaction</returns>
-        public async Task<ulong> CalculateExecutionGasCost(VeChainClient client)
+        public async Task<ulong> CalculateExecutionGasCost(IVeChainClient client)
         {
             var callResults = await client.ExecuteAddressCode(clauses);
             return (ulong) callResults.Sum(result => (decimal) result.gasUsed);
