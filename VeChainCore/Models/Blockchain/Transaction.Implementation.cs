@@ -184,7 +184,7 @@ namespace VeChainCore.Models.Blockchain
             // gas cost of a clause or a contract creation based on whether the 'to'
             // value has been set
             ulong dataGasCost = 0;
-            foreach (var transactionClause in clauses)
+            foreach (IClause transactionClause in clauses)
             {
                 dataGasCost += transactionClause.CalculateDataGas();
                 dataGasCost += transactionClause.to != null ? clauseGas : clauseGasContractCreation;

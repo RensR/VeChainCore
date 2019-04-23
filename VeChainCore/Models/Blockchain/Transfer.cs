@@ -13,5 +13,8 @@ namespace VeChainCore.Models.Blockchain
 
         [DataMember]
         public string amount { get; set; }
+        
+        [DataMember(IsRequired = false)]
+        public TxMeta meta { get; set; }
     }
 }

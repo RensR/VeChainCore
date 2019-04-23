@@ -15,5 +15,11 @@ namespace VeChainCore.Models.Blockchain
 
         [DataMember]
         public uint blockTimestamp { get; set; }
+
+        [DataMember(IsRequired = false)]
+        public string txID { get; set; }
+
+        [DataMember(IsRequired = false)]
+        public string txOrigin { get; set; }
     }
 }

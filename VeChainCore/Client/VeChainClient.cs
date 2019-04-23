@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -6,8 +7,10 @@ using VeChainCore.Models.Blockchain;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Utf8Json;
+using Utf8Json.Formatters;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
 using VeChainCore.Models.Core;
@@ -33,15 +36,23 @@ namespace VeChainCore.Client
         /// <summary>
         /// The address of a running VeChain instance
         /// </summary>
-        public Uri BlockchainAddress
+        public Uri ServerUri
         {
-            get => _blockchainAddress;
-            set => _blockchainAddress = value;
+            get => _client.BaseAddress;
+            set => _client.BaseAddress = value;
         }
 
-        private Uri _blockchainAddress = new Uri("https://sync-mainnet.vechain.org");
-
         private readonly HttpClient _client = new HttpClient();
+
+        public VeChainClient(string serverUri)
+        {
+            ServerUri = new Uri(serverUri);
+        }
+
+        public VeChainClient()
+            : this("https://sync-mainnet.vechain.org")
+        {
+        }
 
         /// <summary>
         /// Gets the blockchain tag that indicates what network is connected; Main, Testnet or a dev instance
@@ -112,18 +123,6 @@ namespace VeChainCore.Client
         public async Task<Receipt> GetReceipt(string id)
             => await SendGetRequest<Receipt>($"/transactions/{id}/receipt");
 
-        public async Task<HttpResponseMessage> TestNetFaucet(string address)
-        {
-            if (!Address.IsValid(address))
-                throw new ArgumentException("Invalid address.", nameof(address));
-
-            var json = new ByteArrayContent(JsonSerializer.Serialize(new {to = address}, JsonFormatterResolver));
-
-            json.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            return await _client.PostAsync("https://faucet-new.outofgas.io/requests", json);
-        }
-
         /// <summary>
         /// Initiate a transaction to be included in the blockchain
         /// </summary>
@@ -147,6 +146,92 @@ namespace VeChainCore.Client
             await DetailedThrowOnUnsuccessfulResponse(response, bytes);
 
             return JsonSerializer.Deserialize<TransferResult>(await response.Content.ReadAsByteArrayAsync(), JsonFormatterResolver);
+        }
+
+        public IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            return GetTransfers(out _, criteriaSet, ct, from, to, pageSize, lazy);
+        }
+
+        public IEnumerable<Transfer> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            if (from >= to)
+                throw new ArgumentOutOfRangeException(nameof(from), from, "From must be less than or equal to.");
+            if (to > 9007199254740991)
+                throw new ArgumentOutOfRangeException(nameof(to), to, "To must be less than or equal to JSON maximum safe integer (9007199254740991).");
+
+
+            var transfers = new BlockingCollection<Transfer>(new ConcurrentQueue<Transfer>());
+
+            async Task FetchTransfers()
+            {
+                try
+                {
+                    for (uint offset = 0;; offset += pageSize)
+                    {
+                        var json = JsonSerializer.Serialize(new
+                        {
+                            range = new
+                            {
+                                unit = "block",
+                                from,
+                                to
+                            },
+                            options = new
+                            {
+                                offset,
+                                limit = pageSize
+                            },
+                            criteriaSet,
+                            order = "asc"
+                        }, JsonFormatterResolver);
+
+                        var content = new ByteArrayContent(json);
+
+                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                        var response = await SendPostRequest("/logs/transfer", content);
+
+                        await DetailedThrowOnUnsuccessfulResponse(response, content);
+
+                        var bytes = await response.Content.ReadAsByteArrayAsync();
+
+                        var transferPage = JsonSerializer.Deserialize<Transfer[]>(bytes, JsonFormatterResolver);
+
+                        if (transferPage.Length == 0)
+                            break;
+
+                        foreach (var transfer in transferPage)
+                            transfers.Add(transfer, ct);
+
+                        while (lazy && transfers.Count > 0)
+                            await Task.Delay(15, ct);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // ok
+                }
+                catch (ObjectDisposedException)
+                {
+                    // ok
+                }
+                finally
+                {
+                    try
+                    {
+                        transfers.CompleteAdding();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // ok
+                    }
+                }
+            }
+
+            fetchCompletion = FetchTransfers();
+
+            return transfers.GetConsumingEnumerable(ct);
         }
 
         /// <summary>
@@ -189,7 +274,7 @@ namespace VeChainCore.Client
         /// <param name="path">The path to the wanted object</param>
         /// <returns></returns>
         private async Task<T> SendGetRequest<T>(string path)
-            => JsonSerializer.Deserialize<T>(await _client.GetByteArrayAsync(GetUri(path)), JsonFormatterResolver);
+            => JsonSerializer.Deserialize<T>(await _client.GetByteArrayAsync(path), JsonFormatterResolver);
 
         /// <summary>
         /// Sends a POST request and return the chosen return type
@@ -198,15 +283,7 @@ namespace VeChainCore.Client
         /// <param name="httpContent">Parameters of the request</param>
         /// <returns></returns>
         private async Task<HttpResponseMessage> SendPostRequest(string path, HttpContent httpContent)
-            => await _client.PostAsync(GetUri(path), httpContent);
-
-        /// <summary>
-        /// Transforms the path to the full URL including the blockchain address
-        /// </summary>
-        /// <param name="path">The query specific part of the URL</param>
-        /// <returns></returns>
-        private Uri GetUri(string path)
-            => new Uri(BlockchainAddress, path);
+            => await _client.PostAsync(path, httpContent);
 
         public void Dispose()
             => _client.Dispose();

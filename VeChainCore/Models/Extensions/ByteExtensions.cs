@@ -1,62 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace VeChainCore.Models.Extensions
 {
     public static class ByteExtensions
     {
-        /// <summary>
-        /// Concatenates two T arrays. The content of the first argument will come before the
-        /// content of the second argument
-        /// </summary>
-        /// <param name="first">The first T[]</param>
-        /// <param name="second">The second T[]</param>
-        /// <returns></returns>
-        public static byte[] Concat(this byte[] first, byte[] second)
-        {
-            var rv = new byte[first.Length + second.Length];
-            if (first.Length > 0)
-                Unsafe.CopyBlock(ref rv[0], ref first[0], (uint) first.Length);
-            if (second.Length > 0)
-                Unsafe.CopyBlock(ref rv[first.Length], ref second[0], (uint) second.Length);
-            return rv;
-        }
-
-        /// <summary>
-        /// Flattens the structure of an array of byte arrays.
-        /// The resulting byte array will contain all
-        /// information found in all the arrays in the given
-        /// order.
-        /// </summary>
-        /// <param name="arrays">An array of arrays of bytes.</param>
-        /// <returns>A flattened array of bytes.</returns>
-        public static byte[] Combine(params byte[][] arrays)
-        {
-            byte[] rv = new byte[arrays.Sum(a => a.Length)];
-            int offset = 0;
-            foreach (byte[] array in arrays)
-            {
-                if (array.Length > 0)
-                    Unsafe.CopyBlock(ref rv[offset], ref array[0], (uint) array.Length);
-                // Array.Copy(array, 0, rv, offset, array.Length);
-                offset += array.Length;
-            }
-
-            return rv;
-        }
-
-        /// <summary>
-        /// Flattens the structure of an array of byte arrays.
-        /// The resulting byte array will contain all
-        /// information found in all the arrays in the given
-        /// order.
-        /// </summary>
-        /// <param name="arrays">An array of arrays of bytes.</param>
-        /// <returns>A flattened array of bytes.</returns>
-        public static byte[] Flatten(this byte[][] arrays)
-            => Combine(arrays);
-
         /// <summary>
         /// Pads the array with the leading byte to a desired length.
         /// </summary>

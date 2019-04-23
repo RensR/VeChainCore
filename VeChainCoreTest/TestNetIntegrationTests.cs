@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Math;
 using Utf8Json;
 using VeChainCore.Client;
@@ -19,7 +23,7 @@ namespace VeChainCoreTest
         public TestNetIntegrationTests()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.BlockchainAddress = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
+            _vechainClient.ServerUri = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
         }
 
         [Fact]
@@ -32,7 +36,7 @@ namespace VeChainCoreTest
         [Fact]
         public async Task GetTransaction()
         {
-            using (var httpClient = new HttpClient() {BaseAddress = _vechainClient.BlockchainAddress})
+            using (var httpClient = new HttpClient() {BaseAddress = _vechainClient.ServerUri})
             {
                 var raw = await httpClient.GetByteArrayAsync("/transactions/0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
 
@@ -47,10 +51,9 @@ namespace VeChainCoreTest
                 for (var i = 0; i < 749; ++i)
                 {
                     var oClause = o["clauses"][i];
-                    var clause = transaction.clauses[i];
+                    IClause clause = transaction.clauses[i];
 
                     Assert.Equal(oClause["to"], clause.to);
-
 
                     Assert.Equal(oClause["data"], clause.data);
 
@@ -67,6 +70,170 @@ namespace VeChainCoreTest
         }
 
         [Fact]
+        public async Task GetTransfersOneAtATime()
+        {
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(60000);
+            var transfers = _vechainClient.GetTransfers(out var fx, new[]
+            {
+                new TransferCriteria {recipient = "0xA43751C42125dfB5fFE662F0ad527660885de3AE"},
+            }, cts.Token, pageSize: 1);
+
+            var firstTxf = JsonSerializer.Deserialize<Transfer>(@"{
+    ""sender"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e"",
+    ""recipient"": ""0xa43751c42125dfb5ffe662f0ad527660885de3ae"",
+    ""amount"": ""0x1a784379d99db42000000"",
+    ""meta"": {
+      ""blockID"": ""0x0000855499c6487d85f24d45a68c5a5c457b6b4618cd14ab4073cc8daa2f32ac"",
+      ""blockNumber"": 34132,
+      ""blockTimestamp"": 1530355720,
+      ""txID"": ""0x8c0fa7d8c62b6d3def7fac8cf7d9801cdc809b5225b6ee13ed91c272198244bf"",
+      ""txOrigin"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e""
+    }
+  }");
+
+            bool oneTransfer = false;
+
+            foreach (var transfer in transfers)
+            {
+                oneTransfer = true;
+                cts.Cancel();
+                Assert.Equal(
+                    JsonSerializer.PrettyPrint(JsonSerializer.Serialize(firstTxf, VeChainClient.JsonFormatterResolver)),
+                    JsonSerializer.PrettyPrint(JsonSerializer.Serialize(transfer, VeChainClient.JsonFormatterResolver))
+                );
+                break;
+            }
+
+            Assert.True(oneTransfer);
+
+            await fx;
+
+
+            // heisenbug
+            //Assert.Empty(transfers);
+
+            Assert.True(fx.IsCompletedSuccessfully);
+        }
+
+        [Fact]
+        public async Task GetTransfersOneAtATimeThrowAwayTask()
+        {
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(60000);
+            var transfers = _vechainClient.GetTransfers(new[]
+            {
+                new TransferCriteria {recipient = "0xA43751C42125dfB5fFE662F0ad527660885de3AE"},
+            }, cts.Token, pageSize: 1);
+
+            var firstTxf = JsonSerializer.Deserialize<Transfer>(@"{
+    ""sender"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e"",
+    ""recipient"": ""0xa43751c42125dfb5ffe662f0ad527660885de3ae"",
+    ""amount"": ""0x1a784379d99db42000000"",
+    ""meta"": {
+      ""blockID"": ""0x0000855499c6487d85f24d45a68c5a5c457b6b4618cd14ab4073cc8daa2f32ac"",
+      ""blockNumber"": 34132,
+      ""blockTimestamp"": 1530355720,
+      ""txID"": ""0x8c0fa7d8c62b6d3def7fac8cf7d9801cdc809b5225b6ee13ed91c272198244bf"",
+      ""txOrigin"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e""
+    }
+  }");
+
+            bool oneTransfer = false;
+
+            foreach (var transfer in transfers)
+            {
+                oneTransfer = true;
+                cts.Cancel();
+                Assert.Equal(
+                    JsonSerializer.PrettyPrint(JsonSerializer.Serialize(firstTxf, VeChainClient.JsonFormatterResolver)),
+                    JsonSerializer.PrettyPrint(JsonSerializer.Serialize(transfer, VeChainClient.JsonFormatterResolver))
+                );
+                break;
+            }
+
+            Assert.True(oneTransfer);
+
+
+            // heisenbug
+            //Assert.Empty(transfers);
+        }
+
+        [Fact]
+        public async Task GetTransfersOneAtATimeForTwo()
+        {
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(60000);
+            var transfers = _vechainClient.GetTransfers(out var fx, new[]
+            {
+                new TransferCriteria {recipient = "0xA43751C42125dfB5fFE662F0ad527660885de3AE"},
+            }, cts.Token, pageSize: 1);
+
+            var firstTxf = JsonSerializer.Deserialize<Transfer>(@"{
+    ""sender"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e"",
+    ""recipient"": ""0xa43751c42125dfb5ffe662f0ad527660885de3ae"",
+    ""amount"": ""0x1a784379d99db42000000"",
+    ""meta"": {
+      ""blockID"": ""0x0000855499c6487d85f24d45a68c5a5c457b6b4618cd14ab4073cc8daa2f32ac"",
+      ""blockNumber"": 34132,
+      ""blockTimestamp"": 1530355720,
+      ""txID"": ""0x8c0fa7d8c62b6d3def7fac8cf7d9801cdc809b5225b6ee13ed91c272198244bf"",
+      ""txOrigin"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e""
+    }
+  }");
+            var secondTxf = JsonSerializer.Deserialize<Transfer>(@"{
+    ""sender"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e"",
+    ""recipient"": ""0xa43751c42125dfb5ffe662f0ad527660885de3ae"",
+    ""amount"": ""0xad78ebc5ac6200000"",
+    ""meta"": {
+      ""blockID"": ""0x0000855499c6487d85f24d45a68c5a5c457b6b4618cd14ab4073cc8daa2f32ac"",
+      ""blockNumber"": 34132,
+      ""blockTimestamp"": 1530355720,
+      ""txID"": ""0x8c0fa7d8c62b6d3def7fac8cf7d9801cdc809b5225b6ee13ed91c272198244bf"",
+      ""txOrigin"": ""0x5034aa590125b64023a0262112b98d72e3c8e40e""
+    }
+  }");
+
+            bool firstTransfer = false;
+            bool secondTransfer = false;
+
+            foreach (var transfer in transfers)
+            {
+                if (!firstTransfer)
+                {
+                    firstTransfer = true;
+                    Assert.Equal(
+                        JsonSerializer.PrettyPrint(JsonSerializer.Serialize(firstTxf, VeChainClient.JsonFormatterResolver)),
+                        JsonSerializer.PrettyPrint(JsonSerializer.Serialize(transfer, VeChainClient.JsonFormatterResolver))
+                    );
+                }
+                else
+                {
+                    secondTransfer = true;
+                    cts.Cancel();
+                    Assert.Equal(
+                        JsonSerializer.PrettyPrint(JsonSerializer.Serialize(secondTxf, VeChainClient.JsonFormatterResolver)),
+                        JsonSerializer.PrettyPrint(JsonSerializer.Serialize(transfer, VeChainClient.JsonFormatterResolver))
+                    );
+
+                    break;
+                }
+            }
+
+            Assert.True(firstTransfer);
+            Assert.True(secondTransfer);
+
+            await fx;
+
+
+            // heisenbug
+            //Assert.Empty(transfers);
+
+            Assert.True(fx.IsCompletedSuccessfully);
+        }
+
+        [
+            Fact]
         public async Task GetReceipt()
         {
             var receipt = await _vechainClient.GetReceipt("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
@@ -76,8 +243,8 @@ namespace VeChainCoreTest
             Assert.Equal((uint) 11989000, receipt.gasUsed);
         }
 
-
-        [Fact]
+        [
+            Fact]
         public async Task GetAccountBalance()
         {
             // Assert that this address has no contract at the current block
@@ -92,8 +259,8 @@ namespace VeChainCoreTest
             Assert.Equal(BigInteger.Zero, genesisAccount.energy.HexToByteArray().ToBigInteger());
         }
 
-
-        [Fact]
+        [
+            Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
             var genesis = new Block // Test

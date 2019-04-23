@@ -9,16 +9,11 @@ namespace VeChainCore.Models.Blockchain
 {
     public partial class VetClause : Clause, IEquatable<VetClause>, IRLPElement
     {
-        [IgnoreDataMember]
-        private readonly VET _vet;
-
         public VetClause(string to, decimal value, string data)
         {
             this.to = to;
             this.value = value;
             this.data = data;
-
-            _vet = new VET(this.value);
         }
 
         public override bool Equals(object obj)
@@ -54,11 +49,15 @@ namespace VeChainCore.Models.Blockchain
             => new[]
             {
                 new Address(to).RLPData,
-                RLP.EncodeElement(_vet.AsBytes),
+                RLP.EncodeElement(new VET(value).AsBytes),
                 RLP.EncodeElement(data.HexToByteArray())
             };
 
         [IgnoreDataMember]
         public override byte[] RLPData => RLP.EncodeList(RlpDataParts);
+
+        protected override string GetTo() => to;
+        protected override decimal GetValue() => value;
+        protected override string GetData() => data;
     }
 }

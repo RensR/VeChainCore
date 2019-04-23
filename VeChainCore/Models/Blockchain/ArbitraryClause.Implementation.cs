@@ -6,7 +6,7 @@ using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public sealed partial class ArbitraryClause
+    public sealed partial class ArbitraryClause : Clause
     {
         public ArbitraryClause(string to, decimal value, string data)
             => (this.to, this.value, this.data) = (to, value, data);
@@ -23,5 +23,11 @@ namespace VeChainCore.Models.Blockchain
 
         [IgnoreDataMember]
         public override byte[] RLPData => RLP.EncodeList(RlpDataParts);
+
+        protected override string GetTo() => to;
+
+        protected override decimal GetValue() => value;
+
+        protected override string GetData() => data;
     }
 }

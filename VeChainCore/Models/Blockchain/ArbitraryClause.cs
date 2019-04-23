@@ -7,13 +7,15 @@ using VeChainCore.Utils;
 namespace VeChainCore.Models.Blockchain
 {
     [DataContract]
-    public sealed partial class ArbitraryClause : Clause
+    public sealed partial class ArbitraryClause
     {
         [DataMember]
-        public override string to { get; }
+        public string to { get; }
+
         [DataMember]
-        public override decimal value { get; }
+        public decimal value { get; }
+
         [DataMember]
-        public override string data { get; }
+        public string data { get; }
     }
 }

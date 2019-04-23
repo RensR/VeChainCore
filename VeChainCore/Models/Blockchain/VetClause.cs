@@ -5,13 +5,16 @@ namespace VeChainCore.Models.Blockchain
     [DataContract]
     public partial class VetClause
     {
+        // implementation handles serialization
+        
         [DataMember]
-        public override string to { get; }
+        public string to { get; set; }
 
         [DataMember]
-        public override decimal value { get; }
+        public decimal value { get; set; }
 
         [DataMember]
-        public override string data { get; }
+        public string data { get; set; }
+
     }
 }

@@ -8,7 +8,6 @@ namespace VeChainCore.Models.Core
         protected decimal _decimalsMultiplier;
 
         public abstract decimal Value { get; }
-        public abstract string ContractAddress { get; }
 
         public int Decimals { get; }
         public decimal DecimalsMultiplier => _decimalsMultiplier;
@@ -16,6 +15,9 @@ namespace VeChainCore.Models.Core
         public byte[] AsBytes => AsBigInt.ToByteArrayUnsigned();
 
         public BigInteger AsBigInt => (Value * _decimalsMultiplier).ToBigInteger();
+
+        public string ContractAddress => GetContractAddress();
+        protected abstract string GetContractAddress();
 
 
         protected Amount(int decimals)

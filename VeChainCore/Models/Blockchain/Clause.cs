@@ -6,13 +6,14 @@ using VeChainCore.Utils.Json;
 namespace VeChainCore.Models.Blockchain
 {
     [DataContract]
-    public abstract partial class Clause : IRLPElement
+    public abstract partial class Clause : IClause, IRLPElement
     {
-        [DataMember]
-        public abstract string to { get; }
-        [DataMember]
-        public abstract decimal value { get; }
-        [DataMember]
-        public abstract string data { get; }
+        // implementation handles serialization
+        
+        string IClause.to => GetTo();
+
+        decimal IClause.value => GetValue();
+
+        string IClause.data => GetData();
     }
 }

@@ -13,7 +13,7 @@ namespace VeChainCoreTest
         public GasTests()
         {
             _vechainClient = new VeChainClient();
-            _vechainClient.BlockchainAddress = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
+            _vechainClient.ServerUri = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
         }
 
         [Fact]

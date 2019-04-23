@@ -14,8 +14,10 @@ namespace VeChainCore.Utils.Json
         private static readonly byte[] PropertyNameValue = Encoding.UTF8.GetBytes("\"value\"");
         private static readonly byte[] PropertyNameData = Encoding.UTF8.GetBytes("\"data\"");
 
-        public void Serialize(ref JsonWriter writer, Clause clause, IJsonFormatterResolver formatterResolver)
+        public void Serialize(ref JsonWriter writer, Clause aClause, IJsonFormatterResolver formatterResolver)
         {
+            IClause clause = aClause;
+
             writer.WriteBeginObject();
             writer.WriteRaw(PropertyNameTo);
             writer.WriteNameSeparator();

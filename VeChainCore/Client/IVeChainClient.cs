@@ -11,7 +11,7 @@ namespace VeChainCore.Client
         /// <summary>
         /// The address of a running VeChain instance
         /// </summary>
-        Uri BlockchainAddress { get; set; }
+        Uri ServerUri { get; set; }
 
         /// <summary>
         /// Gets the blockchain tag that indicates what network is connected; Main, Testnet or a dev instance
@@ -53,8 +53,6 @@ namespace VeChainCore.Client
         /// <param name="id">The transaction id</param>
         /// <returns></returns>
         Task<Receipt> GetReceipt(string id);
-
-        Task<HttpResponseMessage> TestNetFaucet(string address);
 
         /// <summary>
         /// Initiate a transaction to be included in the blockchain
