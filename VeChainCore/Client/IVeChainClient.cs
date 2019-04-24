@@ -45,7 +45,7 @@ namespace VeChainCore.Client
         /// </summary>
         /// <param name="id">The transaction id</param>
         /// <returns></returns>
-        Task<Transaction> GetTransaction(string id);
+        Task<TransactionLog> GetTransaction(string id);
 
         /// <summary>
         /// Gets the <see cref="Receipt"/> object that contains all Receipt information for
@@ -69,8 +69,8 @@ namespace VeChainCore.Client
         /// <returns></returns>
         Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses);
 
-        IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
+        IEnumerable<TransactionLog> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
 
-        IEnumerable<Transfer> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
+        IEnumerable<TransactionLog> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
     }
 }

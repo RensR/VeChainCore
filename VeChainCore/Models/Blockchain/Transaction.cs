@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Ocsp;
 using Utf8Json;
 using VeChainCore.Utils.Json;
 
@@ -46,16 +47,6 @@ namespace VeChainCore.Models.Blockchain
         public string signature { get; set; }
 
         [IgnoreDataMember]
-        public string id { get; set; }
-
-        [IgnoreDataMember]
-        public string origin { get; set; }
-
-
-        [IgnoreDataMember]
-        public ulong size { get; set; }
-
-        [IgnoreDataMember]
-        public TxMeta meta { get; set; }
+        public virtual string id { get; set; }
     }
 }
