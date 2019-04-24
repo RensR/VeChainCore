@@ -159,6 +159,8 @@ namespace VeChainCore.Client
                 throw new ArgumentOutOfRangeException(nameof(from), from, "From must be less than or equal to.");
             if (to > 9007199254740991)
                 throw new ArgumentOutOfRangeException(nameof(to), to, "To must be less than or equal to JSON maximum safe integer (9007199254740991).");
+            if (criteriaSet != null && criteriaSet.Length == 0)
+                throw new ArgumentException("The criteriaSet parameter must be null or contain at least one criteria.", nameof(criteriaSet));
 
 
             var transfers = new BlockingCollection<Transfer>(new ConcurrentQueue<Transfer>());
