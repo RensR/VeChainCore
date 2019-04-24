@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using VeChainCore.Models.Blockchain;
 
@@ -67,5 +68,9 @@ namespace VeChainCore.Client
         /// <param name="clauses">Transaction clauses</param>
         /// <returns></returns>
         Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses);
+
+        IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
+
+        IEnumerable<Transfer> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
     }
 }
