@@ -11,7 +11,7 @@ namespace VeChainCore.Models.Blockchain
     public partial class Block : IEquatable<Block>
     {
         [DataMember]
-        public uint number { get; set; }
+        public ulong number { get; set; }
 
         [DataMember]
         public string id { get; set; }
@@ -23,7 +23,7 @@ namespace VeChainCore.Models.Blockchain
         public string parentID { get; set; }
 
         [DataMember]
-        public uint timestamp { get; set; }
+        public ulong timestamp { get; set; }
 
         [DataMember]
         public uint gasLimit { get; set; }

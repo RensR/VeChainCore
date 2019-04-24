@@ -11,10 +11,10 @@ namespace VeChainCore.Models.Blockchain
         public string blockID { get; set; }
 
         [DataMember]
-        public uint blockNumber { get; set; }
+        public ulong blockNumber { get; set; }
 
         [DataMember]
-        public uint blockTimestamp { get; set; }
+        public ulong blockTimestamp { get; set; }
 
         [DataMember(IsRequired = false)]
         public string txID { get; set; }
