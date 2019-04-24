@@ -57,7 +57,9 @@ namespace VeChainCore.Models.Extensions
 
             uint bufferLength = (uint) (buffer.Length - leadingCount);
 
-            return buffer.LastBytes(bufferLength);
+            return bufferLength == 0
+                ? Array.Empty<byte>()
+                : buffer.LastBytes(bufferLength);
         }
 
         public static byte[] FirstBytes(this byte[] buffer, uint length)

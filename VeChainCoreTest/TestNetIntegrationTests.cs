@@ -98,10 +98,9 @@ namespace VeChainCoreTest
             {
                 oneTransfer = true;
                 cts.Cancel();
-                Assert.Equal(
-                    JsonSerializer.PrettyPrint(JsonSerializer.Serialize(firstTxf, VeChainClient.JsonFormatterResolver)),
-                    JsonSerializer.PrettyPrint(JsonSerializer.Serialize(transfer, VeChainClient.JsonFormatterResolver))
-                );
+                string expected = JsonSerializer.PrettyPrint(JsonSerializer.Serialize(firstTxf, VeChainClient.JsonFormatterResolver));
+                string actual = JsonSerializer.PrettyPrint(JsonSerializer.Serialize(transfer, VeChainClient.JsonFormatterResolver));
+                Assert.Equal(expected, actual);
                 break;
             }
 
@@ -117,7 +116,7 @@ namespace VeChainCoreTest
         }
 
         [Fact]
-        public async Task GetTransfersOneAtATimeThrowAwayTask()
+        public void GetTransfersOneAtATimeThrowAwayTask()
         {
             var cts = new CancellationTokenSource();
             cts.CancelAfter(60000);

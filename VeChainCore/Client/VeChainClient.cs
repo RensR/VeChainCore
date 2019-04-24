@@ -148,12 +148,12 @@ namespace VeChainCore.Client
             return JsonSerializer.Deserialize<TransferResult>(await response.Content.ReadAsByteArrayAsync(), JsonFormatterResolver);
         }
 
-        public IEnumerable<TransactionLog> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        public IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
         {
             return GetTransfers(out _, criteriaSet, ct, from, to, pageSize, lazy);
         }
 
-        public IEnumerable<TransactionLog> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        public IEnumerable<Transfer> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
         {
             if (from >= to)
                 throw new ArgumentOutOfRangeException(nameof(from), from, "From must be less than or equal to.");
@@ -163,7 +163,7 @@ namespace VeChainCore.Client
                 throw new ArgumentException("The criteriaSet parameter must be null or contain at least one criteria.", nameof(criteriaSet));
 
 
-            var transfers = new BlockingCollection<TransactionLog>(new ConcurrentQueue<TransactionLog>());
+            var transfers = new BlockingCollection<Transfer>(new ConcurrentQueue<Transfer>());
 
             async Task FetchTransfers()
             {
@@ -198,7 +198,7 @@ namespace VeChainCore.Client
 
                         var bytes = await response.Content.ReadAsByteArrayAsync();
 
-                        var transferPage = JsonSerializer.Deserialize<TransactionLog[]>(bytes, JsonFormatterResolver);
+                        var transferPage = JsonSerializer.Deserialize<Transfer[]>(bytes, JsonFormatterResolver);
 
                         if (transferPage.Length == 0)
                             break;
