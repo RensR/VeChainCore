@@ -9,10 +9,5 @@ namespace VeChainCore.Models.Blockchain
     [DataContract]
     public partial class LogMeta : TxMeta, IEquatable<LogMeta>
     {
-        [DataMember]
-        public string txID { get; set; }
-
-        [DataMember]
-        public string txOrigin { get; set; }
     }
 }
