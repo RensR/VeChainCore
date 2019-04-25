@@ -231,8 +231,7 @@ namespace VeChainCoreTest
             Assert.True(fx.IsCompletedSuccessfully);
         }
 
-        [
-            Fact]
+        [Fact]
         public async Task GetReceipt()
         {
             var receipt = await _vechainClient.GetReceipt("0x9b97b53100c7fc27eb17cf38486fdbaa2eb7c8befa41ed0b033ad11fc9c6673e");
@@ -242,8 +241,7 @@ namespace VeChainCoreTest
             Assert.Equal((uint) 11989000, receipt.gasUsed);
         }
 
-        [
-            Fact]
+        [Fact]
         public async Task GetAccountBalance()
         {
             // Assert that this address has no contract at the current block
@@ -258,8 +256,23 @@ namespace VeChainCoreTest
             Assert.Equal(BigInteger.Zero, genesisAccount.energy.HexToByteArray().ToBigInteger());
         }
 
-        [
-            Fact]
+        [Fact]
+        public async Task GetContractBalance()
+        {
+            // Assert that this address has a specific balance at the specific block
+            decimal balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0x71bdd2521C3BA14EBf41aC7f3F4Fb0b7EB1EFbd4", "2590260");
+            Assert.Equal(31.885m, balance);
+
+            // Assert that this address has a specific balance at the specific block
+            balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0x71bdd2521C3BA14EBf41aC7f3F4Fb0b7EB1EFbd4", "2590259");
+            Assert.Equal(34.985m, balance);
+
+            // Assert that the address had no balance at genesis
+            balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0x71bdd2521C3BA14EBf41aC7f3F4Fb0b7EB1EFbd4", "0");
+            Assert.Equal(0m, balance);
+        }
+
+        [Fact]
         public async Task GenesisBlockIdCheckAsync()
         {
             var genesis = new Block // Test

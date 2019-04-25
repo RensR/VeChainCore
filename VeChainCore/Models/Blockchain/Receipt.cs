@@ -7,7 +7,7 @@ namespace VeChainCore.Models.Blockchain
     public class Receipt
     {
         [DataMember]
-        public uint gasUsed { get; set; }
+        public ulong gasUsed { get; set; }
 
         [DataMember]
         public string gasPayer { get; set; }

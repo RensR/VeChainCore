@@ -14,6 +14,7 @@ using Utf8Json.Formatters;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
 using VeChainCore.Models.Core;
+using VeChainCore.Utils;
 using VeChainCore.Utils.Json;
 using Account = VeChainCore.Models.Blockchain.Account;
 
@@ -83,6 +84,45 @@ namespace VeChainCore.Client
                 address += $"?revision={revision}";
 
             return await SendGetRequest<Account>($"/accounts/{address}");
+        }
+
+        public async Task<decimal> GetContractBalance(string contract, string account, string revision = "best", uint decimalPlaces = 18)
+        {
+            if (!Address.IsValid(contract))
+                throw new ArgumentException("Address is not valid");
+
+            if (revision != "best")
+                contract += $"?revision={revision}";
+
+            var bytes = JsonSerializer.Serialize(new
+            {
+                value = "0x0",
+                data = new StringBuilder()
+                    .Append("0x70a08231") // balanceOf contract method id
+                    .Append('0', 64 - (account.Length - 2)) // zero pad to 64 characters
+                    .Append(account, 2, account.Length - 2) // address without 0x prefix
+                    .ToString()
+            });
+
+            var content = new ByteArrayContent(bytes);
+
+            var response = await SendPostRequest($"/accounts/{contract}", content);
+
+            var respBytes = await response.Content.ReadAsByteArrayAsync();
+
+            var callResult = JsonSerializer.Deserialize<CallResult>(respBytes, JsonFormatterResolver);
+
+            if (callResult.reverted)
+            {
+                if (!string.IsNullOrEmpty(callResult.vmError))
+                    throw new InvalidOperationException($"Execution was reverted: {callResult.vmError}");
+                throw new InvalidOperationException($"Execution was reverted, no error specified.");
+            }
+
+            if (!string.IsNullOrEmpty(callResult.vmError))
+                throw new InvalidOperationException($"VM Error during execution: {callResult.vmError}");
+            
+            return callResult.data.HexToByteArray().ToBigInteger().ToDecimal() / (decimal)Math.Pow(10,decimalPlaces);
         }
 
         /// <summary>

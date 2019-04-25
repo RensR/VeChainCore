@@ -30,6 +30,16 @@ namespace VeChainCore.Client
         Task<Account> GetAccount(string address, string revision = "best");
 
         /// <summary>
+        /// Gets the contract token balance of a given contract address for an token holding account address.
+        /// </summary>
+        /// <param name="contract">The contract address id in 0x notation</param>
+        /// <param name="account">The token holder address id in 0x notation</param>
+        /// <param name="revision">The block number or ID to be able to look at past balances</param>
+        /// <param name="decimalPlaces">The amount of decimal places to adjust the value down by (defaults to 18).</param>
+        /// <returns></returns>
+        Task<decimal> GetContractBalance(string contract, string account, string revision = "best", uint decimalPlaces = 18);
+
+        /// <summary>
         /// Gets the <see cref="Block"/> object that contains all Block information for
         /// the given block number
         /// </summary>
