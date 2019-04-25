@@ -21,7 +21,7 @@ namespace VeChainCore.Models.Blockchain
         [DataMember, Obsolete("This is always the contract address.")]
         public string to => ContractAddress;
 
-        [DataMember, Obsolete("The VET zero as this is a contract operation.")]
+        [DataMember, Obsolete("The VET amount is zero as this is a contract operation.")]
         public decimal value => 0m;
 
         [DataMember]
