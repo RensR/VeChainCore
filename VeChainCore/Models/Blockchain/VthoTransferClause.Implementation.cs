@@ -87,7 +87,7 @@ namespace VeChainCore.Models.Blockchain
 
         private void SetValueField(decimal value)
             => data = value < 0
-                ? throw new ArgumentOutOfRangeException("Value must be zero or positive.", nameof(value))
+                ? throw new ArgumentOutOfRangeException(nameof(value),"Value must be zero or positive.")
                 : data.Substring(0, 74) + value.ToBigInteger().ToByteArrayUnsigned().ToHex().PadLeft(64, '0');
     }
 }
