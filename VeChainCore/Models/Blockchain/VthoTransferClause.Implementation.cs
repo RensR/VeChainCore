@@ -32,7 +32,7 @@ namespace VeChainCore.Models.Blockchain
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as VetClause);
+            return Equals(obj as VthoTransferClause);
         }
 
         public bool Equals(VthoTransferClause other)
