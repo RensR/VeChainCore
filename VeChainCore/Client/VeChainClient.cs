@@ -31,7 +31,8 @@ namespace VeChainCore.Client
                 ImmutableCollectionResolver.Instance,
                 BuiltinResolver.Instance,
                 DynamicGenericResolver.Instance,
-                StandardResolver.ExcludeNullCamelCase
+                StandardResolver.ExcludeNullCamelCase,
+                DynamicObjectResolver.ExcludeNullCamelCase
             );
 
         /// <summary>

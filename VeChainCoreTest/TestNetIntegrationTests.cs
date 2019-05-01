@@ -270,6 +270,18 @@ namespace VeChainCoreTest
             // Assert that the address had no balance at genesis
             balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0x71bdd2521C3BA14EBf41aC7f3F4Fb0b7EB1EFbd4", "0");
             Assert.Equal(0m, balance);
+
+            // Assert that this address has a specific balance at the specific block
+            balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0xF81A38C0d2BDa0375922531a57952FA2353aB989", "2651029");
+            Assert.Equal(1000m, balance);
+
+            // Assert that this address has a specific balance at the specific block
+            balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0xF81A38C0d2BDa0375922531a57952FA2353aB989", "2651026");
+            Assert.Equal(1m, balance);
+
+            // Assert that the address had no balance at genesis
+            balance = await _vechainClient.GetContractBalance("0x9c6e62B3334294D70c8e410941f52D482557955B", "0xF81A38C0d2BDa0375922531a57952FA2353aB989", "0");
+            Assert.Equal(0m, balance);
         }
 
         [Fact]
