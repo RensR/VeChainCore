@@ -35,15 +35,11 @@ namespace VeChainCore.Client
                 DynamicObjectResolver.ExcludeNullCamelCase
             );
 
-        private byte[] SerializeToJson<T>(T o)
-        {
-            return JsonSerializer.Serialize(o, JsonFormatterResolver);
-        }
+        public static byte[] SerializeToJson<T>(T o)
+            => JsonSerializer.Serialize(o, JsonFormatterResolver);
 
-        private T DeserializeFromJson<T>(byte[] data)
-        {
-            return JsonSerializer.Deserialize<T>(data, JsonFormatterResolver);
-        }
+        public static T DeserializeFromJson<T>(byte[] data)
+            => JsonSerializer.Deserialize<T>(data, JsonFormatterResolver);
 
         /// <summary>
         /// The address of a running VeChain instance
