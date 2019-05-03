@@ -35,6 +35,16 @@ namespace VeChainCore.Client
                 DynamicObjectResolver.ExcludeNullCamelCase
             );
 
+        private byte[] SerializeToJson<T>(T o)
+        {
+            return JsonSerializer.Serialize(o, JsonFormatterResolver);
+        }
+
+        private T DeserializeFromJson<T>(byte[] data)
+        {
+            return JsonSerializer.Deserialize<T>(data, JsonFormatterResolver);
+        }
+
         /// <summary>
         /// The address of a running VeChain instance
         /// </summary>
@@ -95,7 +105,7 @@ namespace VeChainCore.Client
             if (revision != "best")
                 contract += $"?revision={revision}";
 
-            var bytes = JsonSerializer.Serialize(new
+            var bytes = SerializeToJson(new
             {
                 value = "0x0",
                 data = new StringBuilder()
@@ -111,7 +121,7 @@ namespace VeChainCore.Client
 
             var respBytes = await response.Content.ReadAsByteArrayAsync();
 
-            var callResult = JsonSerializer.Deserialize<CallResult>(respBytes, JsonFormatterResolver);
+            var callResult = DeserializeFromJson<CallResult>(respBytes);
 
             if (callResult.reverted)
             {
@@ -122,8 +132,8 @@ namespace VeChainCore.Client
 
             if (!string.IsNullOrEmpty(callResult.vmError))
                 throw new InvalidOperationException($"VM Error during execution: {callResult.vmError}");
-            
-            return callResult.data.HexToByteArray().ToBigInteger().ToDecimal() / (decimal)Math.Pow(10,decimalPlaces);
+
+            return callResult.data.HexToByteArray().ToBigInteger().ToDecimal() / (decimal) Math.Pow(10, decimalPlaces);
         }
 
         /// <summary>
@@ -176,7 +186,7 @@ namespace VeChainCore.Client
 
             var rlp = txn.RLPData;
 
-            var json = JsonSerializer.Serialize(new {raw = rlp.ToHex(true)}, JsonFormatterResolver);
+            var json = SerializeToJson(new {raw = rlp.ToHex(true)});
 
             var bytes = new ByteArrayContent(json);
 
@@ -186,7 +196,7 @@ namespace VeChainCore.Client
 
             await DetailedThrowOnUnsuccessfulResponse(response, bytes);
 
-            return JsonSerializer.Deserialize<TransferResult>(await response.Content.ReadAsByteArrayAsync(), JsonFormatterResolver);
+            return DeserializeFromJson<TransferResult>(await response.Content.ReadAsByteArrayAsync());
         }
 
         public IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
@@ -212,7 +222,7 @@ namespace VeChainCore.Client
                 {
                     for (uint offset = 0;; offset += pageSize)
                     {
-                        var json = JsonSerializer.Serialize(new
+                        var json = SerializeToJson(new
                         {
                             range = new
                             {
@@ -227,7 +237,7 @@ namespace VeChainCore.Client
                             },
                             criteriaSet,
                             order = "asc"
-                        }, JsonFormatterResolver);
+                        });
 
                         var content = new ByteArrayContent(json);
 
@@ -239,7 +249,7 @@ namespace VeChainCore.Client
 
                         var bytes = await response.Content.ReadAsByteArrayAsync();
 
-                        var transferPage = JsonSerializer.Deserialize<Transfer[]>(bytes, JsonFormatterResolver);
+                        var transferPage = DeserializeFromJson<Transfer[]>(bytes);
 
                         if (transferPage.Length == 0)
                             break;
@@ -286,7 +296,7 @@ namespace VeChainCore.Client
         {
             //var debugJson = JsonSerializer.ToJsonString(new {clauses}, JsonFormatterResolver);
 
-            var json = JsonSerializer.Serialize(new {clauses}, JsonFormatterResolver);
+            var json = SerializeToJson(new {clauses});
 
             var content = new ByteArrayContent(json);
 
@@ -300,7 +310,7 @@ namespace VeChainCore.Client
 
             var body = await response.Content.ReadAsByteArrayAsync();
 
-            return JsonSerializer.Deserialize<IEnumerable<CallResult>>(body, JsonFormatterResolver);
+            return DeserializeFromJson<IEnumerable<CallResult>>(body);
         }
 
         private static async Task DetailedThrowOnUnsuccessfulResponse(HttpResponseMessage response, ByteArrayContent content)
@@ -317,7 +327,7 @@ namespace VeChainCore.Client
         /// <param name="path">The path to the wanted object</param>
         /// <returns></returns>
         private async Task<T> SendGetRequest<T>(string path)
-            => JsonSerializer.Deserialize<T>(await _client.GetByteArrayAsync(path), JsonFormatterResolver);
+            => DeserializeFromJson<T>(await _client.GetByteArrayAsync(path));
 
         /// <summary>
         /// Sends a POST request and return the chosen return type
