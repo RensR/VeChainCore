@@ -234,11 +234,13 @@ namespace VeChainCore.Models.Blockchain
 
         public void RemoveAtClause(int index) => clauses.RemoveAt(index);
 
-        public override string ToString()
-        {
-            return id != null
+        public override string ToString() =>
+            id != null
                 ? $"{{\"id\":{id}}}"
                 : JsonSerializer.ToJsonString(this, VeChainClient.JsonFormatterResolver);
-        }
+
+        // ReSharper disable once IdentifierTypo
+        public bool ShouldSerializedependsOn() =>
+            !string.IsNullOrEmpty(dependsOn);
     }
 }

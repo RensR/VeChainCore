@@ -180,6 +180,9 @@ namespace VeChainCore.Client
             if (string.IsNullOrEmpty(txn.signature))
                 throw new ArgumentException("Transaction must be signed.", nameof(txn.signature));
 
+            if (txn.dependsOn == "")
+                txn.dependsOn = null;
+
             /*
             var rlp = txn.RLPData;
 
