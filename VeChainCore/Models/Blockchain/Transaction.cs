@@ -34,7 +34,7 @@ namespace VeChainCore.Models.Blockchain
         [DataMember]
         public ulong gas { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false), DefaultValue(null)]
+        [DataMember(IsRequired = false, EmitDefaultValue = false), DefaultValue("")]
         public string dependsOn { get; set; }
 
         [DataMember, JsonFormatter(typeof(VeChainHexFormatter), true)]

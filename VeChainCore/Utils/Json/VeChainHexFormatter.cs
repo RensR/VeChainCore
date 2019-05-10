@@ -59,16 +59,13 @@ namespace VeChainCore.Utils.Json
         {
             int length = value.Length;
             bool noBytes = length == 0;
-            writer.EnsureCapacity((noBytes ? 1 : length) * 2 + 4);
+            writer.EnsureCapacity(noBytes ? 2 : length * 2 + 4);
             writer.WriteRawUnsafe((byte) '"');
-            writer.WriteRawUnsafe((byte) '0');
-            writer.WriteRawUnsafe((byte) 'x');
-            if (noBytes)
+
+            if (!noBytes)
             {
                 writer.WriteRawUnsafe((byte) '0');
-            }
-            else
-            {
+                writer.WriteRawUnsafe((byte) 'x');
                 bool writtenNonZero = false;
                 for (int i = 0; i < length; i++)
                 {
@@ -88,6 +85,7 @@ namespace VeChainCore.Utils.Json
                             writtenNonZero = true;
                             continue;
                         }
+
                         writtenNonZero = true;
                     }
 
@@ -139,7 +137,7 @@ namespace VeChainCore.Utils.Json
 
         void IJsonFormatter<ulong?>.Serialize(ref JsonWriter writer, ulong? value, IJsonFormatterResolver formatterResolver)
         {
-            if ( value != null )
+            if (value != null)
                 Serialize(ref writer, value.Value, formatterResolver);
             else
                 throw new NotImplementedException();

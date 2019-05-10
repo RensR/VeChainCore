@@ -47,7 +47,7 @@ namespace VeChainCore.Models.Blockchain
                 RLP.EncodeList(clauses.Select(c => c.RLPData).ToArray()),
                 RLP.EncodeByte(gasPriceCoef),
                 RLP.EncodeElement(gas.ToBigEndianBytes().TrimLeading()),
-                RLP.EncodeElement(dependsOn?.HexToByteArray().TrimLeading()),
+                RLP.EncodeElement(dependsOn == "" ? null : dependsOn?.HexToByteArray().TrimLeading()),
                 RLP.EncodeElement(nonce.ToBigEndianBytes().TrimLeading()),
                 Reserved,
                 RLP.EncodeElement(signature?.HexToByteArray())
@@ -95,7 +95,7 @@ namespace VeChainCore.Models.Blockchain
             this.nonce = nonce;
             this.gasPriceCoef = gasPriceCoef;
             this.gas = gas;
-            this.dependsOn = dependsOn;
+            this.dependsOn = dependsOn == "" ? null : dependsOn;
         }
 
         public byte[][] GetRlpDataSignatureElements()

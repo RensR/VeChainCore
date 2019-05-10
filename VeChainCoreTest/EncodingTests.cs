@@ -179,7 +179,7 @@ namespace VeChainCoreTest
 
             var json = JsonSerializer.ToJsonString(t, VeChainClient.JsonFormatterResolver);
 
-            Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
+            Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[],\"gasPriceCoef\":255,\"gas\":21000,\"nonce\":\"0xfffffff\"}", json);
 
             //var pretty = JsonSerializer.PrettyPrint(json);
         }
@@ -204,7 +204,7 @@ namespace VeChainCoreTest
             var json = JsonSerializer.ToJsonString(t, VeChainClient.JsonFormatterResolver);
 
             Assert.Equal(
-                "{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x0186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}",
+                "{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x0186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"nonce\":\"0xfffffff\"}",
                 json);
             //Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
 
@@ -231,7 +231,7 @@ namespace VeChainCoreTest
             var json = JsonSerializer.ToJsonString(t, VeChainClient.JsonFormatterResolver);
 
             Assert.Equal(
-                "{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x38\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}",
+                "{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x38\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"nonce\":\"0xfffffff\"}",
                 json);
             //Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
 
