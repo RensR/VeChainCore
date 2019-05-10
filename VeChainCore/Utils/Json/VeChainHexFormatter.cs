@@ -13,6 +13,7 @@ namespace VeChainCore.Utils.Json
             IJsonFormatter<decimal>,
             IJsonFormatter<BigInteger>,
             IJsonFormatter<ulong>,
+            IJsonFormatter<ulong?>,
             IJsonFormatter<byte[]>
     {
         public static readonly IJsonFormatter Default = new VeChainHexFormatter();
@@ -135,6 +136,17 @@ namespace VeChainCore.Utils.Json
 
         public Decimal DeserializeDecimal(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
             => DeserializeBigInteger(ref reader, formatterResolver).ToDecimal();
+
+        void IJsonFormatter<ulong?>.Serialize(ref JsonWriter writer, ulong? value, IJsonFormatterResolver formatterResolver)
+        {
+            if ( value != null )
+                Serialize(ref writer, value.Value, formatterResolver);
+            else
+                throw new NotImplementedException();
+        }
+
+        ulong? IJsonFormatter<ulong?>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver) =>
+            DeserializeUInt64(ref reader, formatterResolver);
 
         byte[] IJsonFormatter<byte[]>.Deserialize(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
             => DeserializeBytes(ref reader, formatterResolver);

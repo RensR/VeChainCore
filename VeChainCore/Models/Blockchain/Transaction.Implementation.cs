@@ -24,16 +24,16 @@ namespace VeChainCore.Models.Blockchain
             if (other == null)
                 return false;
             return id == other.id
-                   || (
-                       chainTag == other.chainTag
-                       && blockRef == other.blockRef
-                       && expiration == other.expiration
-                       && clauses.SequenceEqual(other.clauses)
-                       && gasPriceCoef == other.gasPriceCoef
-                       && gas == other.gas
-                       && nonce == other.nonce
-                       && dependsOn == other.dependsOn
-                   );
+                || (
+                    chainTag == other.chainTag
+                    && blockRef == other.blockRef
+                    && expiration == other.expiration
+                    && clauses.SequenceEqual(other.clauses)
+                    && gasPriceCoef == other.gasPriceCoef
+                    && gas == other.gas
+                    && nonce == other.nonce
+                    && dependsOn == other.dependsOn
+                );
         }
 
 
@@ -145,9 +145,9 @@ namespace VeChainCore.Models.Blockchain
         /// </summary>
         /// <param name="client"></param>
         /// <returns>The total gas cost of a transaction</returns>
-        public async Task<ulong> CalculateTotalGasCost(IVeChainClient client)
+        public async Task<ulong> CalculateTotalGasCost(IVeChainClient client, string caller = null)
         {
-            var executionCost = await CalculateExecutionGasCost(client);
+            var executionCost = await CalculateExecutionGasCost(client, caller);
             var intrinsicCost = CalculateIntrinsicGasCost();
             return executionCost + intrinsicCost;
         }
@@ -158,9 +158,11 @@ namespace VeChainCore.Models.Blockchain
         /// </summary>
         /// <param name="client"></param>
         /// <returns>The execution gas cost of the transaction</returns>
-        public async Task<ulong> CalculateExecutionGasCost(IVeChainClient client)
+        public async Task<ulong> CalculateExecutionGasCost(IVeChainClient client, string caller = null)
         {
-            var callResults = await client.ExecuteAddressCode(clauses);
+            var callResults = (await client.ExecuteAddressCode(clauses, caller: caller, gasPrice: gasPriceCoef)).ToArray();
+            if (callResults.Any(result => result.reverted))
+                throw new InvalidOperationException($"Execution reverted during gas estimation: {string.Join(", ", callResults.Select(result => result.vmError))}");
             return (ulong) callResults.Sum(result => (decimal) result.gasUsed);
         }
 

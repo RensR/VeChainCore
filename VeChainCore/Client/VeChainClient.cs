@@ -180,9 +180,13 @@ namespace VeChainCore.Client
             if (string.IsNullOrEmpty(txn.signature))
                 throw new ArgumentException("Transaction must be signed.", nameof(txn.signature));
 
+            /*
             var rlp = txn.RLPData;
 
             var json = SerializeToJson(new {raw = rlp.ToHex(true)});
+            */
+
+            var json = SerializeToJson(txn);
 
             var bytes = new ByteArrayContent(json);
 
@@ -287,12 +291,22 @@ namespace VeChainCore.Client
         /// Checks the results of a mock contract execution
         /// </summary>
         /// <param name="clauses">Transaction clauses</param>
+        /// <param name="caller"></param>
+        /// <param name="blockNum"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="gasPrice"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
+        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses, ulong? blockNum = null, string caller = null, ulong? gasLimit = null, ulong? gasPrice = null)
         {
             //var debugJson = JsonSerializer.ToJsonString(new {clauses}, JsonFormatterResolver);
 
-            var json = SerializeToJson(new {clauses});
+            var json = SerializeToJson(new BatchExecuteRequest
+            {
+                clauses = clauses,
+                caller = caller,
+                gas = gasLimit,
+                gasPrice = gasPrice
+            });
 
             var content = new ByteArrayContent(json);
 
@@ -300,7 +314,10 @@ namespace VeChainCore.Client
 
             //var debugJson = Encoding.UTF8.GetString(json);
 
-            var response = await SendPostRequest("/accounts/*", content);
+            var response =
+                blockNum == null
+                    ? await SendPostRequest("/accounts/*", content)
+                    : await SendPostRequest($"/accounts/*?revision={blockNum}", content);
 
             await DetailedThrowOnUnsuccessfulResponse(response, content);
 

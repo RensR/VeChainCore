@@ -9,6 +9,7 @@ using VeChainCore.Models.Core;
 using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
 using VeChainCore.Utils.Cryptography;
+using VeChainCore.Utils.Json;
 using Xunit;
 
 namespace VeChainCoreTest
@@ -132,6 +133,32 @@ namespace VeChainCoreTest
             var actualSignedRlpHex = txn.RLPData.ToHex(true);
 
             Assert.Equal(expectedSignedRlpHex, actualSignedRlpHex);
+
+            var jsonBytes = JsonSerializer.Serialize(txn, VeChainClient.JsonFormatterResolver);
+
+            var json = JsonSerializer.PrettyPrint(jsonBytes);
+
+            Assert.Equal(@"{
+  ""chainTag"": 1,
+  ""blockRef"": ""0x00000000aabbccdd"",
+  ""expiration"": 32,
+  ""clauses"": [
+    {
+      ""to"": ""0x7567d83b7b8d80addcb281a71d54fc7b3364ffed"",
+      ""value"": ""0x2710"",
+      ""data"": ""0x000000606060""
+    },
+    {
+      ""to"": ""0x7567d83b7b8d80addcb281a71d54fc7b3364ffed"",
+      ""value"": ""0x4e20"",
+      ""data"": ""0x000000606060""
+    }
+  ],
+  ""gasPriceCoef"": 128,
+  ""gas"": 21000,
+  ""nonce"": ""0xbc614e"",
+  ""signature"": ""0xf76f3c91a834165872aa9464fc55b03a13f46ea8d3b858e528fcceaf371ad6884193c3f313ff8effbb57fe4d1adc13dceb933bedbf9dbb528d2936203d5511df00""
+}", json);
         }
 
         [Fact]
@@ -176,7 +203,9 @@ namespace VeChainCoreTest
 
             var json = JsonSerializer.ToJsonString(t, VeChainClient.JsonFormatterResolver);
 
-            Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x0186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
+            Assert.Equal(
+                "{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x0186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}",
+                json);
             //Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
 
             //var pretty = JsonSerializer.PrettyPrint(json);
@@ -201,7 +230,9 @@ namespace VeChainCoreTest
 
             var json = JsonSerializer.ToJsonString(t, VeChainClient.JsonFormatterResolver);
 
-            Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x38\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
+            Assert.Equal(
+                "{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x38\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}",
+                json);
             //Assert.Equal("{\"chainTag\":39,\"blockRef\":\"0x000000000fffffff\",\"expiration\":720,\"clauses\":[{\"to\":\"0x7567d83b7b8d80addcb281a71d54fc7b3364ffed\",\"value\":\"0x186a0\",\"data\":\"0x000000606060\"}],\"gasPriceCoef\":255,\"gas\":21000,\"dependsOn\":\"\",\"nonce\":\"0xfffffff\"}", json);
 
             //var pretty = JsonSerializer.PrettyPrint(json);

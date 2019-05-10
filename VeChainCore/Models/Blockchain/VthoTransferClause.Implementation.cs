@@ -80,7 +80,9 @@ namespace VeChainCore.Models.Blockchain
         private void SetToField(string value)
             => data = value == null || !value.StartsWith("0x")
                 ? throw new ArgumentException("Value must be a hex string.", nameof(value))
-                : data.Substring(0, 10) + value.Substring(2, 64).PadLeft(64, '0') + data.Substring(74);
+                : data.Substring(0, 10)
+                + value.Substring(2, (int)Math.Min(value.Length-2,64)).PadLeft(64, '0')
+                + data.Substring(74);
 
         private decimal GetValueField()
             => data.Substring(6, 32).HexToByteArray().ToBigInteger().ToDecimal() / VTHO.Unit.DecimalsMultiplier;

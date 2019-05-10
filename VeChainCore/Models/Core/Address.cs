@@ -12,7 +12,7 @@ namespace VeChainCore.Models.Core
         public string HexString { get; set; }
 
         private byte[] Bytes
-            => HexString.HexToByteArray().TrimLeading();
+            => HexString.HexToByteArray(); //.TrimLeading();
 
         public Address(string address)
         {

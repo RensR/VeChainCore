@@ -76,8 +76,12 @@ namespace VeChainCore.Client
         /// Checks the results of a mock contract execution
         /// </summary>
         /// <param name="clauses">Transaction clauses</param>
+        /// <param name="caller"></param>
+        /// <param name="blockNum"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="gasPrice"></param>
         /// <returns></returns>
-        Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses);
+        Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses, ulong? blockNum = null, string caller = null, ulong? gasLimit = null, ulong? gasPrice = null);
 
         IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true);
 
