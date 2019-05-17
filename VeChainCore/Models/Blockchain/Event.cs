@@ -7,9 +7,14 @@ namespace VeChainCore.Models.Blockchain
     {
         [DataMember]
         public string address { get; set; }
+
         [DataMember]
         public string[] topics { get; set; }
+
         [DataMember]
         public string data { get; set; }
+
+        [DataMember(IsRequired = false, EmitDefaultValue = false)]
+        public TxMeta meta { get; set; }
     }
 }

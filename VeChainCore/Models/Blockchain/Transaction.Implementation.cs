@@ -119,11 +119,7 @@ namespace VeChainCore.Models.Blockchain
             signature = sigBytes.ToHex(true);
 
             var signer
-                = Hash.Keccak256(
-                        key.PublicKey.ToByteArrayUnsigned()
-                            .PadLeading(20)
-                    )
-                    .LastBytes(20);
+                = key.GetRawAddress();
 
 
             byte[] concatenatedBytes = new byte[52];

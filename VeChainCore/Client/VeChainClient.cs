@@ -289,6 +289,94 @@ namespace VeChainCore.Client
 
             return transfers.GetConsumingEnumerable(ct);
         }
+        
+        public IEnumerable<Transfer> GetEvents(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            return GetTransfers(out _, criteriaSet, ct, from, to, pageSize, lazy);
+        }
+
+        public IEnumerable<Event> GetEvents(out Task fetchCompletion, EventCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            if (from >= to)
+                throw new ArgumentOutOfRangeException(nameof(from), from, "From must be less than or equal to.");
+            if (to > 9007199254740991)
+                throw new ArgumentOutOfRangeException(nameof(to), to, "To must be less than or equal to JSON maximum safe integer (9007199254740991).");
+            if (criteriaSet != null && criteriaSet.Length == 0)
+                throw new ArgumentException("The criteriaSet parameter must be null or contain at least one criteria.", nameof(criteriaSet));
+
+
+            var events = new BlockingCollection<Event>(new ConcurrentQueue<Event>());
+
+            async Task FetchEvents()
+            {
+                try
+                {
+                    for (uint offset = 0;; offset += pageSize)
+                    {
+                        var json = SerializeToJson(new
+                        {
+                            range = new
+                            {
+                                unit = "block",
+                                from,
+                                to
+                            },
+                            options = new
+                            {
+                                offset,
+                                limit = pageSize
+                            },
+                            criteriaSet,
+                            order = "asc"
+                        });
+
+                        var content = new ByteArrayContent(json);
+
+                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                        var response = await SendPostRequest("/logs/event", content);
+
+                        await DetailedThrowOnUnsuccessfulResponse(response, content);
+
+                        var bytes = await response.Content.ReadAsByteArrayAsync();
+
+                        var eventPage = DeserializeFromJson<Event[]>(bytes);
+
+                        if (eventPage.Length == 0)
+                            break;
+
+                        foreach (var @event in eventPage)
+                            events.Add(@event, ct);
+
+                        while (lazy && events.Count > 0)
+                            await Task.Delay(15, ct);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // ok
+                }
+                catch (ObjectDisposedException)
+                {
+                    // ok
+                }
+                finally
+                {
+                    try
+                    {
+                        events.CompleteAdding();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // ok
+                    }
+                }
+            }
+
+            fetchCompletion = FetchEvents();
+
+            return events.GetConsumingEnumerable(ct);
+        }
 
         /// <summary>
         /// Checks the results of a mock contract execution

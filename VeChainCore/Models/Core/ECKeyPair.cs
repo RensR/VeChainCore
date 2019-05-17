@@ -60,11 +60,11 @@ namespace VeChainCore.Models.Core
             if (check && (!Equals(publicKey, ECDSASign.PublicKeyFromPrivate(privateKey))))
                 throw new InvalidKeyException("The public key does not match the private key.");
         }
-        
+
 
         public byte[] GetRawAddress()
         {
-            var hash = Hash.Keccak256(PublicKey.ToByteArray().PadLeading(PublicKeySize));
+            var hash = Hash.Keccak256(PublicKey.ToByteArrayUnsigned().PadLeading(PublicKeySize));
             var address = new byte[20];
             Unsafe.CopyBlock(ref address[0], ref hash[12], (uint) address.Length);
             // Array.Copy(hash, 12, address, 0, address.Length);

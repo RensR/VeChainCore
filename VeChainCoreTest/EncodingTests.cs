@@ -72,7 +72,7 @@ namespace VeChainCoreTest
         public void RlpEncode10000m()
         {
             var expected = "0x822710".HexToByteArray();
-            var actual = RLP.EncodeElement(10000m.ToBigInteger().ToByteArray().TrimLeading());
+            var actual = RLP.EncodeElement(10000m.ToBigInteger().ToByteArrayUnsigned().TrimLeading());
 
             Assert.Equal(expected, actual);
         }
@@ -81,7 +81,7 @@ namespace VeChainCoreTest
         public void RlpEncode20000m()
         {
             var expected = "0x824e20".HexToByteArray();
-            var actual = RLP.EncodeElement(20000m.ToBigInteger().ToByteArray().TrimLeading());
+            var actual = RLP.EncodeElement(20000m.ToBigInteger().ToByteArrayUnsigned().TrimLeading());
 
             Assert.Equal(expected, actual);
         }
