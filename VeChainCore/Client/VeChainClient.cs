@@ -290,9 +290,9 @@ namespace VeChainCore.Client
             return transfers.GetConsumingEnumerable(ct);
         }
         
-        public IEnumerable<Transfer> GetEvents(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        public IEnumerable<Event> GetEvents(EventCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
         {
-            return GetTransfers(out _, criteriaSet, ct, from, to, pageSize, lazy);
+            return GetEvents(out _, criteriaSet, ct, from, to, pageSize, lazy);
         }
 
         public IEnumerable<Event> GetEvents(out Task fetchCompletion, EventCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
