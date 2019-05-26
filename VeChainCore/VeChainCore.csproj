@@ -10,7 +10,7 @@
     <PackageReference Include="Nethereum.Signer" Version="3.3.0" />
     <PackageReference Include="Nethereum.Util" Version="3.3.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
-    <PackageReference Include="Utf8Json" Version="1.3.8-alphapoint-006" />
+    <PackageReference Include="Utf8Json" Version="1.3.7" />
     <PackageReference Include="Utf8Json.ImmutableCollection" Version="1.3.7" />
   </ItemGroup>
 
