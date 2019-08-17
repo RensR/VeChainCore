@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Utf8Json;
-using Utf8Json.Formatters;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
 using VeChainCore.Models.Core;

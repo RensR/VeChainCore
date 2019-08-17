@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Nethereum.Hex.HexConvertors.Extensions;
-using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Math;
 using Utf8Json;
 using VeChainCore.Client;

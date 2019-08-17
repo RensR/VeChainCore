@@ -18,8 +18,7 @@
         public VET(decimal value, bool preMultipliedPrecision = true)
             : base(Decimals)
         {
-            Value =
-                preMultipliedPrecision
+            Value = preMultipliedPrecision
                     ? value / _decimalsMultiplier
                     : value;
         }
