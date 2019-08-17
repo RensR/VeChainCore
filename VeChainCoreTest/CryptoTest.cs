@@ -13,7 +13,6 @@ namespace VeChainCoreTest
         const string helloWordStr = "Hello world";
         static readonly byte[] helloBytes = Encoding.UTF8.GetBytes(helloWordStr);
 
-
         [Fact]
         public void TestBlake2B()
         {
@@ -75,7 +74,7 @@ namespace VeChainCoreTest
         [Fact]
         public void TestKeccak256Threaded()
         {
-            Func<byte[], byte[]> hashFunc = Hash.Blake2B;
+            Func<byte[], byte[]> hashFunc = Hash.Keccak256;
 
             ThreadedHashTest(hashFunc);
         }
