@@ -118,9 +118,7 @@ namespace VeChainCore.Models.Blockchain
             var sigBytes = sig.ToByteArray();
             signature = sigBytes.ToHex(true);
 
-            var signer
-                = key.GetRawAddress();
-
+            var signer = key.GetRawAddress();
 
             byte[] concatenatedBytes = new byte[52];
             Unsafe.CopyBlock(ref concatenatedBytes[0], ref hash[0], (uint) hash.Length);

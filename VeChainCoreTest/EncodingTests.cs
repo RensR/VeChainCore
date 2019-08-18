@@ -9,7 +9,6 @@ using VeChainCore.Models.Core;
 using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
 using VeChainCore.Utils.Cryptography;
-using VeChainCore.Utils.Json;
 using Xunit;
 
 namespace VeChainCoreTest

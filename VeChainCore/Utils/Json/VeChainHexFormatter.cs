@@ -27,7 +27,7 @@ namespace VeChainCore.Utils.Json
 
         public void Serialize(
             ref JsonWriter writer,
-            Decimal value,
+            decimal value,
             IJsonFormatterResolver formatterResolver)
         {
             Serialize(ref writer, value.ToBigInteger(), formatterResolver);
@@ -132,7 +132,7 @@ namespace VeChainCore.Utils.Json
             return Unsafe.ReadUnaligned<ulong>(ref bytes[0]);
         }
 
-        public Decimal DeserializeDecimal(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
+        public decimal DeserializeDecimal(ref JsonReader reader, IJsonFormatterResolver formatterResolver)
             => DeserializeBigInteger(ref reader, formatterResolver).ToDecimal();
 
         void IJsonFormatter<ulong?>.Serialize(ref JsonWriter writer, ulong? value, IJsonFormatterResolver formatterResolver)

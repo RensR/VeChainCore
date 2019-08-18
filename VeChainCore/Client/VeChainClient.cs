@@ -182,15 +182,10 @@ namespace VeChainCore.Client
             if (txn.dependsOn == "")
                 txn.dependsOn = null;
 
-            /*
-            var rlp = txn.RLPData;
+            var stringOutput = ByteArrayToString(txn.RLPData);
+            var totalProperEncoding = Encoding.UTF8.GetBytes("{\"raw\":\"0x" + stringOutput + "\"}");
 
-            var json = SerializeToJson(new {raw = rlp.ToHex(true)});
-            */
-
-            var json = SerializeToJson(txn);
-
-            var bytes = new ByteArrayContent(json);
+            var bytes = new ByteArrayContent(totalProperEncoding);
 
             bytes.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
@@ -199,6 +194,12 @@ namespace VeChainCore.Client
             await DetailedThrowOnUnsuccessfulResponse(response, bytes);
 
             return DeserializeFromJson<TransferResult>(await response.Content.ReadAsByteArrayAsync());
+        }
+
+
+        public static string ByteArrayToString(byte[] ba)
+        {
+            return BitConverter.ToString(ba).Replace("-", "");
         }
 
         public IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
