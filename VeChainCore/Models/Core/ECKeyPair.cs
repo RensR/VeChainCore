@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
+using Nethereum.Hex.HexConvertors.Extensions;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -7,8 +9,10 @@ using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
+using Org.BouncyCastle.Math.EC.Multiplier;
 using Org.BouncyCastle.Security;
-using VeChainCore.Utils;
+using VeChainCore.Models.Extensions;
 using VeChainCore.Utils.Cryptography;
 
 namespace VeChainCore.Models.Core
@@ -16,7 +20,7 @@ namespace VeChainCore.Models.Core
     public class ECKeyPair
     {
         public static int PrivateKeySize = 32;
-        private const int PublicKeySize = 64;
+        public const int PublicKeySize = 64;
 
         private static readonly X9ECParameters CurveParams = CustomNamedCurves.GetByName("secp256k1");
         public static BigInteger HalfCurveOrder = CurveParams.N.ShiftRight(1);
@@ -30,49 +34,47 @@ namespace VeChainCore.Models.Core
         private static readonly ECDomainParameters Domain = new ECDomainParameters(Curve.Curve,
             Curve.G, Curve.N, Curve.H);
 
-        private readonly BigInteger _privateKey;
-        private readonly BigInteger _publicKey;
+        public BigInteger PrivateKey { get; }
+        public BigInteger PublicKey { get; }
 
 
-        public ECKeyPair(BigInteger privateKey, BigInteger publicKey)
+        static ECPoint GetCorrespondingPublicKey(
+            BigInteger d)
         {
-            _privateKey = privateKey;
-            _publicKey = publicKey;
+            return new FixedPointCombMultiplier().Multiply(Domain.G, d);
         }
 
-        public BigInteger GetPrivateKey()
+        public ECKeyPair(BigInteger privateKey)
         {
-            return _privateKey;
+            PrivateKey = privateKey;
+
+            PublicKey = ECDSASign.PublicKeyFromPrivate(privateKey);
         }
 
-        public byte[] GetRawPrivateKey()
+        public ECKeyPair(BigInteger privateKey, BigInteger publicKey, bool check = false)
         {
-            return Hex.ToBytesPadded(_privateKey, PrivateKeySize);
+            PrivateKey = privateKey;
+
+            PublicKey = publicKey;
+
+            if (check && (!Equals(publicKey, ECDSASign.PublicKeyFromPrivate(privateKey))))
+                throw new InvalidKeyException("The public key does not match the private key.");
         }
 
-
-        public BigInteger GetPublicKey()
-        {
-            return _publicKey;
-        }
-
-        public byte[] GetRawPublicKey()
-        {
-            return Hex.ToBytesPadded(_publicKey, PublicKeySize);
-        }
 
         public byte[] GetRawAddress()
         {
-            var hash = Hash.Keccac256(GetRawPublicKey());
+            var hash = Hash.Keccak256(PublicKey.ToByteArrayUnsigned().PadLeading(PublicKeySize));
             var address = new byte[20];
-            Array.Copy(hash, 12, address, 0, address.Length);
+            Unsafe.CopyBlock(ref address[0], ref hash[12], (uint) address.Length);
+            // Array.Copy(hash, 12, address, 0, address.Length);
             return address; // right most 160 bits
         }
 
         public string GetHexAddress()
         {
             var addressBytes = GetRawAddress();
-            return addressBytes.ByteArrayToString(StringType.Hex | StringType.ZeroLowerX);
+            return addressBytes.ToHex(true);
         }
 
         /**
@@ -84,11 +86,11 @@ namespace VeChainCore.Models.Core
         {
             var signer = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
 
-            var privateKey = new ECPrivateKeyParameters(_privateKey, Curve);
+            var privateKey = new ECPrivateKeyParameters(PrivateKey, Curve);
             signer.Init(true, privateKey);
             var components = signer.GenerateSignature(message);
 
-            return new ECDSASignature(components[0], components[1]).ToCanonicalised();
+            return new ECDSASignature(components[0], components[1]).Canonicalize();
         }
 
         public static ECKeyPair Create(BigInteger privateKey)
@@ -98,16 +100,15 @@ namespace VeChainCore.Models.Core
 
         public static ECKeyPair Create(string privateKeyHex)
         {
-            return Create(privateKeyHex.HexStringToByteArray());
+            return Create(privateKeyHex.HexToByteArray());
         }
 
         public static ECKeyPair Create(byte[] privateKey)
         {
-            if (privateKey.Length == PrivateKeySize)
-            {
-                return Create(Hex.BytesToBigInt(privateKey));
-            }
-            throw new Exception("Invalid privatekey size");
+            if (privateKey.Length != PrivateKeySize)
+                throw new ArgumentException("Invalid private key size", nameof(privateKey));
+
+            return Create(new BigInteger(1, privateKey));
         }
 
         public static ECKeyPair Create()
@@ -123,24 +124,24 @@ namespace VeChainCore.Models.Core
         {
             if (this == o)
                 return true;
-            
-            if (o == null || !(o is ECKeyPair))
+
+            if (!(o is ECKeyPair))
                 return false;
 
             var ecKeyPair = (ECKeyPair) o;
 
-            if (!_privateKey?.Equals(ecKeyPair._privateKey) ?? ecKeyPair._privateKey != null)
+            if (!PrivateKey?.Equals(ecKeyPair.PrivateKey) ?? ecKeyPair.PrivateKey != null)
                 return false;
-            
-            return _publicKey?.Equals(ecKeyPair._publicKey) ?? ecKeyPair._publicKey == null;
+
+            //return _publicKey?.Equals(ecKeyPair._publicKey) ?? ecKeyPair._publicKey == null;
+            return true;
         }
 
         public override int GetHashCode()
         {
-            var result = _privateKey != null ? _privateKey.GetHashCode() : 0;
-            result = 31 * result + (_publicKey != null ? _publicKey.GetHashCode() : 0);
+            int result = PrivateKey?.GetHashCode() ?? 0;
+            //result = 31 * result + (_publicKey?.GetHashCode() ?? 0);
             return result;
         }
-
     }
 }

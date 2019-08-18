@@ -1,12 +1,12 @@
 ﻿namespace VeChainCore.Models.Core
 {
-    public class VET : Amount
+    public class VTHO : Amount
     {
-        public static readonly VET Unit = new VET(1);
+        public static readonly VTHO Unit = new VTHO(1);
 
         public new const int Decimals = 18;
-
-        public new const string ContractAddress = null;
+        
+        public new const string ContractAddress = "0x0000000000000000000000000000456e65726779";
         public override decimal Value { get; }
         protected override string GetContractAddress() => ContractAddress;
 
@@ -15,10 +15,11 @@
         /// </summary>
         /// <param name="value"></param>
         /// <param name="preMultipliedPrecision">Indicate whether the precision is already taken into account</param>
-        public VET(decimal value, bool preMultipliedPrecision = true)
+        public VTHO(decimal value, bool preMultipliedPrecision = true)
             : base(Decimals)
         {
-            Value = preMultipliedPrecision
+            Value =
+                preMultipliedPrecision
                     ? value / _decimalsMultiplier
                     : value;
         }

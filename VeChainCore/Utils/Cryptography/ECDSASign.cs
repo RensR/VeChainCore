@@ -5,21 +5,22 @@ using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Math.EC.Multiplier;
 using Org.BouncyCastle.Utilities;
 using VeChainCore.Models.Core;
+using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Utils.Cryptography
 {
-    public class ECDSASign
+    public static class ECDSASign
     {
         public static SignatureData SignMessage(byte[] message, ECKeyPair keys, bool needToHash)
         {
-            BigInteger publicKey = keys.GetPublicKey();
-            var messageHash = needToHash ? Hash.HashBlake2B(message) : message;
+            BigInteger publicKey = keys.PublicKey;
+            var messageHash = needToHash ? Hash.Blake2B(message) : message;
             var recId = -1;
 
             ECDSASignature sig = keys.Sign(messageHash);
             for (int i = 0; i < 4; i++)
             {
-                BigInteger k = RecoverFromSignature(i, sig, messageHash);            
+                BigInteger k = RecoverFromSignature(i, sig, messageHash);
 
                 if (k != null && k.Equals(publicKey))
                 {
@@ -29,45 +30,35 @@ namespace VeChainCore.Utils.Cryptography
             }
 
             if (recId == -1)
-                throw new Exception("Sign the data failed.");
-            if (recId == 2 || recId == 3) throw new Exception("Recovery is not valid for VeChain MainNet.");
+                throw new FormatException("Sign the data failed.");
+            if (recId == 2 || recId == 3)
+                throw new InvalidOperationException("Recovery is not valid for VeChain MainNet.");
 
             byte v = (byte) recId;
-            sig.R.ToByteArray();
-            byte[] r = BigIntToBytesWithPadding(sig.R, 32);
-            byte[] s = BigIntToBytesWithPadding(sig.S, 32);
+            
+            byte[] r = sig.R.ToByteArrayUnsigned().PadLeading(32);
+            byte[] s = sig.S.ToByteArrayUnsigned().PadLeading(32);
 
             return new SignatureData(v, r, s);
         }
 
-        public static byte[] BigIntToBytesWithPadding(BigInteger bigint, int size)
-        {
-            byte[] asBytes = bigint.BigIntegerToBytes();
-            var newArray = new byte[size];
-
-            var startAt = newArray.Length - asBytes.Length;
-            Array.Copy(asBytes, 0, newArray, startAt, asBytes.Length);
-
-            return newArray;
-        }
-
         /**
-    * Recover the public key from signature and message.
-    * @param recId recovery id which 0 or 1.
-    * @param sig {@link ECDSASignature} a signature object
-    * @param message message bytes array.
-    * @return public key represented by {@link BigInteger}
-    */
+        * Recover the public key from signature and message.
+        * @param recId recovery id which 0 or 1.
+        * @param sig {@link ECDSASignature} a signature object
+        * @param message message bytes array.
+        * @return public key represented by {@link BigInteger}
+        */
         public static BigInteger RecoverFromSignature(int recId, ECDSASignature sig, byte[] message)
         {
             if (!(recId == 0 || recId == 1))
-                throw new Exception("recId must be 0 or 1");
+                throw new ArgumentOutOfRangeException(nameof(recId), "recId must be 0 or 1");
             if (message == null)
-                throw new Exception("message cannot be null");
+                throw new ArgumentNullException(nameof(message), "message cannot be null");
 
 
-            BigInteger n = ECKeyPair.Curve.N;  // Curve order.
-            BigInteger i = BigInteger.ValueOf((long)recId / 2);
+            BigInteger n = ECKeyPair.Curve.N; // Curve order.
+            BigInteger i = BigInteger.ValueOf((long) recId / 2);
             BigInteger x = sig.R.Add(i.Multiply(n));
 
             // TODO SecP256K1Curve
@@ -100,7 +91,7 @@ namespace VeChainCore.Utils.Cryptography
         private static ECPoint DecompressKey(BigInteger xBN, bool yBit)
         {
             byte[] compEnc = X9IntegerConverter.IntegerToBytes(xBN, 1 + X9IntegerConverter.GetByteLength(ECKeyPair.Curve.Curve));
-            compEnc[0] = (byte)(yBit ? 0x03 : 0x02);
+            compEnc[0] = (byte) (yBit ? 0x03 : 0x02);
             return ECKeyPair.Curve.Curve.DecodePoint(compEnc);
         }
 
@@ -109,7 +100,7 @@ namespace VeChainCore.Utils.Cryptography
             ECPoint point = PublicPointFromPrivate(privKey);
 
             byte[] encoded = point.GetEncoded(false);
-            return new BigInteger(1, Arrays.CopyOfRange(encoded, 1, encoded.Length));  // remove prefix
+            return new BigInteger(1, Arrays.CopyOfRange(encoded, 1, encoded.Length)); // remove prefix
         }
 
         public static ECPoint PublicPointFromPrivate(BigInteger privKey)
@@ -122,58 +113,8 @@ namespace VeChainCore.Utils.Cryptography
             {
                 privKey = privKey.Mod(ECKeyPair.Curve.N);
             }
+
             return new FixedPointCombMultiplier().Multiply(ECKeyPair.Curve.G, privKey);
-        }
-    }
-
-
-    public class SignatureData
-    {
-        public byte V;
-        public byte[] R;
-        public byte[] S;
-
-        public SignatureData(byte v, byte[] r, byte[] s)
-        {
-            V = v;
-            R = r;
-            S = s;
-        }
-
-        public override bool Equals(object o)
-        {
-            if (!(o is SignatureData that)) return false;
-            if (V != that.V)
-            {
-                return false;
-            }
-            return Equals(R, that.R) && Equals(S, that.S);
-        }
-
-        protected bool Equals(SignatureData other)
-        {
-            return V == other.V && Equals(R, other.R) && Equals(S, other.S);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = V.GetHashCode();
-                hashCode = (hashCode * 397) ^ (R != null ? R.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (S != null ? S.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
-
-        public byte[] ToByteArray()
-        {
-            int size = R.Length + S.Length + 1;
-            byte[] flat = new byte[size];
-            Array.Copy(R, 0, flat, 0, R.Length);
-            Array.Copy(S, 0, flat, R.Length, S.Length);
-            flat[size - 1] = V;
-            return flat;
         }
     }
 }

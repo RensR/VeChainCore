@@ -1,40 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+using System.Runtime.Serialization;
+using Nethereum.RLP;
+using Utf8Json;
+using VeChainCore.Utils.Json;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public class Clause : IEquatable<Clause>
+    [DataContract]
+    public abstract partial class Clause : IClause, IRLPElement
     {
-        public string to { get; set; }
-        public string value { get; set; }
-        public string data { get; set; }
+        // implementation handles serialization
+        
+        string IClause.to => GetTo();
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as Clause);
-        }
+        decimal IClause.value => GetValue();
 
-        public bool Equals(Clause other)
-        {
-            return other != null &&
-               to == other.to &&
-               value == other.value &&
-               data == other.data;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(to, value, data);
-        }
-
-        public static bool operator ==(Clause clause1, Clause clause2)
-        {
-            return EqualityComparer<Clause>.Default.Equals(clause1, clause2);
-        }
-
-        public static bool operator !=(Clause clause1, Clause clause2)
-        {
-            return !(clause1 == clause2);
-        }
+        string IClause.data => GetData();
     }
 }

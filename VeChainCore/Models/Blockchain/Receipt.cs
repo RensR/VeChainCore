@@ -1,14 +1,30 @@
-﻿namespace VeChainCore.Models.Blockchain
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
+
+namespace VeChainCore.Models.Blockchain
 {
+    [DataContract]
     public class Receipt
     {
-        public  uint gasUsed { get; set; }
-        public string gasPayer { get; set; }
-        public string paid { get; set; }
-        public string reward { get; set; }
-        public bool reverted { get; set; }
-        public Output[] outputs { get; set; }
-        public LogMeta meta { get; set; }
+        [DataMember]
+        public ulong gasUsed { get; set; }
 
+        [DataMember]
+        public string gasPayer { get; set; }
+
+        [DataMember]
+        public string paid { get; set; }
+
+        [DataMember]
+        public string reward { get; set; }
+
+        [DataMember]
+        public bool reverted { get; set; }
+
+        [DataMember]
+        public List<Output> outputs { get; set; }
+
+        [DataMember]
+        public LogMeta meta { get; set; }
     }
 }

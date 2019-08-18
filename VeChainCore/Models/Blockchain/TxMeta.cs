@@ -1,40 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public class TxMeta : IEquatable<TxMeta>
+    [DataContract]
+    public partial class TxMeta : IEquatable<TxMeta>
     {
+        [DataMember]
         public string blockID { get; set; }
-        public uint blockNumber { get; set; }
-        public uint blockTimestamp { get; set; }
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as TxMeta);
-        }
+        [DataMember]
+        public ulong blockNumber { get; set; }
 
-        public bool Equals(TxMeta other)
-        {
-            return other != null &&
-                   blockID == other.blockID &&
-                   blockNumber == other.blockNumber &&
-                   blockTimestamp == other.blockTimestamp;
-        }
+        [DataMember]
+        public ulong blockTimestamp { get; set; }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(blockID, blockNumber, blockTimestamp);
-        }
+        [DataMember(IsRequired = false)]
+        public string txID { get; set; }
 
-        public static bool operator ==(TxMeta meta1, TxMeta meta2)
-        {
-            return EqualityComparer<TxMeta>.Default.Equals(meta1, meta2);
-        }
-
-        public static bool operator !=(TxMeta meta1, TxMeta meta2)
-        {
-            return !(meta1 == meta2);
-        }
+        [DataMember(IsRequired = false)]
+        public string txOrigin { get; set; }
     }
 }

@@ -3,18 +3,18 @@
 namespace VeChainCore.Models.Blockchain
 {
     [DataContract]
-    public class Event
+    public partial class VetClause
     {
+        // implementation handles serialization
+        
         [DataMember]
-        public string address { get; set; }
+        public string to { get; set; }
 
         [DataMember]
-        public string[] topics { get; set; }
+        public decimal value { get; set; }
 
         [DataMember]
         public string data { get; set; }
 
-        [DataMember(IsRequired = false, EmitDefaultValue = false)]
-        public TxMeta meta { get; set; }
     }
 }

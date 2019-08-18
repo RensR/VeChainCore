@@ -1,62 +1,101 @@
-﻿using System.Linq;
+﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace VeChainCore.Models.Extensions
 {
     public static class ByteExtensions
     {
         /// <summary>
-        /// Concatenates two T arrays. The content of the first argument will come before the
-        /// content of the second argument
+        /// Pads the array with the leading byte to a desired length.
         /// </summary>
-        /// <param name="first">The first T[]</param>
-        /// <param name="second">The second T[]</param>
-        /// <returns></returns>
-        public static T[] Concat<T>(this T[] first, T[] second)
+        /// <param name="buffer">The array of bytes.</param>
+        /// <param name="desiredLength">The desired length of the array.</param>
+        /// <param name="value">The value of the padding byte.</param>
+        /// <param name="allowLonger">If true, over-length input buffers are returned instead of being in error.</param>
+        /// <returns>An array with leading bytes.</returns>
+        public static byte[] PadLeading(this byte[] buffer, int desiredLength, byte value = 0, bool allowLonger = true)
         {
-            var rv = new T[first.Length + second.Length];
-            System.Buffer.BlockCopy(first, 0, rv, 0, first.Length);
-            System.Buffer.BlockCopy(second, 0, rv, first.Length, second.Length);
-            return rv;
-        }
+            if (desiredLength == buffer.Length)
+                return buffer;
 
-        /// <summary>
-        /// Flattens the structure of an array of T arrays. The resulting T[] will contains all
-        /// information found in all the arrays.
-        /// </summary>
-        /// <param name="arrays">An array of arrays of T</param>
-        /// <returns>A combinated, flattened array of T</returns>
-        public static T[] Combine<T>(params T[][] arrays)
-        {
-            T[] rv = new T[arrays.Sum(a => a.Length)];
-            int offset = 0;
-            foreach (T[] array in arrays)
+            if (desiredLength < buffer.Length)
             {
-                System.Buffer.BlockCopy(array, 0, rv, offset, array.Length);
-                offset += array.Length;
+                if (allowLonger)
+                    return buffer;
+
+                throw new ArgumentException("Array longer than desired padded length.", nameof(desiredLength));
             }
-            return rv;
+
+            var bytes = new byte[desiredLength];
+
+            int paddingLength = desiredLength - buffer.Length;
+
+            if (value != 0 && paddingLength > 0)
+                Unsafe.InitBlock(ref bytes[0], value, (uint) paddingLength);
+
+            if (buffer.Length > 0)
+                Unsafe.CopyBlock(ref bytes[paddingLength], ref buffer[0], (uint) buffer.Length);
+
+            return bytes;
         }
 
         /// <summary>
-        /// Trims the leading zero's of a byte[]
+        /// Trims the leading bytes from a byte array.
         /// </summary>
-        /// <param name="array">The array with potential leading 0's</param>
-        /// <returns>An array without leading 0's</returns>
-        public static byte[] TrimLeadingZeroBytes(this byte[] array)
+        /// <param name="buffer">The array with leading instances of value.</param>
+        /// <param name="value">The value that will be trimmed.</param>
+        /// <returns>An array without leading bytes.</returns>
+        public static byte[] TrimLeading(this byte[] buffer, byte value = 0)
         {
-            return array.TrimLeading<byte>(0);
+            var leadingCount = 0;
+            while (leadingCount < buffer.Length)
+            {
+                if (buffer[leadingCount] != value)
+                    break;
+                ++leadingCount;
+            }
+
+            uint bufferLength = (uint) (buffer.Length - leadingCount);
+
+            return bufferLength == 0
+                ? Array.Empty<byte>()
+                : buffer.LastBytes(bufferLength);
         }
 
-        /// <summary>
-        /// Trims the leading instances of T b from an array.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array">The array with potential leading instances of b</param>
-        /// <param name="b">The object that will be trimmed</param>
-        /// <returns>An array without leading instances of b</returns>
-        public static T[] TrimLeading<T>(this T[] array, T b)
+        public static byte[] FirstBytes(this byte[] buffer, uint length)
         {
-            return array.SkipWhile(leading => leading.Equals(b)).ToArray();
+            if (buffer.Length < length)
+                throw new ArgumentOutOfRangeException(nameof(length), "Length must be greater than length of buffer.");
+
+            if (buffer.Length == 0)
+                return Array.Empty<byte>();
+
+            if (buffer.Length == length)
+                return buffer;
+
+            var bytes = new byte[length];
+
+            Unsafe.CopyBlock(ref bytes[0], ref buffer[0], length);
+
+            return bytes;
+        }
+
+        public static byte[] LastBytes(this byte[] buffer, uint length)
+        {
+            if (buffer.Length < length)
+                throw new ArgumentOutOfRangeException(nameof(length), "Length must be greater than length of buffer.");
+
+            if (buffer.Length == 0)
+                return Array.Empty<byte>();
+
+            if (buffer.Length == length)
+                return buffer;
+
+            var bytes = new byte[length];
+
+            Unsafe.CopyBlock(ref bytes[0], ref buffer[buffer.Length - length], length);
+
+            return bytes;
         }
     }
 }

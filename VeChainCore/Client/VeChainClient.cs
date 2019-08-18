@@ -1,70 +1,81 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Runtime.Serialization.Json;
-using System.Text;
 using System.Threading.Tasks;
-using VeChainCore.Utils;
 using VeChainCore.Models.Blockchain;
-using VeChainCore.Models.Extensions;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
+using Nethereum.Hex.HexConvertors.Extensions;
+using Utf8Json;
+using Utf8Json.ImmutableCollection;
+using Utf8Json.Resolvers;
+using VeChainCore.Models.Core;
+using VeChainCore.Utils;
+using VeChainCore.Utils.Json;
+using Account = VeChainCore.Models.Blockchain.Account;
 
 namespace VeChainCore.Client
 {
-    public class VeChainClient
+    public class VeChainClient : IVeChainClient
     {
-        /// <summary>
-        /// The chaintags of the three known VeChain networks
-        /// </summary>
-        public enum Network
-        {
-            Main = 74,
-            Test = 39,
-            Dev = 164
-        }
+        public static readonly IJsonFormatterResolver JsonFormatterResolver
+            = CompositeResolver.Create(
+                VeChainFormatterResolver.Instance,
+                ClauseFormatterResolver.Instance,
+                AttributeFormatterResolver.Instance,
+                EnumResolver.UnderlyingValue,
+                ImmutableCollectionResolver.Instance,
+                BuiltinResolver.Instance,
+                DynamicGenericResolver.Instance,
+                StandardResolver.ExcludeNullCamelCase,
+                DynamicObjectResolver.ExcludeNullCamelCase
+            );
+
+        public static byte[] SerializeToJson<T>(T o)
+            => JsonSerializer.Serialize(o, JsonFormatterResolver);
+
+        public static T DeserializeFromJson<T>(byte[] data)
+            => JsonSerializer.Deserialize<T>(data, JsonFormatterResolver);
 
         /// <summary>
         /// The address of a running VeChain instance
         /// </summary>
-        private string _blockchainAddress = "http://localhost:8669";
+        public Uri ServerUri
+        {
+            get => _client.BaseAddress;
+            set => _client.BaseAddress = value;
+        }
 
         private readonly HttpClient _client = new HttpClient();
 
-        // Config methods
-        /// <summary>
-        /// Sets the address of the blockchain that the client is interacting with.
-        /// </summary>
-        /// <param name="address">The address of the blockchain, by default "http://localhost:8669"</param>
-        public void SetBlockchainAddress(string address)
+        public VeChainClient(string serverUri)
         {
-            _blockchainAddress = address.TrimEnd('/');
+            ServerUri = new Uri(serverUri);
         }
 
-        /// <summary>
-        /// Gets the address of the blockchain that the client is interacting with.
-        /// </summary>
-        /// <returns></returns>
-        public string GetBlockchainAddress()
+        public VeChainClient()
+            : this("https://sync-mainnet.vechain.org")
         {
-            return _blockchainAddress;
         }
 
         /// <summary>
         /// Gets the blockchain tag that indicates what network is connected; Main, Testnet or a dev instance
         /// </summary>
         /// <returns></returns>
-        public async Task<byte> GetChainTag()
+        public async Task<Network> GetChainTag()
         {
             var genesis = await GetBlock("0");
             var lastByte = genesis.id.Substring(genesis.id.Length - 2);
 
-            return byte.Parse(lastByte, System.Globalization.NumberStyles.HexNumber);
+            return (Network) byte.Parse(lastByte, System.Globalization.NumberStyles.HexNumber);
         }
 
         // Logic methods
         /// <summary>
-        /// Gets an <see cref="Account"/> object that contains all Account information for
+        /// Gets an <see cref="Models.Blockchain.Account"/> object that contains all Account information for
         /// the given address.
         /// </summary>
         /// <param name="address">The address id in 0x notation</param>
@@ -72,13 +83,52 @@ namespace VeChainCore.Client
         /// <returns></returns>
         public async Task<Account> GetAccount(string address, string revision = "best")
         {
-            if (address == null || address.Length != 42)
+            if (!Address.IsValid(address))
                 throw new ArgumentException("Address is not valid");
 
             if (revision != "best")
                 address += $"?revision={revision}";
 
             return await SendGetRequest<Account>($"/accounts/{address}");
+        }
+
+        public async Task<decimal> GetContractBalance(string contract, string account, string revision = "best", uint decimalPlaces = 18)
+        {
+            if (!Address.IsValid(contract))
+                throw new ArgumentException("Address is not valid");
+
+            if (revision != "best")
+                contract += $"?revision={revision}";
+
+            var bytes = SerializeToJson(new
+            {
+                value = "0x0",
+                data = new StringBuilder()
+                    .Append("0x70a08231") // balanceOf contract method id
+                    .Append('0', 64 - (account.Length - 2)) // zero pad to 64 characters
+                    .Append(account, 2, account.Length - 2) // address without 0x prefix
+                    .ToString()
+            });
+
+            var content = new ByteArrayContent(bytes);
+
+            var response = await SendPostRequest($"/accounts/{contract}", content);
+
+            var respBytes = await response.Content.ReadAsByteArrayAsync();
+
+            var callResult = DeserializeFromJson<CallResult>(respBytes);
+
+            if (callResult.reverted)
+            {
+                if (!string.IsNullOrEmpty(callResult.vmError))
+                    throw new InvalidOperationException($"Execution was reverted: {callResult.vmError}");
+                throw new InvalidOperationException($"Execution was reverted, no error specified.");
+            }
+
+            if (!string.IsNullOrEmpty(callResult.vmError))
+                throw new InvalidOperationException($"VM Error during execution: {callResult.vmError}");
+
+            return callResult.data.HexToByteArray().ToBigInteger().ToDecimal() / (decimal) Math.Pow(10, decimalPlaces);
         }
 
         /// <summary>
@@ -88,18 +138,17 @@ namespace VeChainCore.Client
         /// <param name="blockNumber">The block number or "best" for the latest</param>
         /// <returns></returns>
         public async Task<Block> GetBlock(string blockNumber)
-        {
-            return await SendGetRequest<Block>($"/blocks/{blockNumber}");
-        }
+            => await SendGetRequest<Block>($"/blocks/{blockNumber}");
 
-        public async Task<string> GetLatestBlockRef()
+        public async Task<ulong> GetLatestBlockRef()
         {
-            Block bestBlockID = await GetBlock("best");
-            var bestBlockIDHex = bestBlockID.id.HexStringToByteArray();
+            var bestBlockId = await GetBlock("best");
+            var bestBlockIdHex = bestBlockId.id.HexToByteArray();
             var eightByte = new byte[8];
-            Buffer.BlockCopy(bestBlockIDHex, 0, eightByte, 0, 8);
-
-            return eightByte.TrimLeadingZeroBytes().ByteArrayToString();
+            Unsafe.CopyBlock(ref eightByte[0], ref bestBlockIdHex[0], 8);
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(eightByte);
+            return BitConverter.ToUInt64(eightByte);
         }
 
         /// <summary>
@@ -108,10 +157,8 @@ namespace VeChainCore.Client
         /// </summary>
         /// <param name="id">The transaction id</param>
         /// <returns></returns>
-        public async Task<Transaction> GetTransaction(string id)
-        {
-            return await SendGetRequest<Transaction>($"/transactions/{id}");
-        }
+        public async Task<TransactionLog> GetTransaction(string id)
+            => await SendGetRequest<TransactionLog>($"/transactions/{id}");
 
         /// <summary>
         /// Gets the <see cref="Receipt"/> object that contains all Receipt information for
@@ -120,51 +167,261 @@ namespace VeChainCore.Client
         /// <param name="id">The transaction id</param>
         /// <returns></returns>
         public async Task<Receipt> GetReceipt(string id)
-        {
-            return await SendGetRequest<Receipt>($"/transactions/{id}/receipt");
-        }
-
-        public async Task<HttpResponseMessage> TestNetFaucet(string address)
-        {
-            if (!Hex.IsValidAddress(address))
-                return null;
-
-            var content = new StringContent($"{{\"to\":\"{address}\"}}", Encoding.UTF8, "application/json");
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-            return await _client.PostAsync("https://faucet.outofgas.io/requests", content);
-        }
+            => await SendGetRequest<Receipt>($"/transactions/{id}/receipt");
 
         /// <summary>
         /// Initiate a transaction to be included in the blockchain
         /// </summary>
-        /// <param name="transactionBytes">The raw transaction in bytes</param>
+        /// <param name="txn">The transaction</param>
         /// <returns></returns>
-        public async Task<TransferResult> SendTransaction(byte[] transactionBytes)
+        public async Task<TransferResult> SendTransaction(Transaction txn)
         {
-            var transactionJson = new ByteArrayContent(transactionBytes);
+            if (string.IsNullOrEmpty(txn.signature))
+                throw new ArgumentException("Transaction must be signed.", nameof(txn.signature));
 
-            var response = await SendPostRequest($"/transactions", transactionJson);
-            return new TransferResult{ id = response.ToString()};
+            if (txn.dependsOn == "")
+                txn.dependsOn = null;
+
+            var stringOutput = ByteArrayToString(txn.RLPData);
+            var totalProperEncoding = Encoding.UTF8.GetBytes("{\"raw\":\"0x" + stringOutput + "\"}");
+
+            var bytes = new ByteArrayContent(totalProperEncoding);
+
+            bytes.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await SendPostRequest("/transactions", bytes);
+
+            await DetailedThrowOnUnsuccessfulResponse(response, bytes);
+
+            return DeserializeFromJson<TransferResult>(await response.Content.ReadAsByteArrayAsync());
+        }
+
+
+        public static string ByteArrayToString(byte[] ba)
+        {
+            return BitConverter.ToString(ba).Replace("-", "");
+        }
+
+        public IEnumerable<Transfer> GetTransfers(TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            return GetTransfers(out _, criteriaSet, ct, from, to, pageSize, lazy);
+        }
+
+        public IEnumerable<Transfer> GetTransfers(out Task fetchCompletion, TransferCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            if (from >= to)
+                throw new ArgumentOutOfRangeException(nameof(from), from, "From must be less than or equal to.");
+            if (to > 9007199254740991)
+                throw new ArgumentOutOfRangeException(nameof(to), to, "To must be less than or equal to JSON maximum safe integer (9007199254740991).");
+            if (criteriaSet != null && criteriaSet.Length == 0)
+                throw new ArgumentException("The criteriaSet parameter must be null or contain at least one criteria.", nameof(criteriaSet));
+
+
+            var transfers = new BlockingCollection<Transfer>(new ConcurrentQueue<Transfer>());
+
+            async Task FetchTransfers()
+            {
+                try
+                {
+                    for (uint offset = 0;; offset += pageSize)
+                    {
+                        var json = SerializeToJson(new
+                        {
+                            range = new
+                            {
+                                unit = "block",
+                                from,
+                                to
+                            },
+                            options = new
+                            {
+                                offset,
+                                limit = pageSize
+                            },
+                            criteriaSet,
+                            order = "asc"
+                        });
+
+                        var content = new ByteArrayContent(json);
+
+                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                        var response = await SendPostRequest("/logs/transfer", content);
+
+                        await DetailedThrowOnUnsuccessfulResponse(response, content);
+
+                        var bytes = await response.Content.ReadAsByteArrayAsync();
+
+                        var transferPage = DeserializeFromJson<Transfer[]>(bytes);
+
+                        if (transferPage.Length == 0)
+                            break;
+
+                        foreach (var transfer in transferPage)
+                            transfers.Add(transfer, ct);
+
+                        while (lazy && transfers.Count > 0)
+                            await Task.Delay(15, ct);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // ok
+                }
+                catch (ObjectDisposedException)
+                {
+                    // ok
+                }
+                finally
+                {
+                    try
+                    {
+                        transfers.CompleteAdding();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // ok
+                    }
+                }
+            }
+
+            fetchCompletion = FetchTransfers();
+
+            return transfers.GetConsumingEnumerable(ct);
+        }
+        
+        public IEnumerable<Event> GetEvents(EventCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            return GetEvents(out _, criteriaSet, ct, from, to, pageSize, lazy);
+        }
+
+        public IEnumerable<Event> GetEvents(out Task fetchCompletion, EventCriteria[] criteriaSet, CancellationToken ct, ulong from = 0, ulong to = 9007199254740991, uint pageSize = 10, bool lazy = true)
+        {
+            if (from >= to)
+                throw new ArgumentOutOfRangeException(nameof(from), from, "From must be less than or equal to.");
+            if (to > 9007199254740991)
+                throw new ArgumentOutOfRangeException(nameof(to), to, "To must be less than or equal to JSON maximum safe integer (9007199254740991).");
+            if (criteriaSet != null && criteriaSet.Length == 0)
+                throw new ArgumentException("The criteriaSet parameter must be null or contain at least one criteria.", nameof(criteriaSet));
+
+
+            var events = new BlockingCollection<Event>(new ConcurrentQueue<Event>());
+
+            async Task FetchEvents()
+            {
+                try
+                {
+                    for (uint offset = 0;; offset += pageSize)
+                    {
+                        var json = SerializeToJson(new
+                        {
+                            range = new
+                            {
+                                unit = "block",
+                                from,
+                                to
+                            },
+                            options = new
+                            {
+                                offset,
+                                limit = pageSize
+                            },
+                            criteriaSet,
+                            order = "asc"
+                        });
+
+                        var content = new ByteArrayContent(json);
+
+                        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                        var response = await SendPostRequest("/logs/event", content);
+
+                        await DetailedThrowOnUnsuccessfulResponse(response, content);
+
+                        var bytes = await response.Content.ReadAsByteArrayAsync();
+
+                        var eventPage = DeserializeFromJson<Event[]>(bytes);
+
+                        if (eventPage.Length == 0)
+                            break;
+
+                        foreach (var @event in eventPage)
+                            events.Add(@event, ct);
+
+                        while (lazy && events.Count > 0)
+                            await Task.Delay(15, ct);
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    // ok
+                }
+                catch (ObjectDisposedException)
+                {
+                    // ok
+                }
+                finally
+                {
+                    try
+                    {
+                        events.CompleteAdding();
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // ok
+                    }
+                }
+            }
+
+            fetchCompletion = FetchEvents();
+
+            return events.GetConsumingEnumerable(ct);
         }
 
         /// <summary>
         /// Checks the results of a mock contract execution
         /// </summary>
-        /// <param name="transactionBytes"></param>
-        /// <param name="address">Address of the contract</param>
+        /// <param name="clauses">Transaction clauses</param>
+        /// <param name="caller"></param>
+        /// <param name="blockNum"></param>
+        /// <param name="gasLimit"></param>
+        /// <param name="gasPrice"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses)
+        public async Task<IEnumerable<CallResult>> ExecuteAddressCode(IEnumerable<Clause> clauses, ulong? blockNum = null, string caller = null, ulong? gasLimit = null, ulong? gasPrice = null)
         {
-            var json = $"{{\"clauses\": {JsonConvert.SerializeObject(clauses)}}}";
+            //var debugJson = JsonSerializer.ToJsonString(new {clauses}, JsonFormatterResolver);
 
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var json = SerializeToJson(new BatchExecuteRequest
+            {
+                clauses = clauses,
+                caller = caller,
+                gas = gasLimit,
+                gasPrice = gasPrice
+            });
+
+            var content = new ByteArrayContent(json);
+
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            var response = await SendPostRequest($"/accounts/*", content);
-            var body = await response.Content.ReadAsStringAsync();
+            //var debugJson = Encoding.UTF8.GetString(json);
 
-            return JsonConvert.DeserializeObject<IEnumerable<CallResult>>(body);
+            var response =
+                blockNum == null
+                    ? await SendPostRequest("/accounts/*", content)
+                    : await SendPostRequest($"/accounts/*?revision={blockNum}", content);
+
+            await DetailedThrowOnUnsuccessfulResponse(response, content);
+
+            var body = await response.Content.ReadAsByteArrayAsync();
+
+            return DeserializeFromJson<IEnumerable<CallResult>>(body);
+        }
+
+        private static async Task DetailedThrowOnUnsuccessfulResponse(HttpResponseMessage response, ByteArrayContent content)
+        {
+            if (!response.IsSuccessStatusCode)
+                throw new HttpRequestException($"HTTP {(uint) response.StatusCode} {response.ReasonPhrase}\n{response.Content.Headers}\n\n{await response.Content.ReadAsStringAsync()}\n\n")
+                    {Data = {{typeof(HttpContent), content}}};
         }
 
         /// <summary>
@@ -174,11 +431,7 @@ namespace VeChainCore.Client
         /// <param name="path">The path to the wanted object</param>
         /// <returns></returns>
         private async Task<T> SendGetRequest<T>(string path)
-        {
-            var serializer = new DataContractJsonSerializer(typeof(T));
-            object returnObject = serializer.ReadObject(await _client.GetStreamAsync(RawUrl(path)));
-            return (T) returnObject;
-        }
+            => DeserializeFromJson<T>(await _client.GetByteArrayAsync(path));
 
         /// <summary>
         /// Sends a POST request and return the chosen return type
@@ -187,18 +440,9 @@ namespace VeChainCore.Client
         /// <param name="httpContent">Parameters of the request</param>
         /// <returns></returns>
         private async Task<HttpResponseMessage> SendPostRequest(string path, HttpContent httpContent)
-        {
-            return await _client.PostAsync(RawUrl(path), httpContent);
-        }
+            => await _client.PostAsync(path, httpContent);
 
-        /// <summary>
-        /// Transforms the path to the full URL including the blockchain address
-        /// </summary>
-        /// <param name="path">The query specific part of the URL</param>
-        /// <returns></returns>
-        private string RawUrl(string path)
-        {
-            return _blockchainAddress + path;
-        }
+        public void Dispose()
+            => _client.Dispose();
     }
 }
