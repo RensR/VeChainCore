@@ -44,7 +44,7 @@ namespace VeChainCoreTest
             for (int i = 0; i < threadCount; ++i)
             {
                 RandomNumberGenerator.Fill(sources[i] = new byte[1024]);
-                expected[i] = Hash.Blake2B(sources[i]);
+                expected[i] = hashFunc(sources[i]);
                 (threads[i] = new Thread(o =>
                 {
                     int k = (int) o;

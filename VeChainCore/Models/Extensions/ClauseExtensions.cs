@@ -7,7 +7,7 @@ namespace VeChainCore.Models.Extensions
         /// <summary>
         /// Calculates the gas cost of the data part of a clause.
         /// </summary>
-        /// <param name="data">The data for which the cost is calculated</param>
+        /// <param name="clause">The clause for which the cost is calculated</param>
         /// <returns></returns>
         public static ulong CalculateDataGas(this IClause clause)
         {

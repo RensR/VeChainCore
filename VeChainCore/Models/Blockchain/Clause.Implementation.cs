@@ -8,7 +8,9 @@ namespace VeChainCore.Models.Blockchain
         public abstract byte[] RLPData { get; }
 
         protected abstract string GetTo();
+        
         protected abstract decimal GetValue();
+        
         protected abstract string GetData();
     }
 }

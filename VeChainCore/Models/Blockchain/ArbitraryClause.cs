@@ -1,8 +1,4 @@
 using System.Runtime.Serialization;
-using Nethereum.Hex.HexConvertors.Extensions;
-using Nethereum.RLP;
-using VeChainCore.Models.Core;
-using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Blockchain
 {
