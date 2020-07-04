@@ -72,8 +72,7 @@ namespace VeChainCore.Models.Blockchain
         protected override string GetTo() => ContractAddress;
         protected override decimal GetValue() => 0;
         protected override string GetData() => data;
-
-
+        
         private string GetToField()
             => "0x" + data.Substring(6, 32);
 
@@ -81,7 +80,7 @@ namespace VeChainCore.Models.Blockchain
             => data = value == null || !value.StartsWith("0x")
                 ? throw new ArgumentException("Value must be a hex string.", nameof(value))
                 : data.Substring(0, 10)
-                + value.Substring(2, (int)Math.Min(value.Length-2,64)).PadLeft(64, '0')
+                + value.Substring(2, Math.Min(value.Length-2,64)).PadLeft(64, '0')
                 + data.Substring(74);
 
         private decimal GetValueField()

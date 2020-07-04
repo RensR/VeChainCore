@@ -5,7 +5,7 @@ namespace VeChainCore.Models.Core
 {
     public abstract class Amount : IAmount
     {
-        protected decimal _decimalsMultiplier;
+        protected readonly decimal _decimalsMultiplier;
 
         public abstract decimal Value { get; }
 
@@ -17,8 +17,8 @@ namespace VeChainCore.Models.Core
         public BigInteger AsBigInt => (Value * _decimalsMultiplier).ToBigInteger();
 
         public string ContractAddress => GetContractAddress();
+        
         protected abstract string GetContractAddress();
-
 
         protected Amount(int decimals)
         {

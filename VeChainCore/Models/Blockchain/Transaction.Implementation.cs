@@ -111,7 +111,7 @@ namespace VeChainCore.Models.Blockchain
 
         public Transaction Sign(ECKeyPair key)
         {
-            var hash = Hash.Blake2B(this.RlpDataForSignature);
+            var hash = Hash.Blake2B(RlpDataForSignature);
 
             var sig = ECDSASign.SignMessage(hash, key, false);
 

@@ -11,8 +11,7 @@ namespace VeChainCore.Models.Core
     {
         public string HexString { get; set; }
 
-        private byte[] Bytes
-            => HexString.HexToByteArray(); //.TrimLeading();
+        private byte[] Bytes => HexString.HexToByteArray();
 
         public Address(string address)
         {
@@ -41,7 +40,6 @@ namespace VeChainCore.Models.Core
         }
 
         [IgnoreDataMember]
-        public byte[] RLPData
-            => RLP.EncodeElement(Bytes);
+        public byte[] RLPData => RLP.EncodeElement(Bytes);
     }
 }

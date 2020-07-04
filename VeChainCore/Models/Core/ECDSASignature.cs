@@ -4,8 +4,8 @@ namespace VeChainCore.Models.Core
 {
     public class ECDSASignature
     {
-        public BigInteger R;
-        public BigInteger S;
+        public readonly BigInteger R;
+        public readonly BigInteger S;
 
         public ECDSASignature(byte[] rBytes, byte[] sBytes)
         {

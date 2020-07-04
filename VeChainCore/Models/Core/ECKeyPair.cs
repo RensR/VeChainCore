@@ -19,7 +19,7 @@ namespace VeChainCore.Models.Core
 {
     public class ECKeyPair
     {
-        public static int PrivateKeySize = 32;
+        public const int PrivateKeySize = 32;
         public const int PublicKeySize = 64;
 
         private static readonly X9ECParameters CurveParams = CustomNamedCurves.GetByName("secp256k1");
@@ -38,8 +38,7 @@ namespace VeChainCore.Models.Core
         public BigInteger PublicKey { get; }
 
 
-        static ECPoint GetCorrespondingPublicKey(
-            BigInteger d)
+        static ECPoint GetCorrespondingPublicKey(BigInteger d)
         {
             return new FixedPointCombMultiplier().Multiply(Domain.G, d);
         }
@@ -57,7 +56,7 @@ namespace VeChainCore.Models.Core
 
             PublicKey = publicKey;
 
-            if (check && (!Equals(publicKey, ECDSASign.PublicKeyFromPrivate(privateKey))))
+            if (check && !Equals(publicKey, ECDSASign.PublicKeyFromPrivate(privateKey)))
                 throw new InvalidKeyException("The public key does not match the private key.");
         }
 

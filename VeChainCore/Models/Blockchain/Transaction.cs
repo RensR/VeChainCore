@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Org.BouncyCastle.Ocsp;
 using Utf8Json;
 using VeChainCore.Utils.Json;
 
