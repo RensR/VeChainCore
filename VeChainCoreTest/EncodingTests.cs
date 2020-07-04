@@ -15,9 +15,8 @@ namespace VeChainCoreTest
 {
     public class EncodingTests
     {
-        private const decimal eighteenDecimalPlaces = 1000000000000000000m;
-        private static readonly decimal DecimalMaxValueDown18 = decimal.Round(decimal.MaxValue / eighteenDecimalPlaces);
-        private static readonly decimal DecimalMinValueDown18 = decimal.Round(decimal.MinValue / eighteenDecimalPlaces);
+        private const decimal EighteenDecimalPlaces = 1000000000000000000m;
+        private static readonly decimal DecimalMaxValueDown18 = decimal.Round(decimal.MaxValue / EighteenDecimalPlaces);
 
         [Fact]
         public void BigIntToMaxDec()
