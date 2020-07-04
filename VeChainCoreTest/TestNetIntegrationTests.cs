@@ -19,8 +19,11 @@ namespace VeChainCoreTest
 
         public TestNetIntegrationTests()
         {
-            _vechainClient = new VeChainClient();
-            _vechainClient.ServerUri = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ?? "https://sync-testnet.vechain.org");
+            _vechainClient = new VeChainClient
+            {
+                ServerUri = new Uri(Environment.GetEnvironmentVariable("VECHAIN_TESTNET_URL") ??
+                                    "https://sync-testnet.vechain.org")
+            };
         }
 
         [Fact]
