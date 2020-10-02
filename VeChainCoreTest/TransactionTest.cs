@@ -25,10 +25,10 @@ namespace VeChainCoreTest
         public async Task CreateTransaction()
         {
             var chainTag = await _vechainClient.GetChainTag();
-            var blockref = "0x001a7d4448f0948b"; // await _vechainClient.GetLatestBlockRef();
+            var blockRef = await _vechainClient.GetLatestBlockRef();
 
 
-            var trans = RlpTransaction.CreateUnsigned(chainTag, blockref, 720, new[]
+            var trans = RlpTransaction.CreateUnsigned(chainTag, blockRef, 720, new[]
             {
                 new RlpClause("0xd3ae78222beadb038203be21ed5ce7c9b1bff602", "1", "", false)
             }, 12345678, 0, 21000, "");
