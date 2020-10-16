@@ -5,7 +5,7 @@ using Nethereum.ABI.Model;
 
 namespace VeChainCore.Models.Core.Abi.AbiParameters
 {
-    public class AbiParameterCoder
+    public static class AbiParameterCoder
     {
         public static byte[] EncodeParameter(AbiInputParameter parameter)
         {
@@ -47,7 +47,7 @@ namespace VeChainCore.Models.Core.Abi.AbiParameters
             var outputs = new ParameterDecoder().DecodeDefaultData(
                     data, 
                     parameters
-                        .Select(parame => new Parameter(parame.AbiType, parame.Name))
+                        .Select(parameter => new Parameter(parameter.AbiType, parameter.Name))
                         .ToArray());
 
             return outputs.Select(output => new AbiOutputParameter(output.Parameter.Type, output.Parameter.Name) {Result = output.Result}).ToArray();

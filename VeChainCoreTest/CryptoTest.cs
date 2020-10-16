@@ -10,13 +10,13 @@ namespace VeChainCoreTest
 {
     public class CryptoTest
     {
-        const string helloWordStr = "Hello world";
-        static readonly byte[] helloBytes = Encoding.UTF8.GetBytes(helloWordStr);
+        private const string HelloWordStr = "Hello world";
+        private static readonly byte[] HelloBytes = Encoding.UTF8.GetBytes(HelloWordStr);
 
         [Fact]
         public void TestBlake2B()
         {
-            byte[] hashBytes = Hash.Blake2B(helloBytes);
+            byte[] hashBytes = Hash.Blake2B(HelloBytes);
             string hashHex = hashBytes.ToHex(true);
             Assert.Equal("0xa21cf4b3604cf4b2bc53e6f88f6a4d75ef5ff4ab415f3e99aea6b61c8249c4d0", hashHex);
         }
@@ -24,7 +24,7 @@ namespace VeChainCoreTest
         [Fact]
         public void TestKeccak256()
         {
-            byte[] hashBytes = Hash.Keccak256(helloBytes);
+            byte[] hashBytes = Hash.Keccak256(HelloBytes);
             string hashHex = hashBytes.ToHex(true);
             Assert.Equal("0xed6c11b0b5b808960df26f5bfc471d04c1995b0ffd2055925ad1be28d6baadfd", hashHex);
         }

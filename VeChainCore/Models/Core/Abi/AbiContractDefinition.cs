@@ -43,7 +43,7 @@ namespace VeChainCore.Models.Core.Abi
             definition.StateMutability = stateMutability;
             
             definition.Type = "constructor";
-            definition.Inputs = new AbiParameterBuilder().Builder(abiJson["inputs"].ToString());
+            definition.Inputs = AbiParameterBuilder.Builder(abiJson["inputs"].ToString());
             
             return definition;
         }

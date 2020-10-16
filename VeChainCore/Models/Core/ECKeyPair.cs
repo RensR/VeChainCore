@@ -25,7 +25,7 @@ namespace VeChainCore.Models.Core
         private static readonly X9ECParameters CurveParams = CustomNamedCurves.GetByName("secp256k1");
         public static BigInteger HalfCurveOrder = CurveParams.N.ShiftRight(1);
 
-        public static ECDomainParameters Curve = new ECDomainParameters(
+        public static readonly ECDomainParameters Curve = new ECDomainParameters(
             CurveParams.Curve, CurveParams.G, CurveParams.N, CurveParams.H);
 
 

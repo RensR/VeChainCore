@@ -2,10 +2,10 @@
 {
     public class AbiParameterDefinition: IAbiParameterDefinition
     {
-        public string Name { get; set; }
-        public string AbiType { get; set; }
+        public string Name { get; }
+        public string AbiType { get; }
 
-        public AbiParameterDefinition(string name,string type)
+        public AbiParameterDefinition(string name, string type)
         {
             Name = name;
             AbiType = type;

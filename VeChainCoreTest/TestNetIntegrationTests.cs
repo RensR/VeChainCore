@@ -8,7 +8,6 @@ using Utf8Json;
 using VeChainCore.Client;
 using VeChainCore.Models.Blockchain;
 using VeChainCore.Models.Extensions;
-using VeChainCore.Utils;
 using Xunit;
 
 namespace VeChainCoreTest

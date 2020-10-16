@@ -3,7 +3,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
-using VeChainCore.Models.Extensions;
 
 namespace VeChainCore.Models.Core
 {

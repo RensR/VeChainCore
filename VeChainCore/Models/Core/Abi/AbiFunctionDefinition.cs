@@ -45,8 +45,8 @@ namespace VeChainCore.Models.Core.Abi
                 out AbiStateMutability stateMutability);
             definition.StateMutability = stateMutability;
 
-            definition.Inputs = new AbiParameterBuilder().Builder(abiJson["inputs"].ToString());
-            definition.Outputs = new AbiParameterBuilder().Builder(abiJson["outputs"].ToString());
+            definition.Inputs = AbiParameterBuilder.Builder(abiJson["inputs"].ToString());
+            definition.Outputs = AbiParameterBuilder.Builder(abiJson["outputs"].ToString());
             definition.Sha3Signature = GetNethFunctionAbi(definition).Sha3Signature.ToBytes();
 
             return definition;

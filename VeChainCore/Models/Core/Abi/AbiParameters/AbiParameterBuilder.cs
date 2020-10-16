@@ -4,9 +4,9 @@ using Newtonsoft.Json.Linq;
 
 namespace VeChainCore.Models.Core.Abi.AbiParameters
 {
-    public class AbiParameterBuilder
+    public static class AbiParameterBuilder
     {
-        public IAbiParameterDefinition[] Builder(string abiString)
+        public static IAbiParameterDefinition[] Builder(string abiString)
         {
             var abiJson = JsonConvert.DeserializeObject<JArray>(abiString);
             return Builder(abiJson);

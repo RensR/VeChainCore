@@ -1,7 +1,7 @@
 using System;
 using Org.BouncyCastle.Math;
 
-namespace VeChainCore.Utils
+namespace VeChainCore.Models.Extensions
 {
     public static class NumberConversionExtensions
     {

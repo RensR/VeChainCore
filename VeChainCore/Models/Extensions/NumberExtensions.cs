@@ -1,6 +1,5 @@
 ﻿using Nethereum.Hex.HexConvertors.Extensions;
 using VeChainCore.Models.Core;
-using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Extensions
 {
@@ -18,7 +17,7 @@ namespace VeChainCore.Models.Extensions
 
         public static string ToHex(this ulong number)
         {
-            return ((decimal) number).ToHex();
+            return number.ToBigEndianBytes().ToHex();
         }
 
         public static string ToHex(this decimal number)

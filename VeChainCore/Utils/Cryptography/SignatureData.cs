@@ -45,8 +45,8 @@ namespace VeChainCore.Utils.Cryptography
 
         public byte[] ToByteArray()
         {
-            int size = R.Length + S.Length + 1;
-            byte[] flat = new byte[size];
+            var size = R.Length + S.Length + 1;
+            var flat = new byte[size];
             Unsafe.CopyBlock(ref flat[0], ref R[0], (uint) R.Length);
             // Array.Copy(R, 0, flat, 0, R.Length);
             Unsafe.CopyBlock(ref flat[R.Length], ref S[0], (uint) S.Length);

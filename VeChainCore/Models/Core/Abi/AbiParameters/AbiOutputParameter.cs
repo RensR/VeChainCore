@@ -7,6 +7,7 @@ namespace VeChainCore.Models.Core.Abi.AbiParameters
         public dynamic Result { get; set; }
         
         public IAbiParameterDefinition Definition;
+        
         public string Name { get; }
         
         private ABIType _nethAbiType;

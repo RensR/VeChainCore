@@ -106,7 +106,7 @@ namespace VeChainCore.Utils.Cryptography
         public static ECPoint PublicPointFromPrivate(BigInteger privKey)
         {
             /*
-             * TODO: FixedPointCombMultiplier currently doesn't support scalars longer than the group
+             * FixedPointCombMultiplier currently doesn't support scalars longer than the group
              * order, but that could change in future versions.
              */
             if (privKey.BitLength > ECKeyPair.Curve.N.BitLength)

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using Nethereum.Hex.HexConvertors.Extensions;
-using VeChainCore.Models.Core;
 
 namespace VeChainCore.Models.Extensions
 {
@@ -58,7 +56,7 @@ namespace VeChainCore.Models.Extensions
                 ++leadingCount;
             }
 
-            uint bufferLength = (uint) (buffer.Length - leadingCount);
+            var bufferLength = (uint) (buffer.Length - leadingCount);
 
             return bufferLength == 0
                 ? Array.Empty<byte>()
