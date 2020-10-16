@@ -4,7 +4,8 @@ namespace VeChainCore.Models.Core.Abi.AbiParameters
 {
     public class AbiOutputParameter
     {
-        public dynamic Result { get; }
+        public dynamic Result { get; set; }
+        
         public IAbiParameterDefinition Definition;
         public string Name { get; }
         

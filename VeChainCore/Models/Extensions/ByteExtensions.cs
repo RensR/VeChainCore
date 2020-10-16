@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace VeChainCore.Models.Extensions
@@ -117,6 +118,16 @@ namespace VeChainCore.Models.Extensions
         {
             var val = (int)hex;
             return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
+        }
+        
+        public static void Append(this MemoryStream stream, byte value)
+        {
+            stream.Append(new[] { value });
+        }
+
+        public static void Append(this MemoryStream stream, byte[] values)
+        {
+            stream.Write(values, 0, values.Length);
         }
     }
 }

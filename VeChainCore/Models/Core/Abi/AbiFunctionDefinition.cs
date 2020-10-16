@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nethereum.ABI.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,19 +12,19 @@ namespace VeChainCore.Models.Core.Abi
     {
         public string Type => "function";
         
-        public string Name { get; protected internal set; }
+        public string Name { get; private set; }
 
         public bool Constant { get; protected internal set; }
 
         public bool Payable { get; protected internal set; }
 
-        public AbiStateMutability stateMutability { get; protected internal set; }
+        public AbiStateMutability StateMutability { get; protected internal set; }
 
-        public IAbiParameterDefinition[] inputs { get; protected internal set; }
+        public IAbiParameterDefinition[] Inputs { get; private set; }
 
-        public IAbiParameterDefinition[] outputs { get; protected internal set; }
+        public IAbiParameterDefinition[] Outputs { get; private set; }
 
-        public byte[] Sha3Signature { get; protected internal set; }
+        public byte[] Sha3Signature { get; private set; }
         
         public static AbiFunctionDefinition Builder(string abiString)
         {
@@ -43,10 +44,10 @@ namespace VeChainCore.Models.Core.Abi
 
             Enum.TryParse(abiJson["stateMutability"].ToString(), true,
                 out AbiStateMutability stateMutability);
-            definition.stateMutability = stateMutability;
+            definition.StateMutability = stateMutability;
 
-            definition.inputs = new AbiParameterBuilder().Builder(abiJson["inputs"].ToString());
-            definition.outputs = new AbiParameterBuilder().Builder(abiJson["outputs"].ToString());
+            definition.Inputs = new AbiParameterBuilder().Builder(abiJson["inputs"].ToString());
+            definition.Outputs = new AbiParameterBuilder().Builder(abiJson["outputs"].ToString());
             definition.Sha3Signature = GetNethFunctionAbi(definition).Sha3Signature.ToBytes();
 
             return definition;
@@ -56,15 +57,15 @@ namespace VeChainCore.Models.Core.Abi
         {
             return new FunctionABI(definition.Name, definition.Constant)
             {
-                InputParameters = GetNethParameters(definition.inputs),
-                OutputParameters = GetNethParameters(definition.outputs)
+                InputParameters = GetNethParameters(definition.Inputs),
+                OutputParameters = GetNethParameters(definition.Outputs)
             };
         }
         
-        private static Parameter[] GetNethParameters(IAbiParameterDefinition[] parameters)
+        private static Parameter[] GetNethParameters(IReadOnlyList<IAbiParameterDefinition> parameters)
         {
-            var result = new Parameter[parameters.Length];
-            for(var index = 0; index < parameters.Length; index++)
+            var result = new Parameter[parameters.Count];
+            for(var index = 0; index < parameters.Count; index++)
             {
                 result[index] = new Parameter(parameters[index].AbiType, parameters[index].Name, index + 1);
             }
