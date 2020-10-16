@@ -8,10 +8,10 @@ namespace VeChainCore.Models.Core.Abi
     {
         public static AbiFunctionCoder GetFunctionCoder(this AbiContractDefinition definition, string funcName)
         {
-            var funcDefinition = definition.Functions.First(item => item.Name == funcName);
+            var funcDefinition = definition.Functions.FirstOrDefault(item => item.Name == funcName);
             if (funcDefinition == null)
             {
-                throw new Exception("function not exists");
+                throw new Exception($"function {funcName} does not exists");
             }
 
             return new AbiFunctionCoder(funcDefinition);
@@ -27,6 +27,16 @@ namespace VeChainCore.Models.Core.Abi
             return AbiParameterCoder
                 .EncodeParameter(values.Select(t => new AbiInputParameter(definition.Constructor.Inputs[0], t))
                     .ToArray());
+        }
+
+        public static byte[] Execute(this Contract contract, string function, params dynamic[] values)
+        {
+            if (contract.AbiDefinition == null)
+            {
+                throw new ArgumentException("No abi found");
+            }
+
+            return contract.AbiDefinition.GetFunctionCoder(function).Encode(values);
         }
         
         //public static AbiEventCoder GetEventCoder(this AbiContractDefinition definition, string eventName)

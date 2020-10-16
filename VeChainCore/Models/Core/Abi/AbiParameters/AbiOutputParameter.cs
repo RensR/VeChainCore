@@ -14,11 +14,14 @@ namespace VeChainCore.Models.Core.Abi.AbiParameters
         public AbiOutputParameter(string abiType, string name = "")
         {
             _nethAbiType = ABIType.CreateABIType(abiType);
+            Definition = new AbiParameterDefinition(name,abiType);
+            Name = name;
         }
 
         public AbiOutputParameter(IAbiParameterDefinition definition, string name = "")
         {
             _nethAbiType = ABIType.CreateABIType(definition.AbiType);
+            Definition = definition;
             Name = name;
         }
     }

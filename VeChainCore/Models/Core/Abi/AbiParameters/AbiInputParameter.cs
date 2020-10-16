@@ -14,6 +14,7 @@ namespace VeChainCore.Models.Core.Abi.AbiParameters
         public AbiInputParameter(string abiType, dynamic value, string name = "")
         {
             _nethAbiType = ABIType.CreateABIType(abiType);
+            Definition = new AbiParameterDefinition(_nethAbiType.Name,name);
             Value = value;
             Name = name;
         }
@@ -21,6 +22,7 @@ namespace VeChainCore.Models.Core.Abi.AbiParameters
         public AbiInputParameter(IAbiParameterDefinition definition, dynamic value, string name = "")
         {
             _nethAbiType = ABIType.CreateABIType(definition.AbiType);
+            Definition = definition;
             Value = value;
             Name = name;
         }

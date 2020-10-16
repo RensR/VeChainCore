@@ -38,10 +38,9 @@ namespace VeChainCore.Models.Core.Abi
             {
                 Name = abiJson["name"].ToString(),
                 Constant = (bool) abiJson["constant"],
-                Payable = (bool) abiJson["payable"]
+                Payable = (bool) abiJson["payable"] 
             };
-
-
+            
             Enum.TryParse(abiJson["stateMutability"].ToString(), true,
                 out AbiStateMutability stateMutability);
             definition.StateMutability = stateMutability;

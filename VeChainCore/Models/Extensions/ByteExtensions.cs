@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using Nethereum.Hex.HexConvertors.Extensions;
+using VeChainCore.Models.Core;
 
 namespace VeChainCore.Models.Extensions
 {
@@ -97,6 +99,16 @@ namespace VeChainCore.Models.Extensions
             Unsafe.CopyBlock(ref bytes[0], ref buffer[buffer.Length - length], length);
 
             return bytes;
+        }
+
+        public static byte[] AmountToBytes(this Amount amount)
+        {
+            return amount.AsBigInt.ToByteArrayUnsigned();
+        }
+
+        public static string AmountToHex(this Amount amount)
+        {
+            return amount.AmountToBytes().ToHex();
         }
         
         public static byte[] ToBytes(this string hex) 

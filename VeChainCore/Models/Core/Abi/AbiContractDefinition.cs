@@ -20,7 +20,7 @@ namespace VeChainCore.Models.Core.Abi
         {
             var definition = new AbiContractDefinition();
 
-            var constructorJson = abiJson.First(item => item["type"].ToString() == "constructor");
+            var constructorJson = abiJson.FirstOrDefault(item => item["type"].ToString() == "constructor");
             if(constructorJson != null)
             {
                 definition.Constructor = ConstructorBuilder(constructorJson);

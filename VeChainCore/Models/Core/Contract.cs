@@ -8,6 +8,6 @@ namespace VeChainCore.Models.Core
 
         public string Name { get; set; }
 
-        public AbiContractDefinition AbiContractDefinition { get; set; }
+        public AbiContractDefinition AbiDefinition { get; set; }
     }
 }
