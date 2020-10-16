@@ -101,16 +101,6 @@ namespace VeChainCore.Models.Extensions
             return bytes;
         }
 
-        public static byte[] AmountToBytes(this Amount amount)
-        {
-            return amount.AsBigInt.ToByteArrayUnsigned();
-        }
-
-        public static string AmountToHex(this Amount amount)
-        {
-            return amount.AmountToBytes().ToHex();
-        }
-        
         public static byte[] ToBytes(this string hex) 
         {
             if (hex.Length % 2 == 1)
