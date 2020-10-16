@@ -6,9 +6,11 @@
 
         public new const int Decimals = 18;
 
-        public static Contract Contract = new Contract
+        public new const string ContractAddress = "0x0000000000000000000000000000456e65726779";
+
+        public static readonly Contract Contract = new Contract
         {
-            Address = "0x0000000000000000000000000000456e65726779"
+            Address =  ContractAddress
         };
 
         public override decimal Value { get; }
