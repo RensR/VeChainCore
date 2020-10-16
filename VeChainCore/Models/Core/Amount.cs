@@ -1,4 +1,5 @@
 using Org.BouncyCastle.Math;
+using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
 
 namespace VeChainCore.Models.Core

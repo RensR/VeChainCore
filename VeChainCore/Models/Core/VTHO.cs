@@ -5,8 +5,14 @@
         public static readonly VTHO Unit = new VTHO(1);
 
         public new const int Decimals = 18;
-        
+
         public new const string ContractAddress = "0x0000000000000000000000000000456e65726779";
+
+        public static readonly Contract Contract = new Contract
+        {
+            Address =  ContractAddress
+        };
+
         public override decimal Value { get; }
         protected override string GetContractAddress() => ContractAddress;
 

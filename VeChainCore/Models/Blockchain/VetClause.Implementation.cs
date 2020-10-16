@@ -7,7 +7,7 @@ using VeChainCore.Models.Core;
 
 namespace VeChainCore.Models.Blockchain
 {
-    public partial class VetClause : Clause, IEquatable<VetClause>, IRLPElement
+    public partial class VetClause : Clause, IEquatable<VetClause>
     {
         public VetClause(string to, decimal value, string data)
         {

@@ -18,9 +18,9 @@ namespace VeChainCore.Models.Extensions
 
             var data = clause.data;
 
-            for (int i = 2; i < data.Length; i += 2)
+            for (var i = 2; i < data.Length; i += 2)
             {
-                string hexPair = data.Substring(i, 2);
+                var hexPair = data.Substring(i, 2);
                 totalGas += hexPair == "00" ? zgas : nzgas;
             }
 

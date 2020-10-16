@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Nethereum.ABI" Version="3.8.0" />
     <PackageReference Include="Nethereum.Hex" Version="3.8.0" />
     <PackageReference Include="Nethereum.RLP" Version="3.8.0" />
     <PackageReference Include="Nethereum.Signer" Version="3.8.0" />

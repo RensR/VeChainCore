@@ -13,6 +13,7 @@ using Utf8Json;
 using Utf8Json.ImmutableCollection;
 using Utf8Json.Resolvers;
 using VeChainCore.Models.Core;
+using VeChainCore.Models.Extensions;
 using VeChainCore.Utils;
 using VeChainCore.Utils.Json;
 using Account = VeChainCore.Models.Blockchain.Account;

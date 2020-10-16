@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace VeChainCore.Models.Extensions
@@ -55,7 +56,7 @@ namespace VeChainCore.Models.Extensions
                 ++leadingCount;
             }
 
-            uint bufferLength = (uint) (buffer.Length - leadingCount);
+            var bufferLength = (uint) (buffer.Length - leadingCount);
 
             return bufferLength == 0
                 ? Array.Empty<byte>()
@@ -96,6 +97,37 @@ namespace VeChainCore.Models.Extensions
             Unsafe.CopyBlock(ref bytes[0], ref buffer[buffer.Length - length], length);
 
             return bytes;
+        }
+
+        public static byte[] ToBytes(this string hex) 
+        {
+            if (hex.Length % 2 == 1)
+                throw new Exception("The binary key cannot have an odd number of digits");
+
+            var arr = new byte[hex.Length >> 1];
+
+            for (var i = 0; i < hex.Length >> 1; ++i)
+            {
+                arr[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + (GetHexVal(hex[(i << 1) + 1])));
+            }
+
+            return arr;
+        }
+
+        public static int GetHexVal(char hex) 
+        {
+            var val = (int)hex;
+            return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
+        }
+        
+        public static void Append(this MemoryStream stream, byte value)
+        {
+            stream.Append(new[] { value });
+        }
+
+        public static void Append(this MemoryStream stream, byte[] values)
+        {
+            stream.Write(values, 0, values.Length);
         }
     }
 }
