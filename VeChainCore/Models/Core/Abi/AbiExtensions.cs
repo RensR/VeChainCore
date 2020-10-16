@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VeChainCore.Models.Core.Abi.AbiParameters;
 
@@ -37,6 +38,11 @@ namespace VeChainCore.Models.Core.Abi
             }
 
             return contract.AbiDefinition.GetFunctionCoder(function).Encode(values);
+        }
+
+        public static IEnumerable<string> GetFunctions(this Contract contract)
+        {
+            return contract?.AbiDefinition?.Functions?.Select(function => function.Name).ToList();
         }
         
         //public static AbiEventCoder GetEventCoder(this AbiContractDefinition definition, string eventName)

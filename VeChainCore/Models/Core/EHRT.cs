@@ -6,7 +6,11 @@
 
         public new const int Decimals = 18;
 
-        public new const string ContractAddress = "0xf8e1fAa0367298b55F57Ed17F7a2FF3F5F1D1628";
+        public static Contract Contract = new Contract
+        {
+            Address = "0xf8e1fAa0367298b55F57Ed17F7a2FF3F5F1D1628",
+            Name = "Ehrt token contract"
+        };
         public override decimal Value { get; }
         protected override string GetContractAddress() => ContractAddress;
 
