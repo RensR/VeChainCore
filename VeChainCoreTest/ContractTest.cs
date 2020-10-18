@@ -20,7 +20,8 @@ namespace VeChainCoreTest
             
             var approveCode = ehrtTokenContract.Execute(
                     "approve",
-                    "0xeE25500c0F305cc42BdcB0f95E1d3186874bc19a", new EHRT(5000, false).AmountToHex())
+                    "0xeE25500c0F305cc42BdcB0f95E1d3186874bc19a", 
+                    new EHRT(5000, false).ToHex())
                 .ToHex();
             
             Assert.Equal("095ea7b3000000000000000000000000ee25500c0f305cc42bdcb0f95e1d3186874bc19a00000000000000000000000000000000000000000000010f0cf064dd59200000", approveCode);

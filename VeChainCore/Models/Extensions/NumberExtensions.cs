@@ -10,7 +10,7 @@ namespace VeChainCore.Models.Extensions
             return amount.AsBigInt.ToByteArrayUnsigned();
         }
 
-        public static string AmountToHex(this Amount amount)
+        public static string ToHex(this Amount amount)
         {
             return amount.AmountToBytes().ToHex();
         }

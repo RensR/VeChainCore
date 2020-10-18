@@ -9,5 +9,10 @@ namespace VeChainCore.Models.Core
         public string Name { get; set; }
 
         public AbiContractDefinition AbiDefinition { get; set; }
+
+        public static implicit operator string(Contract contract)
+        {
+            return contract.Address;
+        }
     }
 }
